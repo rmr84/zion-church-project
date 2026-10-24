@@ -10,9 +10,9 @@ export default async function RequestPage() {
   return (
     <section className="wrap narrow">
       <p className="eyebrow">New request</p>
-      <h1>Request care</h1>
+      <h1>Request Care</h1>
      
-      <p className="hint">If you or someone else is in danger, call 911. This desk is not an emergency line.</p>
+      <p className="hint">If you or someone else is in danger, please call 911. This desk is not an emergency line.</p>
       <RequestForm />
       {requester ? (
         <p className="hint account-note">Signed in as {requester.email}. This request will be saved to that account.</p>
