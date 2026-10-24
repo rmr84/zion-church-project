@@ -10,7 +10,7 @@ export default async function StatusPage({ searchParams }) {
   const params = await searchParams;
   const raw = String(params.code || '');
   const code = normalizeReferenceCode(raw);
-  const request = code ? getMemberRequest(code) : null;
+  const request = code ? await getMemberRequest(code) : null;
   const missed = raw.trim() && !request;
 
   return (

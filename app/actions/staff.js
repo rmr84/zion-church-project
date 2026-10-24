@@ -38,7 +38,7 @@ export async function updateRequest(_previous, formData) {
 
   if (!result.ok) return { errors: result.errors, values: result.values, saved: false };
 
-  const updated = updateCareRequest(result.values.referenceCode, result.values);
+  const updated = await updateCareRequest(result.values.referenceCode, result.values);
   if (!updated) {
     return {
       errors: { form: 'That request is not on file.' },

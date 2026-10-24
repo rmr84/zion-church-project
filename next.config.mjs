@@ -2,6 +2,7 @@
 const nextConfig = {
   poweredByHeader: false,
   agentRules: false,
+  serverExternalPackages: ['mongodb'],
 };
 
 export default nextConfig;

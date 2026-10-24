@@ -7,7 +7,7 @@ export const metadata = { title: "Archive" };
 export default async function ArchivePage({ searchParams }) {
   const params = await searchParams;
   const sort = parseSort(typeof params.sort === "string" ? params.sort : "");
-  const requests = listRequests({ archive: true, sort });
+  const requests = await listRequests({ archive: true, sort });
 
   return (
     <Queue

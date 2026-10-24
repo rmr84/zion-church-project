@@ -13,7 +13,7 @@ export async function generateMetadata({ params }) {
 
 export default async function RequestDetailPage({ params }) {
   const { code } = await params;
-  const request = getStaffRequest(code);
+  const request = await getStaffRequest(code);
   if (!request) notFound();
 
   const backHref = request.status === "completed" ? "/staff/archive" : "/staff";

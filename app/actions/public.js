@@ -18,6 +18,6 @@ export async function submitCareRequest(_previous, formData) {
   if (!result.ok) return { errors: result.errors, values: result.values };
 
   const requester = await getRequester();
-  const code = createRequest(result.values, { account: requester });
+  const code = await createRequest(result.values, { account: requester });
   redirect(`/request/sent?code=${encodeURIComponent(code)}`);
 }
