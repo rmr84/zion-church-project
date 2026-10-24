@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { RequesterSignIn } from '@/components/RequesterSignIn';
-import { getRequester } from '@/lib/session';
+import { getRequester, isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Care requester sign in' };
 
 export default async function RequesterSignInPage() {
+  if (await isStaffSignedIn()) redirect('/staff');
   if (await getRequester()) redirect('/account');
 
   return (
