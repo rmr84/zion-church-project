@@ -23,7 +23,7 @@ export default async function RequestPage() {
       <RequestForm defaults={defaults} />
       {!requester ? (
          <p className="hint account-note">
-         <Link href="/sign-in">Sign in</Link>
+         <Link href="/sign-in">Sign In</Link>
          {' '}
          to your care request account if you want this request kept on your account.
        </p>

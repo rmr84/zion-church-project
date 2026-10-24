@@ -106,6 +106,9 @@ export function RequesterSignIn() {
           invalid={Boolean(error)}
           aria-describedby={error ? 'sign-in-error' : undefined}
         />
+        <p className="forgot-password">
+          <Link href="/forgot-password">forgot password?</Link>
+        </p>
         {error ? <p className="banner error sign-in-error" id="sign-in-error" role="alert">{error}</p> : null}
       </div>
       <div className="sign-in-actions">

@@ -995,6 +995,8 @@ form[aria-busy="true"] .button:disabled { cursor: wait; }
 
 .banner.error { background: #fdecea; color: #a90707; }
 .sign-in-error { margin: 0.7rem 0 0; font-weight: 700; }
+.forgot-password { margin: 0.55rem 0 0; text-align: left; }
+.forgot-password a { font-style: italic; font-weight: 800; }
 .banner.ok { background: var(--mist); color: var(--teal); }
 .banner p:last-child,
 .banner ul:last-child { margin-bottom: 0; }
