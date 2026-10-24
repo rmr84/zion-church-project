@@ -760,6 +760,7 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
   margin: 0 auto 1.4rem;
   text-align: left;
 }
+.page-heading.centered { text-align: center; }
 .page-heading h1 { margin-bottom: 0; }
 .page-heading .lede { margin: 0.85rem 0 0; max-width: 40rem; }
 main:has(.account-blank) {

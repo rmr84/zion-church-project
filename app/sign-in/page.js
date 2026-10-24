@@ -10,7 +10,7 @@ export default async function RequesterSignInPage() {
 
   return (
     <section className="page-frame">
-      <div className="page-heading">
+      <div className="page-heading centered">
         <p className="eyebrow">Care requester</p>
         <h1>Sign in</h1>
       </div>
