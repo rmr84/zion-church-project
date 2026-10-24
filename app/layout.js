@@ -10,7 +10,7 @@ export const metadata = {
     default: 'Care desk · Zion Church',
     template: '%s · Zion Church',
   },
-  description: 'A private way for Zion Church members to ask the pastoral care team for help.',
+  description: 'Ask the Zion Church care team for a visit, a meal, counseling, or prayer.',
   referrer: 'no-referrer',
   robots: { index: false, follow: false },
 };
