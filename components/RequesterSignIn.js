@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import Link from 'next/link';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { establishRequesterSession } from '@/app/actions/requester';
 import { firebaseApp } from '@/lib/firebase';
 
@@ -9,8 +10,6 @@ function messageFor(code) {
   if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found' || code === 'auth/invalid-login-credentials') {
     return 'That email and password did not match.';
   }
-  if (code === 'auth/email-already-in-use') return 'An account with that email already exists. Sign in instead.';
-  if (code === 'auth/weak-password') return 'Use at least 6 characters.';
   if (code === 'auth/invalid-email') return 'Enter a valid email address.';
   if (code === 'auth/operation-not-allowed') return 'Email sign-in is not turned on for this Firebase project yet.';
   return 'Something went wrong. Try again.';
@@ -28,7 +27,7 @@ export function RequesterSignIn() {
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
-  async function submit(mode, form) {
+  async function submit(form) {
     const { email, password } = fieldsFrom(form);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       setError('Enter a valid email address.');
@@ -43,9 +42,7 @@ export function RequesterSignIn() {
     setPending(true);
     try {
       const auth = getAuth(firebaseApp);
-      const credential = mode === 'create'
-        ? await createUserWithEmailAndPassword(auth, email, password)
-        : await signInWithEmailAndPassword(auth, email, password);
+      const credential = await signInWithEmailAndPassword(auth, email, password);
       const idToken = await credential.user.getIdToken();
       const result = await establishRequesterSession(idToken);
       if (result && result.ok === false) {
@@ -64,7 +61,7 @@ export function RequesterSignIn() {
       aria-busy={pending}
       onSubmit={(event) => {
         event.preventDefault();
-        void submit('sign-in', event.currentTarget);
+        void submit(event.currentTarget);
       }}
     >
       {error ? <p className="banner error" role="alert">{error}</p> : null}
@@ -91,14 +88,7 @@ export function RequesterSignIn() {
       </div>
       <div className="sign-in-actions">
         <button className="button block" type="submit" disabled={pending}>Sign in</button>
-        <button
-          className="button secondary block"
-          type="button"
-          disabled={pending}
-          onClick={(event) => void submit('create', event.currentTarget.form)}
-        >
-          Create Account
-        </button>
+        <Link className="button secondary block" href="/create-account">Create Account</Link>
       </div>
     </form>
   );
