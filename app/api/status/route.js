@@ -12,7 +12,7 @@ export async function GET(request) {
     return NextResponse.json({ error: 'Enter a reference code.' }, { status: 400, headers });
   }
 
-  const result = getMemberRequest(code);
+  const result = await getMemberRequest(code);
   if (!result) {
     return NextResponse.json({ error: 'No request matches that code.' }, { status: 404, headers });
   }

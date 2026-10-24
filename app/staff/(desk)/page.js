@@ -7,7 +7,7 @@ export const metadata = { title: "Open requests" };
 export default async function OpenQueuePage({ searchParams }) {
   const params = await searchParams;
   const sort = parseSort(typeof params.sort === "string" ? params.sort : "");
-  const requests = listRequests({ archive: false, sort });
+  const requests = await listRequests({ archive: false, sort });
 
   return (
     <Queue
