@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { getAuth, signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { establishRequesterSession, registerRequester } from '@/app/actions/requester';
+import { PasswordInput } from '@/components/PasswordInput';
 import { firebaseApp } from '@/lib/firebase';
 import { sendAccountVerification } from '@/lib/send-verification';
 
@@ -96,14 +97,13 @@ export function RequesterSignIn() {
       </div>
       <div className="field">
         <label htmlFor="password">Password</label>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="current-password"
           minLength={6}
           required
-          aria-invalid={Boolean(error)}
+          invalid={Boolean(error)}
           aria-describedby={error ? 'sign-in-error' : undefined}
         />
         {error ? <p className="banner error sign-in-error" id="sign-in-error" role="alert">{error}</p> : null}
