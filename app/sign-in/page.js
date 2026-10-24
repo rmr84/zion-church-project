@@ -1,0 +1,27 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { RequesterSignIn } from '@/components/RequesterSignIn';
+import { getRequester } from '@/lib/session';
+
+export const metadata = { title: 'Care requester sign in' };
+
+export default async function RequesterSignInPage() {
+  if (await getRequester()) redirect('/account');
+
+  return (
+    <section className="wrap narrow">
+      <p className="eyebrow">Care requester</p>
+      <h1>Sign in</h1>
+      <p className="lede">
+        An account keeps the requests you send while you are signed in.
+        You can still send a request without one.
+      </p>
+      <RequesterSignIn />
+      <p>
+        <Link href="/request">Request care without an account</Link>
+        {' · '}
+        <Link href="/staff/login">Care team sign in</Link>
+      </p>
+    </section>
+  );
+}

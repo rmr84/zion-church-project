@@ -2,7 +2,7 @@
 
 Source: [github.com/rmr84/zion-church-project](https://github.com/rmr84/zion-church-project)
 
-A private care-request desk for Zion Church. A member can ask for a hospital visit, a meal, a counseling referral, prayer, or something else, with or without their name. The server returns a reference code they can use to check the status later. The care team reviews, assigns, and archives requests. Staff notes never appear on the member status page.
+A private care-request desk for Zion Church. A member can ask for a hospital visit, a meal, a counseling referral, prayer, or something else, with or without their name, and with or without an account. The server returns a reference code they can use to check the status later. The care team reviews, assigns, and archives requests. Staff notes never appear on the member status page.
 
 ## Run it
 
@@ -17,7 +17,9 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-Care team sign-in is at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). The demo password is `zion-care-team`. `STAFF_SESSION_SECRET` must be at least 16 characters. Both values are in `.env.example`.
+Care requester sign-in is at [http://localhost:3000/sign-in](http://localhost:3000/sign-in). An account is optional. Requests sent while signed in show up on My requests. Requests sent without an account are found with the reference code.
+
+Care team sign-in is separate, at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). The demo password is `zion-care-team`. `STAFF_SESSION_SECRET` must be at least 16 characters. Both values are in `.env.example`.
 
 `npm run seed` deletes the local database and writes the demo requests again.
 
@@ -77,7 +79,8 @@ If that file is missing, startup creates it and seeds the codes above. On a host
 - `lib/db.js` creates the table, the member view, and the delete trigger
 - `lib/requests.js` is the only place that reads and writes requests
 - `lib/notify.js` is the email stub
-- `lib/session-token.js` is the HMAC-signed staff session
+- `lib/session-token.js` is the HMAC-signed staff session and the separate requester session
+- `/sign-in` is the optional care requester account. `/staff/login` is the care team password
 - `lib/firebase.js` starts the Firebase web app for project `code-challenge-zion`
 
 ## A short review path

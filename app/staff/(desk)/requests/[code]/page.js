@@ -34,6 +34,8 @@ export default async function RequestDetailPage({ params }) {
           <dl className="meta">
             <dt>From</dt>
             <dd>{request.name || "Name not given"}</dd>
+            <dt>Account</dt>
+            <dd>{request.requesterEmail || "No account"}</dd>
             <dt>Contact</dt>
             <dd>
               {labelFor(CONTACT_METHODS, request.contactMethod)}

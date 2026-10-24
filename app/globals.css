@@ -453,6 +453,7 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
 
 @media (min-width: 760px) {
   .request-row { grid-template-columns: 6.5rem minmax(0, 1fr) auto auto; }
+  .request-row.account { grid-template-columns: minmax(0, 1fr) auto auto; }
 }
 
 @media (min-width: 900px) {

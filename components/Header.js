@@ -1,9 +1,11 @@
 import Link from 'next/link';
+import { signOutOfRequester } from '@/app/actions/requester';
 import { logout } from '@/app/actions/staff';
-import { isStaffSignedIn } from '@/lib/session';
+import { getRequester, isStaffSignedIn } from '@/lib/session';
 
 export async function Header() {
   const staff = await isStaffSignedIn();
+  const requester = await getRequester();
 
   return (
     <header className="site-header">
@@ -14,10 +16,16 @@ export async function Header() {
         <nav className="primary-nav" aria-label="Primary">
           <Link href="/request">Request care</Link>
           <Link href="/status">Check status</Link>
+          {requester ? <Link href="/account">My requests</Link> : <Link href="/sign-in">Sign in</Link>}
+          {requester ? (
+            <form className="inline-form" action={signOutOfRequester}>
+              <button className="text-button" type="submit">Sign out</button>
+            </form>
+          ) : null}
           {staff ? <Link href="/staff">Open queue</Link> : null}
           {staff ? (
             <form className="inline-form" action={logout}>
-              <button className="text-button" type="submit">Sign out</button>
+              <button className="text-button" type="submit">Sign out of desk</button>
             </form>
           ) : null}
         </nav>

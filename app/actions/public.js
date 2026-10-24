@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { createRequest } from '@/lib/requests';
+import { getRequester } from '@/lib/session';
 import { validateSubmission } from '@/lib/validate';
 
 export async function submitCareRequest(_previous, formData) {
@@ -16,6 +17,7 @@ export async function submitCareRequest(_previous, formData) {
 
   if (!result.ok) return { errors: result.errors, values: result.values };
 
-  const code = createRequest(result.values);
+  const requester = await getRequester();
+  const code = createRequest(result.values, { account: requester });
   redirect(`/request/sent?code=${encodeURIComponent(code)}`);
 }
