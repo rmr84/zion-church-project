@@ -1,5 +1,7 @@
 import Link from 'next/link';
+import { HomeBackdrop } from '@/components/HomeBackdrop';
 import { Reveal } from '@/components/Reveal';
+import { ReviewCarousel } from '@/components/ReviewCarousel';
 
 export const metadata = { title: 'Care Desk' };
 
@@ -11,7 +13,7 @@ const REVIEWS = [
   },
   {
     quote: 'I left my name off the request. They still prayed, and the note I got back was kind.',
-    name: 'James',
+    name: 'Anonymous',
     detail: 'Prayer support',
   },
   {
@@ -19,18 +21,52 @@ const REVIEWS = [
     name: 'Helen',
     detail: 'Hospital visit',
   },
+  {
+    quote: 'They helped me find a counselor and checked in after the first appointment.',
+    name: 'Grace',
+    detail: 'Counseling referral',
+  },
+  {
+    quote: 'I asked for a visit for my neighbor. The team was gentle and kept it quiet.',
+    name: 'Thomas',
+    detail: 'Care visit',
+  },
+  {
+    quote: 'The reference code made it easy to see that someone had picked up the request.',
+    name: 'Miriam',
+    detail: 'Follow-up',
+  },
 ];
 
 export default function HomePage() {
   return (
     <>
+      <HomeBackdrop />
       <section className="wrap home home-hero">
-        <p className="eyebrow">Pastoral care</p>
-        <h1>Submit a Request for Care.</h1>
-        <p className="lede">
-          Request a hospital visit, a meal, a counseling referral, or prayer.
-          Your name is optional, and so is an account. Only the care team can read what you send.
-        </p>
+        <div className="hero-layout">
+          <div>
+            <p className="eyebrow">Pastoral care</p>
+            <h1>Submit a Request for Care.</h1>
+            <p className="lede">
+              Request a hospital visit, a meal, a counseling referral, or prayer.
+              Your name is optional, and so is an account. Only the care team can read what you send.
+            </p>
+          </div>
+          <img
+            className="hero-photo"
+            src="/zion-building.jpg"
+            alt="Zion Church sign on the building"
+            width={447}
+            height={447}
+          />
+        </div>
+        <img
+          className="hero-banner"
+          src="/zion-banner.jpg"
+          alt="Experience. Engage. Equip. Empower."
+          width={738}
+          height={246}
+        />
         <p className="scroll-cue"></p>
       </section>
 
@@ -53,16 +89,7 @@ export default function HomePage() {
       <section className="wrap home home-reviews">
         <Reveal>
           <h2 className="rise">What Members Say</h2>
-          <div className="reviews">
-            {REVIEWS.map((review) => (
-              <figure className="review rise" key={review.name}>
-                <blockquote>
-                  <p>{review.quote}</p>
-                </blockquote>
-                <figcaption>{review.name} · {review.detail}</figcaption>
-              </figure>
-            ))}
-          </div>
+          <ReviewCarousel reviews={REVIEWS} />
         </Reveal>
       </section>
     </>
