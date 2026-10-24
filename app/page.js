@@ -15,11 +15,7 @@ export default function HomePage() {
         <Link className="button" href="/request">Request Care</Link>
         <Link className="button secondary" href="/status">Check a Request</Link>
       </div>
-      <p className="hint">
-        <Link href="/sign-in">Sign in</Link>
-        {' '}
-        to see requests you send while signed in. The care team uses a separate sign-in.
-      </p>
+     
       <h2>How it works</h2>
       <ol className="steps">
         <li>Tell the care team what you need.</li>
