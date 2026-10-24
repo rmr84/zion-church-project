@@ -595,6 +595,9 @@ p { margin: 0 0 1rem; }
 }
 .request-summary .edit-step svg { width: 1.15rem; height: 1.15rem; }
 .request-summary .edit-step:hover { background: #fff6ee; }
+.status-updated { margin: 1.5rem 0 0.35rem; width: 100%; }
+.status-summary { margin-top: 0; width: 100%; }
+.status-summary > div { grid-template-columns: minmax(0, 1fr); }
 
 .sr-only {
   position: absolute;
@@ -774,6 +777,14 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
 .page-heading.centered { text-align: center; }
 @media (min-width: 760px) {
   .page-heading.centered-web { text-align: center; }
+  .page-heading.centered-web .lede { margin-inline: auto; }
+  main h1 { font-size: 2.15rem; }
+  .page-frame:has(.wrap.settings) .page-heading {
+    width: min(100% - 2.5rem, 58rem);
+  }
+  .page-frame:has(.request-table) .page-heading {
+    margin-bottom: 2.75rem;
+  }
 }
 .page-heading h1 { margin-bottom: 0; }
 .page-heading .lede { margin: 0.85rem 0 0; max-width: 40rem; }
@@ -1097,6 +1108,58 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   background: var(--gold);
   border-color: var(--gold);
   color: var(--ink);
+}
+
+.request-table-wrap {
+  width: min(100% - 2.5rem, var(--desk));
+  margin: 0 auto;
+  overflow-x: auto;
+}
+.request-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  text-align: left;
+}
+.request-table th {
+  padding: 0.45rem 0.85rem 0.7rem;
+  border-bottom: 2px solid var(--line);
+  color: var(--teal);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.request-table td {
+  padding: 0.95rem 0.85rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.request-table .request-description {
+  width: 22rem;
+  overflow: hidden;
+}
+.request-table td.request-description {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+.request-table .request-description span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.request-table tbody tr { position: relative; }
+.request-table tbody tr:hover { background: #f3f9fc; }
+.request-table tbody a {
+  color: var(--ink);
+  font-weight: 800;
+  text-decoration: none;
+}
+.request-table tbody a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 
 .request-list { list-style: none; margin: 0.4rem 0 0; padding: 0; }

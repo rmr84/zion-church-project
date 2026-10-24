@@ -1,6 +1,5 @@
 import { redirect } from 'next/navigation';
-import { StatusBadge } from '@/components/Badges';
-import { CARE_TYPES, labelFor } from '@/lib/constants';
+import { CARE_TYPES, CONTACT_METHODS, STATUSES, URGENCY_LEVELS, labelFor } from '@/lib/constants';
 import { formatWhen } from '@/lib/format';
 import { normalizeReferenceCode } from '@/lib/reference';
 import { getMemberRequest } from '@/lib/requests';
@@ -18,7 +17,7 @@ export default async function StatusPage({ searchParams }) {
 
   return (
     <section className="page-frame status-page">
-      <div className="page-heading">
+      <div className="page-heading centered-web">
         <p className="eyebrow">Status</p>
         <h1>Check a Request</h1>
         <p className="lede">
@@ -45,13 +44,45 @@ export default async function StatusPage({ searchParams }) {
       </form>
       {missed ? <p className="banner error" role="alert">No request matches that code.</p> : null}
       {request ? (
-        <article className="result">
-          <StatusBadge status={request.status} />
-          <h2>{labelFor(CARE_TYPES, request.careType)}</h2>
-          <p className="hint">Updated {formatWhen(request.updatedAt)}</p>
-          <h3>Note for you</h3>
-          <p className="prose">{request.memberNote.trim() || 'The care team has not added a note yet.'}</p>
-        </article>
+        <>
+          <p className="hint status-updated">Updated {formatWhen(request.updatedAt)}</p>
+          <dl className="request-summary status-summary">
+            <div>
+              <dt>Name</dt>
+              <dd>{request.name || 'Name not given'}</dd>
+            </div>
+            <div>
+              <dt>Type Of Care</dt>
+              <dd>{labelFor(CARE_TYPES, request.careType)}</dd>
+            </div>
+            <div>
+              <dt>What Is Your Request?</dt>
+              <dd>{request.description}</dd>
+            </div>
+            <div>
+              <dt>Preferred Contact Method</dt>
+              <dd>{labelFor(CONTACT_METHODS, request.contactMethod)}</dd>
+            </div>
+            {request.contactMethod === 'in_person' || request.contactMethod === 'none' || !request.contactDetail ? null : (
+              <div>
+                <dt>How Should We Reach You?</dt>
+                <dd>{request.contactDetail}</dd>
+              </div>
+            )}
+            <div>
+              <dt>Urgency</dt>
+              <dd>{labelFor(URGENCY_LEVELS, request.urgency)}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{labelFor(STATUSES, request.status)}</dd>
+            </div>
+            <div>
+              <dt>Note for you</dt>
+              <dd>{request.memberNote.trim() || 'The care team has not added a note yet.'}</dd>
+            </div>
+          </dl>
+        </>
       ) : null}
       </div>
     </section>
