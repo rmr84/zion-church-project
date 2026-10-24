@@ -149,7 +149,7 @@ export function RequestForm() {
         {errors.urgency ? <p className="field-error" id="urgency-error">{errors.urgency}</p> : null}
       </fieldset>
 
-      <button className="button" type="submit" disabled={pending}>
+      <button className="button block" type="submit" disabled={pending}>
         {pending ? 'Sending…' : 'Submit request'}
       </button>
     </form>
