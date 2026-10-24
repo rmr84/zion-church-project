@@ -14,8 +14,11 @@ export default async function LoginPage({ searchParams }) {
   return (
     <section className="wrap narrow">
       <p className="eyebrow">Care team</p>
-      <h1>Sign in</h1>
-      <p className="lede">Members do not need a password. The demo password is zion-care-team.</p>
+      <h1>Care team sign in</h1>
+      <p className="lede">
+        This password opens the care desk. It is separate from a care requester account.
+        The demo password is zion-care-team.
+      </p>
       <form className="stack" action={login}>
         {error === "1" ? (
           <p className="banner error" role="alert">
@@ -42,6 +45,8 @@ export default async function LoginPage({ searchParams }) {
         </button>
       </form>
       <p>
+        <Link href="/sign-in">Care requester sign in</Link>
+        {" · "}
         <Link href="/">Back to the care desk</Link>
       </p>
     </section>
