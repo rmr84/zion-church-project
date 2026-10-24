@@ -372,6 +372,8 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
   text-align: center;
 }
 
+.sign-in-alt a { font-style: italic; }
+
 .account-prompt { margin-top: 1.15rem; }
 .account-prompt em { font-style: italic; }
 

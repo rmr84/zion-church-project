@@ -19,10 +19,10 @@ export default async function RequesterSignInPage() {
       <RequesterSignIn />
       <p className="or-divider">or</p>
       <p className="sign-in-alt">
-        <Link href="/request">Request care without an account</Link>
+        <Link href="/request">Request Care Without Account</Link>
       </p>
       <p className="sign-in-alt">
-        <Link href="/staff/login">Care team sign in</Link>
+        <Link href="/staff/login">Care Team Sign In</Link>
       </p>
     </section>
   );
