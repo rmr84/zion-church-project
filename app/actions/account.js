@@ -1,7 +1,7 @@
 'use server';
 
 import { getRequester } from '@/lib/session';
-import { cleanProfileName, detectedPhotoType, photoProblem, profileNameProblem } from '@/lib/profile';
+import { cleanProfileName, cleanProfilePhone, detectedPhotoType, photoProblem, profileNameProblem, profilePhoneProblem } from '@/lib/profile';
 import { deleteProfilePhoto, saveProfilePhoto, updateUserProfile } from '@/lib/users';
 
 const NOTIFICATION_FIELDS = new Set(['emailNotifications', 'inAppNotifications']);
@@ -12,11 +12,14 @@ export async function saveRequesterProfile(formData) {
 
   const firstName = cleanProfileName(formData.get('firstName'));
   const lastName = cleanProfileName(formData.get('lastName'));
+  const phone = cleanProfilePhone(formData.get('phone'));
   const errors = {};
   const firstProblem = profileNameProblem(firstName, 'first name');
   const lastProblem = profileNameProblem(lastName, 'last name');
+  const phoneProblem = profilePhoneProblem(phone);
   if (firstProblem) errors.firstName = firstProblem;
   if (lastProblem) errors.lastName = lastProblem;
+  if (phoneProblem) errors.phone = phoneProblem;
 
   const picture = formData.get('photo');
   const hasPicture = picture && typeof picture === 'object' && picture.size > 0;
@@ -26,7 +29,7 @@ export async function saveRequesterProfile(formData) {
   }
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
-  const fields = { firstName, lastName };
+  const fields = { firstName, lastName, phone };
   if (hasPicture) {
     const bytes = new Uint8Array(await picture.arrayBuffer());
     const type = detectedPhotoType(bytes, picture.type);

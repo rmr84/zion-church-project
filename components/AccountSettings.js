@@ -44,6 +44,7 @@ export function AccountSettings({ profile }) {
   const [saved, setSaved] = useState(profile);
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName);
+  const [phone, setPhone] = useState(profile.phone || '');
   const [picture, setPicture] = useState(null);
   const [preview, setPreview] = useState(photoUrl(profile.photoUpdatedAt));
   const [over, setOver] = useState(false);
@@ -75,6 +76,7 @@ export function AccountSettings({ profile }) {
   function resetProfile() {
     setFirstName(saved.firstName);
     setLastName(saved.lastName);
+    setPhone(saved.phone || '');
     setPicture(null);
     setPreview(photoUrl(saved.photoUpdatedAt));
     setProfileErrors({});
@@ -98,6 +100,7 @@ export function AccountSettings({ profile }) {
       ...saved,
       firstName: String(data.get('firstName') || '').trim(),
       lastName: String(data.get('lastName') || '').trim(),
+      phone: String(data.get('phone') || '').trim(),
       photoUpdatedAt: result.photoUpdatedAt || saved.photoUpdatedAt,
       photoType: result.photoUpdatedAt ? 'saved' : saved.photoType,
     };
@@ -191,7 +194,7 @@ export function AccountSettings({ profile }) {
       <form className="settings-card" onSubmit={saveProfile} noValidate>
         <div>
           <h2>Personal Details</h2>
-          <p>Update the name and picture on this account.</p>
+          <p>Update the name, phone, and picture on this account.</p>
         </div>
         <div className="settings-fields">
           {profileMessage && !profileErrors.photo ? <p className={profileMessage === 'Profile saved.' ? 'banner ok' : 'banner error'} role="status">{profileMessage}</p> : null}
@@ -206,6 +209,11 @@ export function AccountSettings({ profile }) {
               <input id="lastName" name="lastName" value={lastName} onChange={(event) => setLastName(event.target.value)} autoComplete="family-name" aria-invalid={Boolean(profileErrors.lastName)} />
               {profileErrors.lastName ? <p className="field-error">{profileErrors.lastName}</p> : null}
             </div>
+          </div>
+          <div className="field">
+            <label htmlFor="account-phone">Phone number</label>
+            <input id="account-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onChange={(event) => setPhone(event.target.value)} aria-invalid={Boolean(profileErrors.phone)} />
+            {profileErrors.phone ? <p className="field-error">{profileErrors.phone}</p> : null}
           </div>
           <div className="field">
             <label htmlFor="account-email">Email address</label>

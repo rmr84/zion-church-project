@@ -284,6 +284,22 @@ body {
   main .wrap:not(.home) h1 { animation-delay: 0.08s; }
   main .wrap:not(.home) :is(h2, h3, p):not(.eyebrow) { animation-delay: 0.16s; }
   main .wrap:not(.home) :is(li, label, legend, .button, .desk-nav a, .sort-nav a) { animation-delay: 0.26s; }
+
+  main .wrap.settings .settings-card {
+    animation-name: home-rise;
+    animation-duration: 0.7s;
+    animation-timing-function: ease;
+    animation-fill-mode: backwards;
+    animation-delay: 0.2s;
+  }
+
+  main .wrap.settings .settings-card + .settings-card { animation-delay: 0.32s; }
+
+  main .wrap.settings .settings-card :is(.eyebrow, h1, h2, h3, p, li, label, legend, .button, .desk-nav a, .sort-nav a) {
+    animation-name: none;
+    animation-duration: 0s;
+    animation-delay: 0s;
+  }
 }
 
 @keyframes home-cue {

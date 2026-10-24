@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { detectedPhotoType, photoProblem, profileNameProblem } from '../lib/profile.js';
+import { detectedPhotoType, photoProblem, profileNameProblem, profilePhoneProblem } from '../lib/profile.js';
 
 test('profile names accept ordinary names and blank values', () => {
   assert.equal(profileNameProblem('Ryan', 'first name'), '');
@@ -8,6 +8,13 @@ test('profile names accept ordinary names and blank values', () => {
   assert.equal(profileNameProblem('  ', 'first name'), '');
   assert.equal(profileNameProblem('', 'last name'), '');
   assert.match(profileNameProblem('Ryan2', 'first name'), /letters/);
+});
+
+test('profile phone numbers are optional and reject letters', () => {
+  assert.equal(profilePhoneProblem(''), '');
+  assert.equal(profilePhoneProblem('  '), '');
+  assert.equal(profilePhoneProblem('(555) 010-0148'), '');
+  assert.match(profilePhoneProblem('call me'), /phone number/);
 });
 
 test('photo checks honor the type and the 10MB limit', () => {

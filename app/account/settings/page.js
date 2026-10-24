@@ -14,6 +14,7 @@ export default async function AccountSettingsPage() {
     email: requester.email,
     firstName: stored?.firstName || '',
     lastName: stored?.lastName || '',
+    phone: stored?.phone || '',
     emailNotifications: stored ? stored.emailNotifications : true,
     inAppNotifications: stored ? stored.inAppNotifications : true,
     photoType: stored?.photoType || '',

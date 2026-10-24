@@ -81,9 +81,30 @@ function stepsFor(values) {
   return STEPS;
 }
 
-export function RequestForm() {
+function detailFor(method, defaults) {
+  if (!defaults) return '';
+  if (method === 'email') return defaults.email || '';
+  if (method === 'phone' || method === 'text') return defaults.phone || '';
+  return '';
+}
+
+function startingValues(defaults) {
+  const next = { ...EMPTY };
+  if (!defaults) return next;
+  next.name = defaults.name || '';
+  if (defaults.phone) {
+    next.contactMethod = 'phone';
+    next.contactDetail = defaults.phone;
+  } else if (defaults.email) {
+    next.contactMethod = 'email';
+    next.contactDetail = defaults.email;
+  }
+  return next;
+}
+
+export function RequestForm({ defaults = null }) {
   const [state, action, pending] = useActionState(submitCareRequest, { errors: {}, values: {} });
-  const [values, setValues] = useState(EMPTY);
+  const [values, setValues] = useState(() => startingValues(defaults));
   const [index, setIndex] = useState(0);
   const [stepError, setStepError] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -126,6 +147,10 @@ export function RequestForm() {
     setValues((current) => {
       const next = { ...current, [name]: value };
       if (name === 'contactMethod' && skipsContactDetail(value)) next.contactDetail = '';
+      else if (name === 'contactMethod') {
+        const previous = detailFor(current.contactMethod, defaults);
+        if (!current.contactDetail || current.contactDetail === previous) next.contactDetail = detailFor(value, defaults);
+      }
       return next;
     });
     setStepError('');
