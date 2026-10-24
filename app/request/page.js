@@ -1,11 +1,13 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { RequestForm } from '@/components/RequestForm';
-import { getRequester } from '@/lib/session';
+import { getRequester, isStaffSignedIn } from '@/lib/session';
 import { getUser } from '@/lib/users';
 
 export const metadata = { title: 'Request care' };
 
 export default async function RequestPage() {
+  if (await isStaffSignedIn()) redirect('/staff');
   const requester = await getRequester();
   const stored = requester ? await getUser(requester.uid).catch(() => null) : null;
   const defaults = requester ? {
@@ -23,7 +25,7 @@ export default async function RequestPage() {
       <RequestForm defaults={defaults} />
       {!requester ? (
          <p className="hint account-note">
-         <Link href="/sign-in">Sign in</Link>
+         <Link href="/sign-in">Sign In</Link>
          {' '}
          to your care request account if you want this request kept on your account.
        </p>

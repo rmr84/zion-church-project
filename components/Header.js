@@ -17,9 +17,9 @@ export async function Header() {
         </Link>
         <SiteMenu>
           <nav className="primary-nav" aria-label="Primary">
-            <Link href="/request">Request Care</Link>
-            <Link href="/status">Check Status</Link>
-            {requester ? <Link href="/account">My Requests</Link> : <Link href="/sign-in">Sign In</Link>}
+            {staff ? null : <Link href="/request">Request Care</Link>}
+            {staff ? null : <Link href="/status">Check Status</Link>}
+            {requester ? <Link href="/account">My Requests</Link> : staff ? null : <Link href="/sign-in">Sign In</Link>}
             {requester ? (
               <Link href="/account/settings" className="account-nav">
                 {profile?.photoType ? (

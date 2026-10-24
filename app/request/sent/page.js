@@ -1,10 +1,13 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { CopyCode } from '@/components/CopyCode';
 import { normalizeReferenceCode } from '@/lib/reference';
+import { isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Request received' };
 
 export default async function SentPage({ searchParams }) {
+  if (await isStaffSignedIn()) redirect('/staff');
   const params = await searchParams;
   const code = normalizeReferenceCode(params.code);
 

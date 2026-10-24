@@ -2,10 +2,11 @@
 
 import { redirect } from 'next/navigation';
 import { createRequest } from '@/lib/requests';
-import { getRequester } from '@/lib/session';
+import { getRequester, isStaffSignedIn } from '@/lib/session';
 import { validateSubmission } from '@/lib/validate';
 
 export async function submitCareRequest(_previous, formData) {
+  if (await isStaffSignedIn()) redirect('/staff');
   const result = validateSubmission({
     name: formData.get('name'),
     careType: formData.get('careType'),

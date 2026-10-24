@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CreateAccount } from '@/components/CreateAccount';
-import { getRequester } from '@/lib/session';
+import { getRequester, isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Create an account' };
 
 export default async function CreateAccountPage() {
+  if (await isStaffSignedIn()) redirect('/staff');
   if (await getRequester()) redirect('/account');
 
   return (
