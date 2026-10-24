@@ -14,35 +14,40 @@ export default async function AccountPage() {
 
   const requests = await listRequesterRequests(requester.uid);
 
+  const empty = requests.length === 0;
+
   return (
-    <section className="wrap narrow">
-      <p className="eyebrow">Care requester</p>
-      <h1>My requests</h1>
-      <p className="lede">
-        Signed in as {requester.email}. This list is only the requests you sent while signed in.
-        A request sent without an account stays with its reference code.
-      </p>
-      {requests.length === 0 ? (
-        <p className="hint">No requests are saved to this account yet.</p>
+    <section className={empty ? 'wrap narrow account-blank' : 'wrap narrow'}>
+      <div className="account-heading">
+        <p className="eyebrow">Care requester</p>
+        <h1>My Requests</h1>
+      </div>
+      {empty ? (
+        <div className="account-empty-block">
+          <p className="hint">No requests are saved to this account yet.</p>
+          <Link className="button" href="/request">Request Care</Link>
+        </div>
       ) : (
-        <ol className="request-list">
-          {requests.map((request) => (
-            <li key={request.referenceCode}>
-              <Link className="request-row account" href={`/status?code=${encodeURIComponent(request.referenceCode)}`}>
-                <span className="row-main">
-                  <span className="row-title">{labelFor(CARE_TYPES, request.careType)}</span>
-                  <span className="row-sub">{request.referenceCode}</span>
-                </span>
-                <StatusBadge status={request.status} />
-                <time dateTime={request.createdAt}>{formatDay(request.createdAt)}</time>
-              </Link>
-            </li>
-          ))}
-        </ol>
+        <>
+          <ol className="request-list">
+            {requests.map((request) => (
+              <li key={request.referenceCode}>
+                <Link className="request-row account" href={`/status?code=${encodeURIComponent(request.referenceCode)}`}>
+                  <span className="row-main">
+                    <span className="row-title">{labelFor(CARE_TYPES, request.careType)}</span>
+                    <span className="row-sub">{request.referenceCode}</span>
+                  </span>
+                  <StatusBadge status={request.status} />
+                  <time dateTime={request.createdAt}>{formatDay(request.createdAt)}</time>
+                </Link>
+              </li>
+            ))}
+          </ol>
+          <p className="account-action">
+            <Link className="button" href="/request">Request Care</Link>
+          </p>
+        </>
       )}
-      <p>
-        <Link className="button" href="/request">Request care</Link>
-      </p>
     </section>
   );
 }
