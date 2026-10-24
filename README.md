@@ -21,6 +21,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 Care requester sign-in is at [http://localhost:3000/sign-in](http://localhost:3000/sign-in). An account is optional. Requests sent while signed in show up on My requests. Requests sent without an account are found with the reference code.
 
+Creating an account sends Firebase's confirmation email. The person is saved in the `users` collection. Sign-in opens after that email is confirmed.
+
 Care team sign-in is separate, at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). The demo password is `zion-care-team`. `STAFF_SESSION_SECRET` must be at least 16 characters. Both values are in `.env.example`.
 
 `npm run seed` replaces the care requests in MongoDB with the demo requests.

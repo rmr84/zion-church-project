@@ -604,6 +604,37 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
 
 .sign-in-alt a { font-style: italic; }
 
+main:has(.account-blank) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 2.4rem;
+}
+.account-blank {
+  flex: 1;
+  display: grid;
+}
+.account-blank > div { grid-area: 1 / 1; }
+.account-heading { align-self: start; justify-self: start; text-align: left; }
+@media (min-width: 760px) {
+  .account-blank .account-heading {
+    position: absolute;
+    top: 2.4rem;
+    left: max(1.25rem, calc((100% - var(--desk)) / 2));
+    margin: 0;
+  }
+}
+.account-empty-block {
+  align-self: center;
+  justify-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.25rem;
+}
+.account-empty-block .hint { margin: 0; }
+.account-action { display: flex; justify-content: center; margin: 1.25rem 0 0; }
 .account-prompt { margin-top: 1.15rem; }
 .account-prompt em { font-style: italic; }
 
@@ -620,6 +651,7 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
 }
 
 .banner.error { background: #fdecea; color: #a90707; }
+.sign-in-error { margin: 0.7rem 0 0; font-weight: 700; }
 .banner.ok { background: var(--mist); color: var(--teal); }
 .banner p:last-child,
 .banner ul:last-child { margin-bottom: 0; }
@@ -775,10 +807,20 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
   font-size: 0.95rem;
 }
 
-.site-footer p { margin: 0; }
-
-.site-footer a { color: var(--gold); font-weight: 800; text-decoration: none; }
+.footer-inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-content: stretch;
+  align-items: center;
+}
+.site-footer p { grid-area: 1 / 1; margin: 0; text-align: center; }
+.site-footer a { grid-area: 1 / 1; justify-self: end; color: var(--gold); font-weight: 800; text-decoration: none; }
 .site-footer a:hover { color: #ffffff; }
+@media (max-width: 759px) {
+  .footer-inner:has(a) { gap: 0.75rem; }
+  .footer-inner:has(a) p,
+  .footer-inner:has(a) a { grid-area: auto; justify-self: center; }
+}
 
 @media (min-width: 760px) {
   .request-row { grid-template-columns: 6.5rem minmax(0, 1fr) auto auto; }
