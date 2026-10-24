@@ -152,7 +152,6 @@ export function RequestForm() {
       <button className="button" type="submit" disabled={pending}>
         {pending ? 'Sending…' : 'Submit request'}
       </button>
-      <p className="hint">If you or someone else is in danger, call 911. This desk is not an emergency line.</p>
     </form>
   );
 }
