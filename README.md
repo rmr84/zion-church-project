@@ -8,6 +8,8 @@ A private care-request desk for Zion Church. A member can ask for a hospital vis
 
 Node 24 or newer. Care requests are stored in MongoDB. Set `MONGODB_URI` in `.env` to the Atlas connection string. `MONGODB_DB` defaults to `production`.
 
+In a real-world scenario, we would default this to 'development' or similar jargon, but since this is the only database we will be using, I went with production. 
+
 ```bash
 npm install
 cp .env.example .env
