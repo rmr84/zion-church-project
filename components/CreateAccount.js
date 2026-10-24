@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { establishRequesterSession } from '@/app/actions/requester';
+import { createUserWithEmailAndPassword, getAuth, signOut } from 'firebase/auth';
+import { registerRequester } from '@/app/actions/requester';
+import { PasswordInput } from '@/components/PasswordInput';
 import { firebaseApp } from '@/lib/firebase';
 import { passwordProblem } from '@/lib/password-rules';
+import { sendAccountVerification } from '@/lib/send-verification';
 
 function messageFor(code) {
   if (code === 'auth/email-already-in-use') return 'An account with that email already exists. Sign in instead.';
@@ -33,6 +35,7 @@ export function CreateAccount() {
   const [formError, setFormError] = useState('');
   const [pending, setPending] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const [sentTo, setSentTo] = useState('');
 
   useEffect(() => {
     const key = ['email', 'password', 'confirm'].find((name) => errors[name]);
@@ -54,26 +57,46 @@ export function CreateAccount() {
     if (Object.keys(nextErrors).length > 0) return;
 
     setPending(true);
+    const auth = getAuth(firebaseApp);
+    let credential = null;
+    let stored = false;
     try {
-      const auth = getAuth(firebaseApp);
-      const credential = await createUserWithEmailAndPassword(auth, fields.email, fields.password);
+      credential = await createUserWithEmailAndPassword(auth, fields.email, fields.password);
       const idToken = await credential.user.getIdToken();
-      const result = await establishRequesterSession(idToken);
-      if (result && result.ok === false) {
-        setFormError('That account could not be confirmed. Try again.');
+      const saved = await registerRequester(idToken);
+      if (!saved || saved.ok === false) {
+        await credential.user.delete().catch(() => {});
+        await signOut(auth).catch(() => {});
+        setFormError('That account could not be saved. Try again.');
+        return;
       }
+      stored = true;
+      await sendAccountVerification(credential.user);
+      setSentTo(fields.email);
+      await signOut(auth);
     } catch (caught) {
+      if (credential?.user) await signOut(auth).catch(() => {});
       const message = messageFor(caught?.code);
       if (caught?.code === 'auth/invalid-email' || caught?.code === 'auth/email-already-in-use') {
         setErrors({ email: message });
       } else if (caught?.code === 'auth/weak-password') {
         setErrors({ password: message });
+      } else if (stored) {
+        setFormError('Your account was created, but the confirmation email did not send. Sign in to send it again.');
       } else {
         setFormError(message);
       }
     } finally {
       setPending(false);
     }
+  }
+
+  if (sentTo) {
+    return (
+      <p className="banner ok" role="status">
+        Check your email. We sent a confirmation link to {sentTo}. Open that link, then sign in.
+      </p>
+    );
   }
 
   return (
@@ -95,26 +118,24 @@ export function CreateAccount() {
       <div className="field">
         <label htmlFor="password">Password<span className="required" aria-hidden="true">*</span></label>
         <p className="hint" id="password-hint">At least 8 characters, one capital letter, and one number or special character.</p>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="new-password"
           required
-          aria-invalid={Boolean(errors.password)}
+          invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? 'password-hint password-error' : 'password-hint'}
         />
         {errors.password ? <p className="field-error" id="password-error">{errors.password}</p> : null}
       </div>
       <div className="field">
         <label htmlFor="confirm">Confirm password<span className="required" aria-hidden="true">*</span></label>
-        <input
+        <PasswordInput
           id="confirm"
           name="confirm"
-          type="password"
           autoComplete="new-password"
           required
-          aria-invalid={Boolean(errors.confirm)}
+          invalid={Boolean(errors.confirm)}
           aria-describedby={errors.confirm ? 'confirm-error' : undefined}
         />
         {errors.confirm ? <p className="field-error" id="confirm-error">{errors.confirm}</p> : null}

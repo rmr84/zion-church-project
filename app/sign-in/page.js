@@ -9,9 +9,12 @@ export default async function RequesterSignInPage() {
   if (await getRequester()) redirect('/account');
 
   return (
-    <section className="wrap narrow">
-      <p className="eyebrow">Care requester</p>
-      <h1>Sign in</h1>
+    <section className="page-frame">
+      <div className="page-heading">
+        <p className="eyebrow">Care requester</p>
+        <h1>Sign in</h1>
+      </div>
+      <div className="wrap narrow">
       <p className="lede">
         An account keeps the requests you send while you are signed in.
       
@@ -24,6 +27,7 @@ export default async function RequesterSignInPage() {
       <p className="sign-in-alt">
         <Link href="/staff/login">Care Team Sign In</Link>
       </p>
+      </div>
     </section>
   );
 }

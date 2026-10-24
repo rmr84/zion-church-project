@@ -4,7 +4,7 @@ import { formatWhen } from '@/lib/format';
 import { normalizeReferenceCode } from '@/lib/reference';
 import { getMemberRequest } from '@/lib/requests';
 
-export const metadata = { title: 'Check a request' };
+export const metadata = { title: 'Check a Request' };
 
 export default async function StatusPage({ searchParams }) {
   const params = await searchParams;
@@ -14,12 +14,15 @@ export default async function StatusPage({ searchParams }) {
   const missed = raw.trim() && !request;
 
   return (
-    <section className="wrap narrow">
-      <p className="eyebrow">Status</p>
-      <h1>Check a request</h1>
-      <p className="lede">
-        Enter the reference code from your confirmation. You will see the status and any note the care team left for you.
-      </p>
+    <section className="page-frame status-page">
+      <div className="page-heading">
+        <p className="eyebrow">Status</p>
+        <h1>Check a Request</h1>
+        <p className="lede">
+          Enter the reference code from your confirmation. You will see the status and any note the care team left for you.
+        </p>
+      </div>
+      <div className="status-lookup">
       <form className="stack" action="/status" method="get">
         <div className="field">
           <label htmlFor="code">Reference Code</label>
@@ -35,7 +38,7 @@ export default async function StatusPage({ searchParams }) {
             defaultValue={code || raw}
           />
         </div>
-        <button className="button" type="submit">Look up</button>
+        <button className="button" type="submit">Look Up</button>
       </form>
       {missed ? <p className="banner error" role="alert">No request matches that code.</p> : null}
       {request ? (
@@ -47,6 +50,7 @@ export default async function StatusPage({ searchParams }) {
           <p className="prose">{request.memberNote.trim() || 'The care team has not added a note yet.'}</p>
         </article>
       ) : null}
+      </div>
     </section>
   );
 }

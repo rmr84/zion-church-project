@@ -5,8 +5,7 @@ out
 .env
 .env*.local
 *.log
-data/*.sqlite
-data/*.sqlite-wal
-data/*.sqlite-shm
+data/profile-photos/
+
 logs/*.log
 .DS_Store
