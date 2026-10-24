@@ -13,7 +13,7 @@ export default async function RequestPage() {
       <h1>Request care</h1>
       <p className="lede">
         Share only what the team needs. Your name is optional.
-        You can send this with or without an account.
+ 
       </p>
       {requester ? (
         <p className="hint">Signed in as {requester.email}. This request will be saved to that account.</p>
@@ -21,7 +21,7 @@ export default async function RequestPage() {
         <p className="hint">
           <Link href="/sign-in">Sign in</Link>
           {' '}
-          if you want this request kept on an account. Sending it without one still works.
+          to your care request account if you want this request kept on your account. 
         </p>
       )}
       <RequestForm />
