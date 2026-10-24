@@ -89,15 +89,15 @@ export function RequesterSignIn() {
           required
         />
       </div>
-      <div className="actions">
-        <button className="button" type="submit" disabled={pending}>Sign in</button>
+      <div className="sign-in-actions">
+        <button className="button block" type="submit" disabled={pending}>Sign in</button>
         <button
-          className="button secondary"
+          className="button secondary block"
           type="button"
           disabled={pending}
           onClick={(event) => void submit('create', event.currentTarget.form)}
         >
-          Create account
+          Create Account
         </button>
       </div>
     </form>
