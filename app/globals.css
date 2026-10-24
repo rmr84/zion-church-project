@@ -583,7 +583,18 @@ p { margin: 0 0 1rem; }
 }
 .request-summary dt { font-weight: 800; }
 .request-summary dd { margin: 0; color: var(--ink-soft); white-space: pre-wrap; }
-.request-summary .text-button { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+.request-summary .edit-step {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 0.45rem;
+}
+.request-summary .edit-step svg { width: 1.15rem; height: 1.15rem; }
+.request-summary .edit-step:hover { background: #fff6ee; }
 
 .sr-only {
   position: absolute;

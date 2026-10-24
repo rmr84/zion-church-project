@@ -289,7 +289,12 @@ export function RequestForm({ defaults = null }) {
             <div key={item.key}>
               <dt>{item.title}</dt>
               <dd>{answerFor(item, values)}</dd>
-              <button className="text-button" type="button" onClick={() => editStep(item.key)}>Edit</button>
+              <button className="text-button edit-step" type="button" aria-label={`Edit ${item.title}`} onClick={() => editStep(item.key)}>
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M4 16.8V20h3.2L18.4 8.8l-3.2-3.2L4 16.8z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                  <path d="M13.6 7.2l3.2 3.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </button>
             </div>
           ))}
         </dl>
