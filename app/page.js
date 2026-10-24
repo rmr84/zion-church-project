@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { ReviewCarousel } from '@/components/ReviewCarousel';
+import { isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Care Desk' };
 
@@ -37,7 +38,9 @@ const REVIEWS = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const staff = await isStaffSignedIn();
+
   return (
     <>
       <section className="wrap home home-hero">
@@ -80,10 +83,12 @@ export default function HomePage() {
             <li className="rise">Save the reference code to check back on your request.</li>
             <li className="rise">The care team updates the status and follows through on your request.</li>
           </ol>
-          <div className="actions rise">
-            <Link className="button" href="/request">Request Care</Link>
-            <Link className="button secondary" href="/status">Check a Request</Link>
-          </div>
+          {staff ? null : (
+            <div className="actions rise">
+              <Link className="button" href="/request">Request Care</Link>
+              <Link className="button secondary" href="/status">Check a Request</Link>
+            </div>
+          )}
           <p className="hint">If this is an emergency, call 911. This desk is not an emergency line.</p>
         </Reveal>
       </section>

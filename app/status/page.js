@@ -1,12 +1,15 @@
+import { redirect } from 'next/navigation';
 import { StatusBadge } from '@/components/Badges';
 import { CARE_TYPES, labelFor } from '@/lib/constants';
 import { formatWhen } from '@/lib/format';
 import { normalizeReferenceCode } from '@/lib/reference';
 import { getMemberRequest } from '@/lib/requests';
+import { isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Check a Request' };
 
 export default async function StatusPage({ searchParams }) {
+  if (await isStaffSignedIn()) redirect('/staff');
   const params = await searchParams;
   const raw = String(params.code || '');
   const code = normalizeReferenceCode(raw);
