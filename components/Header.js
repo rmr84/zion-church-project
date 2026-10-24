@@ -19,7 +19,7 @@ export async function Header() {
           <nav className="primary-nav" aria-label="Primary">
             <Link href="/request">Request Care</Link>
             <Link href="/status">Check Status</Link>
-            {requester ? <Link href="/account">My Requests</Link> : <Link href="/sign-in">Sign In</Link>}
+            {requester ? <Link href="/account">My Requests</Link> : staff ? null : <Link href="/sign-in">Sign In</Link>}
             {requester ? (
               <Link href="/account/settings" className="account-nav">
                 {profile?.photoType ? (

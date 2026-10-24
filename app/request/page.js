@@ -1,12 +1,13 @@
 import Link from 'next/link';
 import { RequestForm } from '@/components/RequestForm';
-import { getRequester } from '@/lib/session';
+import { getRequester, isStaffSignedIn } from '@/lib/session';
 import { getUser } from '@/lib/users';
 
 export const metadata = { title: 'Request care' };
 
 export default async function RequestPage() {
   const requester = await getRequester();
+  const staff = await isStaffSignedIn();
   const stored = requester ? await getUser(requester.uid).catch(() => null) : null;
   const defaults = requester ? {
     name: [stored?.firstName, stored?.lastName].filter(Boolean).join(' '),
@@ -21,7 +22,7 @@ export default async function RequestPage() {
      
       <p className="hint">If you or someone else is in danger, please call 911. This desk is not an emergency line.</p>
       <RequestForm defaults={defaults} />
-      {!requester ? (
+      {!requester && !staff ? (
          <p className="hint account-note">
          <Link href="/sign-in">Sign In</Link>
          {' '}
