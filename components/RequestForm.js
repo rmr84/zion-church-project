@@ -54,7 +54,7 @@ const STEPS = [
     key: 'urgency',
     title: 'Urgency',
     required: true,
-    empty: 'Choose an urgency.',
+    empty: '',
   },
 ];
 
@@ -129,7 +129,9 @@ export function RequestForm({ defaults = null }) {
   const steps = stepsFor(values);
   if (index > steps.length - 1) setIndex(steps.length - 1);
   const step = steps[Math.min(index, steps.length - 1)];
-  const message = stepError || (dismissed[step.key] ? '' : errors[step.key]) || '';
+  const filled = String(values[step.key] ?? '').trim().length > 0;
+  const blocked = step.required && !filled;
+  const message = blocked ? '' : (stepError || (dismissed[step.key] ? '' : errors[step.key]) || '');
 
   useEffect(() => {
     if (skipFocus.current) {
@@ -163,6 +165,7 @@ export function RequestForm({ defaults = null }) {
   }
 
   function continueStep() {
+    if (step.required && !String(values[step.key] ?? '').trim()) return;
     const problem = problemFor(step, values);
     if (problem) {
       showProblem(problem);
@@ -189,6 +192,10 @@ export function RequestForm({ defaults = null }) {
     if (index < steps.length - 1) {
       event.preventDefault();
       continueStep();
+      return;
+    }
+    if (step.required && !String(values[step.key] ?? '').trim()) {
+      event.preventDefault();
       return;
     }
     const problem = problemFor(step, values);
@@ -265,11 +272,11 @@ export function RequestForm({ defaults = null }) {
 
       <div className="builder-actions">
         {index === steps.length - 1 ? (
-          <button className="button block" type="submit" disabled={pending}>
+          <button className="button block" type="submit" disabled={pending || blocked}>
             {pending ? 'Sending…' : 'Submit request'}
           </button>
         ) : (
-          <button className="button block" type="button" onClick={continueStep}>Continue</button>
+          <button className="button block" type="button" onClick={continueStep} disabled={blocked}>Continue</button>
         )}
         {step.required ? null : (
           <button className="button secondary block" type="button" onClick={skipStep}>Skip</button>
