@@ -16,20 +16,36 @@ function messageFor(code) {
   return 'Something went wrong. Try again.';
 }
 
+function fieldsFrom(form) {
+  const data = new FormData(form);
+  return {
+    email: String(data.get('email') || '').trim(),
+    password: String(data.get('password') || ''),
+  };
+}
+
 export function RequesterSignIn() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [pending, setPending] = useState(false);
 
-  async function submit(mode) {
+  async function submit(mode, form) {
+    const { email, password } = fieldsFrom(form);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Use at least 6 characters.');
+      return;
+    }
+
     setError('');
     setPending(true);
     try {
       const auth = getAuth(firebaseApp);
       const credential = mode === 'create'
-        ? await createUserWithEmailAndPassword(auth, email.trim(), password)
-        : await signInWithEmailAndPassword(auth, email.trim(), password);
+        ? await createUserWithEmailAndPassword(auth, email, password)
+        : await signInWithEmailAndPassword(auth, email, password);
       const idToken = await credential.user.getIdToken();
       const result = await establishRequesterSession(idToken);
       if (result && result.ok === false) {
@@ -48,7 +64,7 @@ export function RequesterSignIn() {
       aria-busy={pending}
       onSubmit={(event) => {
         event.preventDefault();
-        void submit('sign-in');
+        void submit('sign-in', event.currentTarget);
       }}
     >
       {error ? <p className="banner error" role="alert">{error}</p> : null}
@@ -58,9 +74,7 @@ export function RequesterSignIn() {
           id="email"
           name="email"
           type="email"
-          autoComplete="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          autoComplete="username"
           required
         />
       </div>
@@ -71,15 +85,18 @@ export function RequesterSignIn() {
           name="password"
           type="password"
           autoComplete="current-password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
           minLength={6}
           required
         />
       </div>
       <div className="actions">
         <button className="button" type="submit" disabled={pending}>Sign in</button>
-        <button className="button secondary" type="button" disabled={pending} onClick={() => void submit('create')}>
+        <button
+          className="button secondary"
+          type="button"
+          disabled={pending}
+          onClick={(event) => void submit('create', event.currentTarget.form)}
+        >
           Create account
         </button>
       </div>
