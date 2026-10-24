@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createUserWithEmailAndPassword, getAuth, signOut } from 'firebase/auth';
 import { registerRequester } from '@/app/actions/requester';
+import { PasswordInput } from '@/components/PasswordInput';
 import { firebaseApp } from '@/lib/firebase';
 import { passwordProblem } from '@/lib/password-rules';
 import { sendAccountVerification } from '@/lib/send-verification';
@@ -117,26 +118,24 @@ export function CreateAccount() {
       <div className="field">
         <label htmlFor="password">Password<span className="required" aria-hidden="true">*</span></label>
         <p className="hint" id="password-hint">At least 8 characters, one capital letter, and one number or special character.</p>
-        <input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="new-password"
           required
-          aria-invalid={Boolean(errors.password)}
+          invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? 'password-hint password-error' : 'password-hint'}
         />
         {errors.password ? <p className="field-error" id="password-error">{errors.password}</p> : null}
       </div>
       <div className="field">
         <label htmlFor="confirm">Confirm password<span className="required" aria-hidden="true">*</span></label>
-        <input
+        <PasswordInput
           id="confirm"
           name="confirm"
-          type="password"
           autoComplete="new-password"
           required
-          aria-invalid={Boolean(errors.confirm)}
+          invalid={Boolean(errors.confirm)}
           aria-describedby={errors.confirm ? 'confirm-error' : undefined}
         />
         {errors.confirm ? <p className="field-error" id="confirm-error">{errors.confirm}</p> : null}
