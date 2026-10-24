@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { signOutOfRequester } from '@/app/actions/requester';
 import { logout } from '@/app/actions/staff';
+import { SignOutButton } from '@/components/SignOutButton';
 import { getRequester, isStaffSignedIn } from '@/lib/session';
 
 export async function Header() {
@@ -17,11 +17,7 @@ export async function Header() {
           <Link href="/request">Request Care</Link>
           <Link href="/status">Check Status</Link>
           {requester ? <Link href="/account">My Requests</Link> : <Link href="/sign-in">Sign In</Link>}
-          {requester ? (
-            <form className="inline-form" action={signOutOfRequester}>
-              <button className="text-button" type="submit">Sign out</button>
-            </form>
-          ) : null}
+          {requester ? <SignOutButton /> : null}
           {staff ? <Link href="/staff">Open queue</Link> : null}
           {staff ? (
             <form className="inline-form" action={logout}>

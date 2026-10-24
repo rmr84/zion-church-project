@@ -14,14 +14,15 @@ export default async function RequestPage() {
      
       <p className="hint">If you or someone else is in danger, please call 911. This desk is not an emergency line.</p>
       <RequestForm />
-      {requester ? (
-        <p className="hint account-note">Signed in as {requester.email}. This request will be saved to that account.</p>
+      {!requester ? (
+         <p className="hint account-note">
+         <Link href="/sign-in">Sign in</Link>
+         {' '}
+         to your care request account if you want this request kept on your account.
+       </p>
+       
       ) : (
-        <p className="hint account-note">
-          <Link href="/sign-in">Sign in</Link>
-          {' '}
-          to your care request account if you want this request kept on your account.
-        </p>
+       null
       )}
     </section>
   );
