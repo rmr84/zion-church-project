@@ -14,7 +14,7 @@ export default async function RequesterSignInPage() {
       <h1>Sign in</h1>
       <p className="lede">
         An account keeps the requests you send while you are signed in.
-        You can still send a request without one.
+        You can still send a request without one <Link href="/request">here</Link>.
       </p>
       <RequesterSignIn />
       <p>
