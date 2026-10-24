@@ -4,6 +4,10 @@ import { useActionState, useEffect, useRef, useState } from 'react';
 import { submitCareRequest } from '@/app/actions/public';
 import { CARE_TYPES, CONTACT_METHODS, URGENCY_LEVELS } from '@/lib/constants';
 
+function RequiredMark() {
+  return <span className="required" aria-hidden="true">*</span>;
+}
+
 const EMPTY = {
   name: '',
   careType: '',
@@ -58,7 +62,7 @@ export function RequestForm() {
       </div>
 
       <div className="field">
-        <label htmlFor="careType">Type of care</label>
+        <label htmlFor="careType">Type Of Care<RequiredMark /></label>
         <select
           id="careType"
           name="careType"
@@ -76,7 +80,7 @@ export function RequestForm() {
       </div>
 
       <div className="field">
-        <label htmlFor="description">What do you need?</label>
+        <label htmlFor="description">What Is Your Request?<RequiredMark /></label>
         <p className="hint" id="description-hint">
           Share only what the team needs. Leave out anything you would rather say in person.
         </p>
@@ -95,7 +99,7 @@ export function RequestForm() {
       </div>
 
       <div className="field">
-        <label htmlFor="contactMethod">Preferred contact method</label>
+        <label htmlFor="contactMethod">Preferred Contact Method<RequiredMark /></label>
         <select
           id="contactMethod"
           name="contactMethod"
@@ -113,7 +117,7 @@ export function RequestForm() {
       </div>
 
       <div className="field">
-        <label htmlFor="contactDetail">How should we reach you?</label>
+        <label htmlFor="contactDetail">How Should We Reach You?</label>
         <p className="hint" id="contactDetail-hint">Optional. A phone number or email, if you want one on file.</p>
         <input
           id="contactDetail"
@@ -129,7 +133,7 @@ export function RequestForm() {
       </div>
 
       <fieldset id="urgency" className="field">
-        <legend>Urgency</legend>
+        <legend>Urgency<RequiredMark /></legend>
         <div className="choice-list">
           {URGENCY_LEVELS.map((level) => (
             <label className="choice" key={level.value}>
