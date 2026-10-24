@@ -11,10 +11,7 @@ export default async function RequestPage() {
     <section className="wrap narrow">
       <p className="eyebrow">New request</p>
       <h1>Request care</h1>
-      <p className="lede">
-        Share only what the team needs. Your name is optional.
- 
-      </p>
+     
       <p className="hint">If you or someone else is in danger, call 911. This desk is not an emergency line.</p>
       <RequestForm />
       {requester ? (
