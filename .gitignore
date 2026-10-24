@@ -5,6 +5,7 @@ out
 .env
 .env*.local
 *.log
+data/profile-photos/
 data/*.sqlite
 data/*.sqlite-wal
 data/*.sqlite-shm
