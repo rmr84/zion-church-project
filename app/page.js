@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { HomeBackdrop } from '@/components/HomeBackdrop';
 import { Reveal } from '@/components/Reveal';
 import { ReviewCarousel } from '@/components/ReviewCarousel';
 
@@ -41,7 +40,6 @@ const REVIEWS = [
 export default function HomePage() {
   return (
     <>
-      <HomeBackdrop />
       <section className="wrap home home-hero">
         <div className="hero-layout">
           <div>
