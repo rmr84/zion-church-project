@@ -17,7 +17,7 @@ export default async function StatusPage({ searchParams }) {
     <section className="page-frame status-page">
       <div className="page-heading">
         <p className="eyebrow">Status</p>
-        <h1>Check a request</h1>
+        <h1>Check a Request</h1>
         <p className="lede">
           Enter the reference code from your confirmation. You will see the status and any note the care team left for you.
         </p>
