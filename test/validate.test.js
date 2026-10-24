@@ -26,6 +26,22 @@ test('description, care type, contact method, and urgency are required', () => {
   assert.equal(result.errors.urgency, 'Choose an urgency.');
 });
 
+test('phone, email, and text require a way to reach the person', () => {
+  for (const contactMethod of ['phone', 'email', 'text']) {
+    const result = validateSubmission({ ...valid, contactMethod, contactDetail: '  ' });
+    assert.equal(result.ok, false);
+    assert.equal(result.errors.contactDetail, 'Enter how we should reach you.');
+  }
+});
+
+test('in person and no contact needed do not keep a contact detail', () => {
+  for (const contactMethod of ['in_person', 'none']) {
+    const result = validateSubmission({ ...valid, contactMethod, contactDetail: '555-0148' });
+    assert.equal(result.ok, true);
+    assert.equal(result.values.contactDetail, '');
+  }
+});
+
 test('staff updates only accept known statuses', () => {
   const result = validateStaffUpdate({
     referenceCode: 'zc-meal-1002',
