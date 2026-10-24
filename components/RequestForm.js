@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { submitCareRequest } from '@/app/actions/public';
-import { CARE_TYPES, CONTACT_METHODS, URGENCY_LEVELS } from '@/lib/constants';
+import { CARE_TYPES, CONTACT_METHODS, URGENCY_LEVELS, labelFor } from '@/lib/constants';
 
 function RequiredMark() {
   return <span className="required" aria-hidden="true">*</span>;
@@ -88,6 +88,15 @@ function detailFor(method, defaults) {
   return '';
 }
 
+function answerFor(step, values) {
+  const raw = String(values[step.key] ?? '').trim();
+  if (step.key === 'name') return raw || 'Name not given';
+  if (step.key === 'careType') return labelFor(CARE_TYPES, raw);
+  if (step.key === 'contactMethod') return labelFor(CONTACT_METHODS, raw);
+  if (step.key === 'urgency') return labelFor(URGENCY_LEVELS, raw);
+  return raw;
+}
+
 function startingValues(defaults) {
   const next = { ...EMPTY };
   if (!defaults) return next;
@@ -106,11 +115,13 @@ export function RequestForm({ defaults = null }) {
   const [state, action, pending] = useActionState(submitCareRequest, { errors: {}, values: {} });
   const [values, setValues] = useState(() => startingValues(defaults));
   const [index, setIndex] = useState(0);
+  const [editing, setEditing] = useState(false);
   const [stepError, setStepError] = useState('');
   const [attempt, setAttempt] = useState(0);
   const [dismissed, setDismissed] = useState({});
   const [trackedState, setTrackedState] = useState(state);
   const headingRef = useRef(null);
+  const confirmReview = useRef(false);
   const errorRef = useRef(null);
   const skipFocus = useRef(true);
   const errors = state.errors || {};
@@ -123,12 +134,17 @@ export function RequestForm({ defaults = null }) {
     }
     const merged = { ...values, ...(state.values || {}) };
     const next = stepsFor(merged).findIndex((item) => state.errors?.[item.key]);
-    if (next >= 0) setIndex(next);
+    if (next >= 0) {
+      setEditing(true);
+      setIndex(next);
+    }
   }
 
-  const steps = stepsFor(values);
+  const questions = stepsFor(values);
+  const steps = [...questions, { key: 'review', title: 'Review', required: false }];
   if (index > steps.length - 1) setIndex(steps.length - 1);
   const step = steps[Math.min(index, steps.length - 1)];
+  const reviewing = step.key === 'review';
   const filled = String(values[step.key] ?? '').trim().length > 0;
   const blocked = step.required && !filled;
   const message = blocked ? '' : (stepError || (dismissed[step.key] ? '' : errors[step.key]) || '');
@@ -164,6 +180,23 @@ export function RequestForm({ defaults = null }) {
     setAttempt((current) => current + 1);
   }
 
+  function reviewIndex(nextValues = values) {
+    return stepsFor(nextValues).length;
+  }
+
+  function finishEdit(nextValues = values) {
+    const upcoming = stepsFor(nextValues);
+    const missing = upcoming.findIndex((item, itemIndex) => (
+      itemIndex > index && item.required && !String(nextValues[item.key] ?? '').trim()
+    ));
+    if (missing >= 0) {
+      setIndex(missing);
+      return;
+    }
+    setEditing(false);
+    setIndex(upcoming.length);
+  }
+
   function continueStep() {
     if (step.required && !String(values[step.key] ?? '').trim()) return;
     const problem = problemFor(step, values);
@@ -172,37 +205,52 @@ export function RequestForm({ defaults = null }) {
       return;
     }
     setStepError('');
+    if (editing) {
+      finishEdit();
+      return;
+    }
     setIndex((current) => Math.min(current + 1, steps.length - 1));
   }
 
   function skipStep() {
     if (step.required) return;
-    setValues((current) => ({ ...current, [step.key]: '' }));
+    const nextValues = { ...values, [step.key]: '' };
+    setValues(nextValues);
     setStepError('');
     setDismissed((current) => ({ ...current, [step.key]: true }));
+    if (editing) {
+      finishEdit(nextValues);
+      return;
+    }
     setIndex((current) => Math.min(current + 1, steps.length - 1));
   }
 
   function backStep() {
     setStepError('');
+    if (editing) {
+      setEditing(false);
+      setIndex(reviewIndex());
+      return;
+    }
     setIndex((current) => Math.max(current - 1, 0));
   }
 
+  function editStep(key) {
+    const next = questions.findIndex((item) => item.key === key);
+    if (next < 0) return;
+    setStepError('');
+    setEditing(true);
+    setIndex(next);
+  }
+
   function onSubmit(event) {
-    if (index < steps.length - 1) {
+    if (!reviewing || !confirmReview.current) {
       event.preventDefault();
-      continueStep();
+      confirmReview.current = false;
+      if (!reviewing) continueStep();
       return;
     }
-    if (step.required && !String(values[step.key] ?? '').trim()) {
-      event.preventDefault();
-      return;
-    }
-    const problem = problemFor(step, values);
-    if (problem) {
-      event.preventDefault();
-      showProblem(problem);
-    }
+    confirmReview.current = false;
   }
 
   const hint = step.key === 'contactDetail' ? contactDetailHint(values.contactMethod) : step.hint;
@@ -232,9 +280,20 @@ export function RequestForm({ defaults = null }) {
         </span>
       </h2>
 
-      {hint ? <p className="hint" id={`${step.key}-hint`}>{hint}</p> : null}
+      {reviewing ? <p className="hint">Check each answer. Edit a step if something needs to change.</p> : null}
+      {hint && !reviewing ? <p className="hint" id={`${step.key}-hint`}>{hint}</p> : null}
 
-      {step.key === 'urgency' ? (
+      {reviewing ? (
+        <dl className="request-summary">
+          {questions.map((item) => (
+            <div key={item.key}>
+              <dt>{item.title}</dt>
+              <dd>{answerFor(item, values)}</dd>
+              <button className="text-button" type="button" onClick={() => editStep(item.key)}>Edit</button>
+            </div>
+          ))}
+        </dl>
+      ) : step.key === 'urgency' ? (
         <fieldset className="field" aria-labelledby="step-title" aria-describedby={describedBy || undefined} aria-invalid={Boolean(message)}>
           <legend className="sr-only">{step.title}</legend>
           <div className="choice-list">
@@ -271,14 +330,14 @@ export function RequestForm({ defaults = null }) {
       ) : null}
 
       <div className="builder-actions">
-        {index === steps.length - 1 ? (
-          <button className="button block" type="submit" disabled={pending || blocked}>
-            {pending ? 'Sending…' : 'Submit request'}
+        {reviewing ? (
+          <button key="send-request" className="button block" type="submit" disabled={pending} onClick={() => { confirmReview.current = true; }}>
+            {pending ? 'Sending…' : 'Continue'}
           </button>
         ) : (
-          <button className="button block" type="button" onClick={continueStep} disabled={blocked}>Continue</button>
+          <button key="continue-step" className="button block" type="button" onClick={continueStep} disabled={blocked}>Continue</button>
         )}
-        {step.required ? null : (
+        {step.required || reviewing ? null : (
           <button className="button secondary block" type="button" onClick={skipStep}>Skip</button>
         )}
         {index > 0 ? (

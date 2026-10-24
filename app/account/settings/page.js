@@ -22,11 +22,15 @@ export default async function AccountSettingsPage() {
   };
 
   return (
-    <section className="wrap settings">
-      <p className="eyebrow">Care requester</p>
-      <h1>Account</h1>
-      <p className="lede">View and update the information on this account.</p>
-      <AccountSettings profile={profile} />
+    <section className="page-frame">
+      <div className="page-heading">
+        <p className="eyebrow">Care requester</p>
+        <h1>Account</h1>
+      </div>
+      <div className="wrap settings">
+        <p className="lede">View and update the information on this account.</p>
+        <AccountSettings profile={profile} />
+      </div>
     </section>
   );
 }

@@ -12,9 +12,12 @@ export default async function LoginPage({ searchParams }) {
   const error = String(params.error || "");
 
   return (
-    <section className="wrap narrow">
-      <p className="eyebrow">Care Team</p>
-      <h1>Care Team Sign In</h1>
+    <section className="page-frame">
+      <div className="page-heading">
+        <p className="eyebrow">Care Team</p>
+        <h1>Care Team Sign In</h1>
+      </div>
+      <div className="wrap narrow">
       <p className="lede">
         This password opens the care desk. It is separate from a care requester account.
         The demo password is zion-care-team.
@@ -49,6 +52,7 @@ export default async function LoginPage({ searchParams }) {
         {" · "}
         <Link href="/">Back to the care desk</Link>
       </p>
+      </div>
     </section>
   );
 }

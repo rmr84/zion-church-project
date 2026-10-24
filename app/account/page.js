@@ -17,8 +17,8 @@ export default async function AccountPage() {
   const empty = requests.length === 0;
 
   return (
-    <section className={empty ? 'wrap narrow account-blank' : 'wrap narrow'}>
-      <div className="account-heading">
+    <section className={empty ? 'page-frame account-blank' : 'page-frame'}>
+      <div className="page-heading">
         <p className="eyebrow">Care requester</p>
         <h1>My Requests</h1>
       </div>
@@ -28,7 +28,7 @@ export default async function AccountPage() {
           <Link className="button" href="/request">Request Care</Link>
         </div>
       ) : (
-        <>
+        <div className="wrap narrow">
           <ol className="request-list">
             {requests.map((request) => (
               <li key={request.referenceCode}>
@@ -43,10 +43,7 @@ export default async function AccountPage() {
               </li>
             ))}
           </ol>
-          <p className="account-action">
-            <Link className="button" href="/request">Request Care</Link>
-          </p>
-        </>
+        </div>
       )}
     </section>
   );

@@ -9,9 +9,12 @@ export default async function SentPage({ searchParams }) {
   const code = normalizeReferenceCode(params.code);
 
   return (
-    <section className="wrap narrow">
-      <p className="eyebrow">Received</p>
-      <h1>We have your request.</h1>
+    <section className="page-frame">
+      <div className="page-heading">
+        <p className="eyebrow">Received</p>
+        <h1>Request Received!</h1>
+      </div>
+      <div className="wrap narrow">
       {code ? (
         <>
           <p className="lede">
@@ -29,6 +32,7 @@ export default async function SentPage({ searchParams }) {
       ) : (
         <p>That confirmation link is missing a reference code.</p>
       )}
+      </div>
     </section>
   );
 }
