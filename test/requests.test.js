@@ -7,6 +7,7 @@ import {
   createRequest,
   getMemberRequest,
   getStaffRequest,
+  listRequesterRequests,
   listRequests,
   updateCareRequest,
 } from '../lib/requests.js';
@@ -147,6 +148,8 @@ test('new requests ignore smuggled staff fields and retry a taken code', () => {
     memberNote: 'visible smuggle',
     internalNote: 'should-not-stick',
     createdAt: '2000-01-01T00:00:00.000Z',
+    requesterUid: 'attackeruid1234',
+    requesterEmail: 'attacker@example.com',
   }, {
     db,
     notify: (body) => notices.push(body),
@@ -160,11 +163,44 @@ test('new requests ignore smuggled staff fields and retry a taken code', () => {
   assert.equal(staff.memberNote, '');
   assert.equal(staff.internalNote, '');
   assert.equal(staff.name, null);
+  assert.equal(staff.requesterEmail, null);
   assert.notEqual(staff.createdAt, '2000-01-01T00:00:00.000Z');
   assert.equal(notices.length, 1);
   assert.equal(notices[0].includes('secret-phrase'), false);
   assert.equal(notices[0].includes('555-0101'), false);
   assert.equal(notices[0].includes('should-not-stick'), false);
+});
+
+test('an account is stored only when the server passes one, and each person sees their own', () => {
+  const db = openTestDb();
+  const input = {
+    name: 'Ada',
+    careType: 'prayer_support',
+    description: 'A private prayer request.',
+    contactMethod: 'none',
+    contactDetail: '',
+    urgency: 'routine',
+  };
+  const owned = createRequest(input, {
+    db,
+    notify() {},
+    codes: ['ZC-OWNR-0001'],
+    account: { uid: 'firebaseUid1234', email: 'Ada@Zion.Example' },
+  });
+  const other = createRequest(input, {
+    db,
+    notify() {},
+    codes: ['ZC-OTHR-0002'],
+    account: { uid: 'otheruser123456', email: 'other@zion.example' },
+  });
+
+  assert.equal(owned, 'ZC-OWNR-0001');
+  assert.equal(getStaffRequest(owned, db).requesterEmail, 'ada@zion.example');
+  assert.equal(JSON.stringify(getMemberRequest(owned, db)).includes('ada@zion.example'), false);
+  assert.deepEqual(listRequesterRequests('firebaseUid1234', db).map((row) => row.referenceCode), [owned]);
+  assert.equal(listRequesterRequests('otheruser123456', db).some((row) => row.referenceCode === owned), false);
+  assert.equal(listRequesterRequests('otheruser123456', db)[0].referenceCode, other);
+  assert.deepEqual(listRequesterRequests('not-a-uid', db), []);
 });
 
 test('the member view has no staff columns and rows cannot be deleted', () => {
@@ -179,6 +215,7 @@ test('the member view has no staff columns and rows cannot be deleted', () => {
     'updated_at',
   ]);
   assert.throws(() => db.prepare('SELECT internal_note FROM member_request_status').get());
+  assert.throws(() => db.prepare('SELECT requester_email FROM member_request_status').get());
   const before = db.prepare('SELECT COUNT(*) AS n FROM care_requests').get().n;
   assert.throws(() => db.prepare('DELETE FROM care_requests').run(), /archived, not deleted/);
   assert.equal(db.prepare('SELECT COUNT(*) AS n FROM care_requests').get().n, before);

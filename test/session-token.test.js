@@ -1,6 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { issueSessionToken, secretsMatch, verifySessionToken } from '../lib/session-token.js';
+import {
+  issueRequesterToken,
+  issueSessionToken,
+  readRequesterToken,
+  secretsMatch,
+  verifySessionToken,
+} from '../lib/session-token.js';
 
 const secret = 'demo-only-change-this-secret';
 
@@ -19,4 +25,17 @@ test('session tokens reject tampering and expiry', () => {
   const flipped = `${signature.slice(0, -1)}${signature.endsWith('a') ? 'b' : 'a'}`;
   assert.equal(verifySessionToken(`${role}.${exp}.${flipped}`, secret, now), false);
   assert.equal(verifySessionToken(token, 'another-secret-value', now), false);
+  assert.equal(readRequesterToken(token, secret, now), null);
+});
+
+test('requester sessions stay separate from the care team session', () => {
+  const now = Date.parse('2026-10-23T12:00:00.000Z');
+  const token = issueRequesterToken(secret, 'firebaseUid1234', 'Member@Zion.Example', now, 1000);
+  assert.deepEqual(readRequesterToken(token, secret, now + 500), {
+    uid: 'firebaseUid1234',
+    email: 'member@zion.example',
+  });
+  assert.equal(readRequesterToken(token, secret, now + 1000), null);
+  assert.equal(verifySessionToken(token, secret, now), false);
+  assert.equal(readRequesterToken(token, 'another-secret-value', now), null);
 });
