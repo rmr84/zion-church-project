@@ -12,8 +12,8 @@ export default function HomePage() {
         and you can ask with an account or without one. The congregation cannot read what you send.
       </p>
       <div className="actions">
-        <Link className="button" href="/request">Request care</Link>
-        <Link className="button secondary" href="/status">Check a request</Link>
+        <Link className="button" href="/request">Request Care</Link>
+        <Link className="button secondary" href="/status">Check a Request</Link>
       </div>
       <p className="hint">
         <Link href="/sign-in">Sign in</Link>
