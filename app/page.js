@@ -52,21 +52,25 @@ export default function HomePage() {
               Your name is optional, and so is an account. Only the care team can read what you send.
             </p>
           </div>
+          <div className="hero-frame">
+            <img
+              className="hero-photo"
+              src="/zion-building.jpg"
+              alt="Zion Church sign on the building"
+              width={447}
+              height={447}
+            />
+          </div>
+        </div>
+        <div className="hero-frame hero-banner-frame">
           <img
-            className="hero-photo"
-            src="/zion-building.jpg"
-            alt="Zion Church sign on the building"
-            width={447}
-            height={447}
+            className="hero-banner"
+            src="/zion-banner.jpg"
+            alt="Experience. Engage. Equip. Empower."
+            width={738}
+            height={246}
           />
         </div>
-        <img
-          className="hero-banner"
-          src="/zion-banner.jpg"
-          alt="Experience. Engage. Equip. Empower."
-          width={738}
-          height={246}
-        />
         <p className="scroll-cue"></p>
       </section>
 

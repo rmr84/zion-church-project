@@ -33,6 +33,7 @@ export function ReviewCarousel({ reviews }) {
   function move(direction) {
     setIndex((current) => {
       if (direction > 0 && current >= maxIndex) return 0;
+      if (direction < 0 && current <= 0) return maxIndex;
       return Math.min(maxIndex, Math.max(0, current + direction));
     });
   }
@@ -52,9 +53,9 @@ export function ReviewCarousel({ reviews }) {
       <button
         className="carousel-button"
         type="button"
-        aria-label="Previous reviews"
+        aria-label={index === 0 && maxIndex > 0 ? 'Last reviews' : 'Previous reviews'}
         onClick={() => move(-1)}
-        disabled={index === 0}
+        disabled={maxIndex === 0}
       >
         <Chevron direction="left" />
       </button>
