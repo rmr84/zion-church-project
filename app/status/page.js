@@ -22,7 +22,7 @@ export default async function StatusPage({ searchParams }) {
       </p>
       <form className="stack" action="/status" method="get">
         <div className="field">
-          <label htmlFor="code">Reference code</label>
+          <label htmlFor="code">Reference Code</label>
           <input
             id="code"
             name="code"

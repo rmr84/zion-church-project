@@ -14,13 +14,15 @@ export default async function RequesterSignInPage() {
       <h1>Sign in</h1>
       <p className="lede">
         An account keeps the requests you send while you are signed in.
-        You can still send a request without one.
+      
       </p>
       <RequesterSignIn />
-      <p>
-        <Link href="/request">Request care without an account</Link>
-        {' · '}
-        <Link href="/staff/login">Care team sign in</Link>
+      <p className="or-divider">or</p>
+      <p className="sign-in-alt">
+        <Link href="/request">Request Care Without Account</Link>
+      </p>
+      <p className="sign-in-alt">
+        <Link href="/staff/login">Care Team Sign In</Link>
       </p>
     </section>
   );

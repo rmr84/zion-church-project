@@ -14,9 +14,9 @@ export async function Header() {
           <img src="/zion-logo.png" alt="" width={293} height={80} />
         </Link>
         <nav className="primary-nav" aria-label="Primary">
-          <Link href="/request">Request care</Link>
-          <Link href="/status">Check status</Link>
-          {requester ? <Link href="/account">My requests</Link> : <Link href="/sign-in">Sign in</Link>}
+          <Link href="/request">Request Care</Link>
+          <Link href="/status">Check Status</Link>
+          {requester ? <Link href="/account">My Requests</Link> : <Link href="/sign-in">Sign In</Link>}
           {requester ? (
             <form className="inline-form" action={signOutOfRequester}>
               <button className="text-button" type="submit">Sign out</button>

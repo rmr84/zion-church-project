@@ -13,8 +13,8 @@ export default async function LoginPage({ searchParams }) {
 
   return (
     <section className="wrap narrow">
-      <p className="eyebrow">Care team</p>
-      <h1>Care team sign in</h1>
+      <p className="eyebrow">Care Team</p>
+      <h1>Care Team Sign In</h1>
       <p className="lede">
         This password opens the care desk. It is separate from a care requester account.
         The demo password is zion-care-team.
