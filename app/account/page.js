@@ -12,7 +12,7 @@ export default async function AccountPage() {
   const requester = await getRequester();
   if (!requester) redirect('/sign-in');
 
-  const requests = listRequesterRequests(requester.uid);
+  const requests = await listRequesterRequests(requester.uid);
 
   return (
     <section className="wrap narrow">
