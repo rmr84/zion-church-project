@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { after, test } from 'node:test';
 import { closeDb } from '../lib/db.js';
-import { REQUESTER_ROLE, getUserRole, saveUser, usersCollection } from '../lib/users.js';
+import { REQUESTER_ROLE, getUserRole, listDeskMembers, saveUser, usersCollection } from '../lib/users.js';
 
 process.env.MONGODB_DB = 'zion-care-test';
 
@@ -33,8 +33,10 @@ test('saveUser writes the requester and can mark the email confirmed', async () 
   assert.equal(confirmed.emailVerified, true);
   assert.equal(confirmed.role, 'admin');
   assert.equal(await getUserRole(uid), 'Admin');
-  await users.updateOne({ uid }, { $set: { role: 'careTeam' } });
+  await users.updateOne({ uid }, { $set: { role: 'careTeam', firstName: 'Desk', lastName: 'Member' } });
   assert.equal(await getUserRole(uid), 'careTeam');
+  const members = await listDeskMembers();
+  assert.ok(members.some((member) => member.email === email && member.role === 'Care team' && member.name === 'Desk Member'));
   assert.equal(confirmed.createdAt, created.createdAt);
   assert.ok(confirmed.updatedAt >= created.updatedAt);
 });
