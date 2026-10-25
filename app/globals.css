@@ -2177,7 +2177,21 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 
 .title-row h1 { margin: 0; }
 
+.detail-panel {
+  background: white;
+  border: 1px solid #e6ebef;
+  border-radius: 1rem;
+  padding: 1.35rem 1.4rem 1.5rem;
+  box-shadow: 0 10px 28px rgba(36, 37, 40, 0.06);
+}
 .detail-grid { display: grid; gap: 1.5rem; align-items: start; }
+.staff-editor { min-width: 0; }
+.staff-editor-save {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+.staff-editor .member-picker { z-index: 2; }
+.staff-editor .member-picker.is-open { z-index: 30; }
 
 .meta {
   display: grid;

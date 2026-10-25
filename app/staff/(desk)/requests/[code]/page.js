@@ -1,10 +1,11 @@
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { StatusBadge, UrgencyBadge } from "@/components/Badges";
-import { StaffEditor } from "@/components/StaffEditor";
-import { CARE_TYPES, CONTACT_METHODS, labelFor } from "@/lib/constants";
-import { formatWhen } from "@/lib/format";
-import { getStaffRequest } from "@/lib/requests";
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { StatusBadge, UrgencyBadge } from '@/components/Badges';
+import { StaffEditor } from '@/components/StaffEditor';
+import { CARE_TYPES, CONTACT_METHODS, labelFor } from '@/lib/constants';
+import { formatWhen } from '@/lib/format';
+import { getStaffRequest } from '@/lib/requests';
+import { listDeskMembers } from '@/lib/users';
 
 export async function generateMetadata({ params }) {
   const { code } = await params;
@@ -13,58 +14,67 @@ export async function generateMetadata({ params }) {
 
 export default async function RequestDetailPage({ params }) {
   const { code } = await params;
-  const request = await getStaffRequest(code);
+  const [request, members] = await Promise.all([
+    getStaffRequest(code),
+    listDeskMembers(),
+  ]);
   if (!request) notFound();
 
-  const backHref = request.status === "completed" ? "/staff/archive" : "/staff";
+  const backHref = request.status === 'completed' ? '/staff/archive' : '/staff';
 
   return (
-    <section className="wrap wide">
-      <p className="eyebrow">{request.referenceCode}</p>
-      <div className="title-row">
-        <h1>{labelFor(CARE_TYPES, request.careType)}</h1>
-        <UrgencyBadge urgency={request.urgency} />
-        <StatusBadge status={request.status} desk />
-      </div>
-      <p>
-        <Link href={backHref}>Back</Link>
-      </p>
-      <div className="detail-grid">
-        <div>
-          <dl className="meta">
-            <dt>From</dt>
-            <dd>{request.name || "Name not given"}</dd>
-            <dt>Account</dt>
-            <dd>{request.requesterEmail || "No account"}</dd>
-            <dt>Contact</dt>
-            <dd>
-              {labelFor(CONTACT_METHODS, request.contactMethod)}
-              {request.contactDetail ? ` · ${request.contactDetail}` : ""}
-            </dd>
-            <dt>Assigned to</dt>
-            <dd>{request.assignee || "Unassigned"}</dd>
-            <dt>Submitted</dt>
-            <dd>{formatWhen(request.createdAt)}</dd>
-            <dt>Updated</dt>
-            <dd>{formatWhen(request.updatedAt)}</dd>
-            {request.completedAt ? (
-              <>
-                <dt>Completed</dt>
-                <dd>{formatWhen(request.completedAt)}</dd>
-              </>
-            ) : null}
-          </dl>
-          <h2>What they asked</h2>
-          <p className="prose">{request.description}</p>
+    <section className="page-frame">
+      <div className="page-heading">
+        <p className="eyebrow">Care Team</p>
+        <div className="title-row">
+          <h1>{labelFor(CARE_TYPES, request.careType)}</h1>
+          <UrgencyBadge urgency={request.urgency} />
+          <StatusBadge status={request.status} desk />
         </div>
-        <StaffEditor
-          key={`${request.updatedAt}-${request.status}`}
-          referenceCode={request.referenceCode}
-          status={request.status}
-          assignee={request.assignee}
-          memberNote={request.memberNote}
-          internalNote={request.internalNote}
-        />
+        <p className="lede">{request.referenceCode}</p>
+        <p>
+          <Link href={backHref}>Back</Link>
+        </p>
+      </div>
+      <div className="wrap wide detail-panel">
+        <div className="detail-grid">
+          <div>
+            <dl className="meta">
+              <dt>From</dt>
+              <dd>{request.name || 'Name not given'}</dd>
+              <dt>Account</dt>
+              <dd>{request.requesterEmail || 'No account'}</dd>
+              <dt>Contact</dt>
+              <dd>
+                {labelFor(CONTACT_METHODS, request.contactMethod)}
+                {request.contactDetail ? ` · ${request.contactDetail}` : ''}
+              </dd>
+              <dt>Assigned to</dt>
+              <dd>{request.assignee || 'Unassigned'}</dd>
+              <dt>Submitted</dt>
+              <dd>{formatWhen(request.createdAt)}</dd>
+              <dt>Updated</dt>
+              <dd>{formatWhen(request.updatedAt)}</dd>
+              {request.completedAt ? (
+                <>
+                  <dt>Completed</dt>
+                  <dd>{formatWhen(request.completedAt)}</dd>
+                </>
+              ) : null}
+            </dl>
+            <h2>What they asked</h2>
+            <p className="prose">{request.description}</p>
+          </div>
+          <StaffEditor
+            key={`${request.updatedAt}-${request.status}`}
+            referenceCode={request.referenceCode}
+            status={request.status}
+            assignee={request.assignee}
+            memberNote={request.memberNote}
+            internalNote={request.internalNote}
+            members={members}
+          />
+        </div>
       </div>
     </section>
   );

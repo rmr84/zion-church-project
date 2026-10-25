@@ -2,17 +2,34 @@
 
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { updateRequest } from '@/app/actions/staff';
+import { MemberPicker } from '@/components/MemberPicker';
+import { useToast } from '@/components/Toast';
 import { DESK_STATUSES } from '@/lib/constants';
+import { findMember, memberValue } from '@/lib/members';
 
-export function StaffEditor({ referenceCode, status, assignee, memberNote, internalNote }) {
+function assigneeValue(members, assignee) {
+  const matched = findMember(members, assignee);
+  return matched ? memberValue(matched) : (assignee || '');
+}
+
+export function StaffEditor({
+  referenceCode,
+  status,
+  assignee,
+  memberNote,
+  internalNote,
+  members = [],
+}) {
+  const showToast = useToast();
   const [state, action, pending] = useActionState(updateRequest, { errors: {}, saved: false });
   const [values, setValues] = useState({
     status,
-    assignee: assignee || '',
+    assignee: assigneeValue(members, assignee),
     memberNote: memberNote || '',
     internalNote: internalNote || '',
   });
   const summaryRef = useRef(null);
+  const toastedRef = useRef(false);
   const errors = state.errors || {};
   const errorEntries = Object.entries(errors);
 
@@ -20,14 +37,23 @@ export function StaffEditor({ referenceCode, status, assignee, memberNote, inter
     if (errorEntries.length > 0) summaryRef.current?.focus();
   }, [state, errorEntries.length]);
 
+  useEffect(() => {
+    if (!state.saved) {
+      toastedRef.current = false;
+      return;
+    }
+    if (toastedRef.current) return;
+    toastedRef.current = true;
+    showToast?.('Request saved.');
+  }, [state.saved, showToast]);
+
   function setField(name, value) {
     setValues((current) => ({ ...current, [name]: value }));
   }
 
   return (
-    <form action={action} className="stack" aria-busy={pending}>
+    <form action={action} className="stack staff-editor" aria-busy={pending}>
       <input type="hidden" name="referenceCode" value={referenceCode} />
-      {state.saved ? <p className="banner ok" role="status">Saved.</p> : null}
       {errorEntries.length > 0 ? (
         <div className="banner error" role="alert" tabIndex={-1} ref={summaryRef}>
           <ul>
@@ -58,15 +84,15 @@ export function StaffEditor({ referenceCode, status, assignee, memberNote, inter
       <div className="field">
         <label htmlFor="assignee">Assigned to</label>
         <p className="hint" id="assignee-hint">Shown to the care team only.</p>
-        <input
+        <MemberPicker
           id="assignee"
           name="assignee"
-          maxLength={120}
-          autoComplete="off"
+          members={members}
+          value={values.assignee}
+          onChange={(value) => setField('assignee', value)}
+          disabled={pending}
           aria-describedby="assignee-hint"
           aria-invalid={Boolean(errors.assignee)}
-          value={values.assignee}
-          onChange={(event) => setField('assignee', event.target.value)}
         />
       </div>
 
@@ -88,7 +114,7 @@ export function StaffEditor({ referenceCode, status, assignee, memberNote, inter
       </div>
 
       <div className="private-panel">
-        <label htmlFor="internalNote">Care team note</label>
+        <label htmlFor="internalNote">Care Team Note</label>
         <p className="hint" id="internalNote-hint">
           Never shown on the status page, and left out of the notification log.
         </p>
@@ -105,7 +131,7 @@ export function StaffEditor({ referenceCode, status, assignee, memberNote, inter
         />
       </div>
 
-      <button className="button" type="submit" disabled={pending}>
+      <button className="button staff-editor-save" type="submit" disabled={pending}>
         {pending ? 'Saving…' : 'Save changes'}
       </button>
     </form>

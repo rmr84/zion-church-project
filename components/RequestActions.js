@@ -3,88 +3,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateRequestAssignee } from '@/app/actions/staff';
-import { MemberAvatar } from '@/components/MemberAvatar';
+import { MemberPicker } from '@/components/MemberPicker';
 import { useToast } from '@/components/Toast';
-import { memberLabel, memberValue } from '@/lib/members';
-
-function MemberPicker({ id, members, value, onChange, disabled = false }) {
-  const [open, setOpen] = useState(false);
-  const rootRef = useRef(null);
-  const listId = useId();
-  const selected = members.find((member) => memberValue(member) === value);
-
-  useEffect(() => {
-    if (!open) return undefined;
-    function closeOnOutside(event) {
-      if (!rootRef.current?.contains(event.target)) setOpen(false);
-    }
-    function closeOnEscape(event) {
-      if (event.key === 'Escape') setOpen(false);
-    }
-    document.addEventListener('pointerdown', closeOnOutside);
-    document.addEventListener('keydown', closeOnEscape);
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutside);
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-  }, [open]);
-
-  function choose(member) {
-    const next = memberValue(member);
-    onChange?.(next === value ? '' : next);
-    setOpen(false);
-  }
-
-  return (
-    <div className={`member-picker${open ? ' is-open' : ''}`} ref={rootRef}>
-      <button
-        id={id}
-        className="member-picker-trigger"
-        type="button"
-        aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={listId}
-        disabled={disabled}
-        onClick={() => setOpen((current) => !current)}
-      >
-        {selected ? (
-          <>
-            <MemberAvatar member={selected} className="member-picker-avatar" />
-            <span className="member-picker-label">{memberLabel(selected)}</span>
-          </>
-        ) : (
-          <span className="member-picker-placeholder">Select a member</span>
-        )}
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 10l5 5 5-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
-      {open ? (
-        <ul className="member-picker-menu" id={listId} role="listbox" aria-label="Care Team Member">
-          {members.map((member) => {
-            const option = memberValue(member);
-            const checked = option === value;
-            return (
-              <li key={member.uid || member.email} role="option" aria-selected={checked}>
-                <button type="button" onClick={() => choose(member)}>
-                  <span className={`member-picker-check${checked ? ' is-on' : ''}`} aria-hidden="true">
-                    {checked ? (
-                      <svg viewBox="0 0 24 24">
-                        <path d="M5.5 12.5 10 17l8.5-9.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    ) : null}
-                  </span>
-                  <MemberAvatar member={member} className="member-picker-avatar" />
-                  <span className="member-picker-label">{memberLabel(member)}</span>
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      ) : null}
-    </div>
-  );
-}
 
 export function RequestActions({ request, members = [] }) {
   const router = useRouter();
