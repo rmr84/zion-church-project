@@ -12,8 +12,7 @@ const ITEMS = [
     label: 'Care requests',
     current: (pathname) => pathname === '/staff'
       || pathname.startsWith('/staff/requests')
-      || pathname.startsWith('/staff/archive')
-      || pathname.startsWith('/staff/notifications'),
+      || pathname.startsWith('/staff/archive'),
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="5" y="3.5" width="14" height="17" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -81,6 +80,9 @@ export function DeskMenu({ member, isAdmin = false }) {
                 {item.label}
               </Link>
             ))}
+            <Link href="/staff/notifications" aria-current={pathname.startsWith('/staff/notifications') ? 'page' : undefined}>
+              Notifications
+            </Link>
           </nav>
         </SiteMenu>
       </div>
@@ -95,25 +97,39 @@ export function DeskMenu({ member, isAdmin = false }) {
           <nav className="desk-rail-nav" aria-label="Care team">
             {links}
           </nav>
-          <Link href="/staff/account" className="desk-rail-user" aria-current={pathname.startsWith('/staff/account') ? 'page' : undefined}>
-            {member?.photo && !photoFailed ? (
-              <img
-                src={`/api/profile-photo?desk=1&v=${encodeURIComponent(member.photoUpdatedAt)}`}
-                alt=""
-                width={36}
-                height={36}
-                onError={() => setPhotoFailed(true)}
-              />
-            ) : (
-              <span className="desk-rail-avatar" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <circle cx="12" cy="8" r="3.15" fill="none" stroke="currentColor" strokeWidth="1.8" />
-                  <path d="M5.6 19.1c1.35-3.05 3.55-4.45 6.4-4.45s5.05 1.4 6.4 4.45" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </span>
-            )}
-            <span>{label}</span>
-          </Link>
+          <div className="desk-rail-foot">
+            <Link
+              href="/staff/notifications"
+              className="desk-rail-note"
+              aria-current={pathname.startsWith('/staff/notifications') ? 'page' : undefined}
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4.2 1.5 5.5 1.5 5.5H5s1.5-1.3 1.5-5.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                <path d="M10 18.2a2 2 0 0 0 4 0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              Notifications
+            </Link>
+            <Link href="/staff/account" className="desk-rail-user" aria-current={pathname.startsWith('/staff/account') ? 'page' : undefined}>
+              {member?.photo && !photoFailed ? (
+                <img
+                  src={`/api/profile-photo?desk=1&v=${encodeURIComponent(member.photoUpdatedAt)}`}
+                  alt=""
+                  width={36}
+                  height={36}
+                  onError={() => setPhotoFailed(true)}
+                />
+              ) : (
+                <span className="desk-rail-avatar" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <circle cx="12" cy="8" r="3.15" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                    <path d="M5.6 19.1c1.35-3.05 3.55-4.45 6.4-4.45s5.05 1.4 6.4 4.45" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </span>
+              )}
+              <span className="desk-rail-user-name">{label}</span>
+              <span className="desk-rail-online" title="Online" aria-label="Online" />
+            </Link>
+          </div>
         </aside>
         <button
           className="desk-rail-toggle"
