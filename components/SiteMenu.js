@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
-export function SiteMenu({ children }) {
+export function SiteMenu({ children, dropdown = false }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const pathname = usePathname();
@@ -29,7 +29,7 @@ export function SiteMenu({ children }) {
   }, [open]);
 
   return (
-    <div className={`site-menu${open ? ' is-open' : ''}`} ref={rootRef}>
+    <div className={`site-menu${dropdown ? ' is-dropdown' : ''}${open ? ' is-open' : ''}`} ref={rootRef}>
       <button
         className="menu-toggle"
         type="button"
