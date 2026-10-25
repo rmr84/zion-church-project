@@ -2,6 +2,7 @@ import './globals.css';
 import { FirebaseApp } from '@/components/FirebaseApp';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { ToastProvider } from '@/components/Toast';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,11 +20,13 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <a className="skip" href="#main">Skip to content</a>
-        <FirebaseApp />
-        <Header />
-        <main id="main" tabIndex={-1}>{children}</main>
-        <Footer />
+        <ToastProvider>
+          <a className="skip" href="#main">Skip to content</a>
+          <FirebaseApp />
+          <Header />
+          <main id="main" tabIndex={-1}>{children}</main>
+          <Footer />
+        </ToastProvider>
       </body>
     </html>
   );

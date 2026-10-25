@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { CopyCode } from '@/components/CopyCode';
+import { ArrivalToast } from '@/components/ArrivalToast';
 import { normalizeReferenceCode } from '@/lib/reference';
 import { isStaffSignedIn } from '@/lib/session';
 
@@ -20,6 +21,7 @@ export default async function SentPage({ searchParams }) {
       <div className="wrap narrow">
       {code ? (
         <>
+          <ArrivalToast message="Request received." />
           <p className="lede">
             Save this code. Anyone with it can see the status and the notes the team leaves for you.
             Staff notes stay with the team.

@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { StatusBadge } from '@/components/Badges';
-import { CARE_TYPES, labelFor } from '@/lib/constants';
-import { formatDay } from '@/lib/format';
+import { RequestTable } from '@/components/RequestTable';
 import { listRequesterRequests } from '@/lib/requests';
 import { getRequester } from '@/lib/session';
 
@@ -28,22 +26,7 @@ export default async function AccountPage() {
           <Link className="button" href="/request">Request Care</Link>
         </div>
       ) : (
-        <div className="wrap narrow">
-          <ol className="request-list">
-            {requests.map((request) => (
-              <li key={request.referenceCode}>
-                <Link className="request-row account" href={`/status?code=${encodeURIComponent(request.referenceCode)}`}>
-                  <span className="row-main">
-                    <span className="row-title">{labelFor(CARE_TYPES, request.careType)}</span>
-                    <span className="row-sub">{request.referenceCode}</span>
-                  </span>
-                  <StatusBadge status={request.status} />
-                  <time dateTime={request.createdAt}>{formatDay(request.createdAt)}</time>
-                </Link>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <RequestTable requests={requests} />
       )}
     </section>
   );
