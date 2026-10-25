@@ -15,13 +15,19 @@ const requestIcon = (
 
 const ACTIONS = [
   {
-    href: '/staff/account',
-    title: 'Account',
-    detail: 'View and update the information on this account.',
+    href: '/staff',
+    title: 'Care requests',
+    detail: 'View and manage open care requests.',
+    icon: requestIcon,
+  },
+  {
+    href: '/staff/reviews',
+    title: 'Reviews',
+    detail: 'Read what members say about the care desk.',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="8" r="3.15" fill="none" stroke="currentColor" strokeWidth="1.8" />
-        <path d="M5.6 19.1c1.35-3.05 3.55-4.45 6.4-4.45s5.05 1.4 6.4 4.45" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M7 7.5h10M7 12h10M7 16.5h6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <rect x="4.5" y="4" width="15" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
       </svg>
     ),
   },
@@ -39,10 +45,15 @@ const ACTIONS = [
     ),
   },
   {
-    href: '/staff',
-    title: 'Care requests',
-    detail: 'View and manage open care requests.',
-    icon: requestIcon,
+    href: '/staff/account',
+    title: 'Account',
+    detail: 'View and update the information on this account.',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.15" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M5.6 19.1c1.35-3.05 3.55-4.45 6.4-4.45s5.05 1.4 6.4 4.45" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    ),
   },
 ];
 

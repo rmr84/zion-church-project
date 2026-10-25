@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { DeskMenu } from '@/components/DeskMenu';
 import { SiteMenu } from '@/components/SiteMenu';
 import { getRequester, getStaff, isStaffSignedIn } from '@/lib/session';
-import { getUser } from '@/lib/users';
+import { ADMIN_ROLE, getUser, getUserRole } from '@/lib/users';
 
 export async function Header() {
   const staff = await isStaffSignedIn();
@@ -10,20 +10,29 @@ export async function Header() {
   const profile = requester ? await getUser(requester.uid).catch(() => null) : null;
   const staffIdentity = staff ? await getStaff() : null;
   const staffProfile = staffIdentity ? await getUser(staffIdentity.uid).catch(() => null) : null;
+  const role = staffIdentity ? await getUserRole(staffIdentity.uid).catch(() => '') : '';
+  const isAdmin = role === ADMIN_ROLE;
   const staffName = [staffProfile?.firstName, staffProfile?.lastName].filter(Boolean).join(' ');
   const member = {
     label: staffName || staffIdentity?.email || 'Care team',
     photo: Boolean(staffProfile?.photoType),
     photoUpdatedAt: staffProfile?.photoUpdatedAt || '',
   };
+  const brandHref = staff ? '/staff' : '/';
 
   return (
     <header className="site-header">
       <div className="header-inner">
-        <Link href="/" className="wordmark" aria-label="Zion Church">
-          <img src="/zion-logo.png" alt="" width={293} height={80} />
-        </Link>
-        {staff ? <DeskMenu member={member} /> : (
+        {isAdmin ? (
+          <Link href="/staff" className="wordmark desk-wordmark-phone" aria-label="Zion Church">
+            <img src="/zion-logo.png" alt="" width={293} height={80} />
+          </Link>
+        ) : (
+          <Link href={brandHref} className="wordmark" aria-label="Zion Church">
+            <img src="/zion-logo.png" alt="" width={293} height={80} />
+          </Link>
+        )}
+        {staff ? <DeskMenu member={member} isAdmin={isAdmin} /> : (
           <SiteMenu>
             <nav className="primary-nav" aria-label="Primary">
               <Link href="/request">Request Care</Link>

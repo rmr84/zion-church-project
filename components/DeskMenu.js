@@ -22,6 +22,17 @@ const ITEMS = [
     ),
   },
   {
+    href: '/staff/reviews',
+    label: 'Reviews',
+    current: (pathname) => pathname.startsWith('/staff/reviews'),
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 7.5h10M7 12h10M7 16.5h6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <rect x="4.5" y="4" width="15" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    ),
+  },
+  {
     href: '/staff/users',
     label: 'User management',
     current: (pathname) => pathname.startsWith('/staff/users'),
@@ -47,7 +58,7 @@ const ITEMS = [
   },
 ];
 
-export function DeskMenu({ member }) {
+export function DeskMenu({ member, isAdmin = false }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [photoFailed, setPhotoFailed] = useState(false);
@@ -75,6 +86,11 @@ export function DeskMenu({ member }) {
       </div>
       <div className={`desk-rail-slot${open ? ' is-open' : ''}`}>
         <aside id="desk-rail" className="desk-rail" inert={open ? undefined : true}>
+          {isAdmin ? (
+            <Link href="/staff" className="desk-rail-brand" aria-label="Zion Church">
+              <img src="/zion-logo.png" alt="" width={293} height={80} />
+            </Link>
+          ) : null}
           <DeskSearch />
           <nav className="desk-rail-nav" aria-label="Care team">
             {links}
