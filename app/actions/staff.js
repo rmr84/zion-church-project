@@ -2,23 +2,9 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { passwordMatches } from '@/lib/password';
 import { updateCareRequest } from '@/lib/requests';
-import { isStaffSignedIn, signInStaff, signOutStaff } from '@/lib/session';
+import { isStaffSignedIn, signOutStaff } from '@/lib/session';
 import { validateStaffUpdate } from '@/lib/validate';
-
-export async function login(formData) {
-  const sessionSecret = process.env.STAFF_SESSION_SECRET || '';
-  if (!process.env.STAFF_PASSWORD || sessionSecret.length < 16) {
-    redirect('/staff/login?error=config');
-  }
-
-  const password = String(formData.get('password') || '');
-  if (!passwordMatches(password)) redirect('/staff/login?error=1');
-
-  await signInStaff();
-  redirect('/staff');
-}
 
 export async function logout() {
   await signOutStaff();
@@ -26,7 +12,7 @@ export async function logout() {
 }
 
 export async function updateRequest(_previous, formData) {
-  if (!(await isStaffSignedIn())) redirect('/staff/login');
+  if (!(await isStaffSignedIn())) redirect('/sign-in');
 
   const result = validateStaffUpdate({
     referenceCode: formData.get('referenceCode'),
