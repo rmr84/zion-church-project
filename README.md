@@ -23,7 +23,7 @@ Care requester sign-in is at [http://localhost:3000/sign-in](http://localhost:30
 
 Creating an account sends Firebase's confirmation email. The person is saved in the `users` collection. Sign-in opens after that email is confirmed.
 
-Care team sign-in is separate, at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). The demo password is `zion-care-team`. `STAFF_SESSION_SECRET` must be at least 16 characters. Both values are in `.env.example`.
+Care team members use that same email and password sign-in. An account opens the desk when its document in `users` has `role` set to `staff`. `STAFF_SESSION_SECRET` must be at least 16 characters and is in `.env.example`.
 
 `npm run seed` replaces the care requests in MongoDB with the demo requests.
 
@@ -71,27 +71,27 @@ npm run build
 npm start
 ```
 
-Set `STAFF_PASSWORD` and `STAFF_SESSION_SECRET` (16 characters or more). Set `MONGODB_URI`. The Firebase web app reads `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, and `NEXT_PUBLIC_FIREBASE_APP_ID` from the environment.
+Set `STAFF_SESSION_SECRET` (16 characters or more). Set `MONGODB_URI`. The Firebase web app reads `NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`, `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`, and `NEXT_PUBLIC_FIREBASE_APP_ID` from the environment.
 
 If the care-requests collection is empty, startup seeds the codes above. Later requests stay in Atlas.
 
 ## Project map
 
 - Member pages live at `/`, `/request`, `/request/sent`, and `/status`
-- `app/staff` is the password-protected desk, archive, and notification log
+- `app/staff` is the care team desk, archive, and notification log
 - `app/api/status` is the member lookup as JSON
 - `lib/db.js` connects to MongoDB, validates each request, and creates the member view
 - `lib/requests.js` is the only place that reads and writes requests
 - `lib/notify.js` is the email stub
 - `lib/session-token.js` is the HMAC-signed staff session and the separate requester session
-- `/sign-in` is the optional care requester account. `/staff/login` is the care team password
+- `/sign-in` is the email and password sign-in for care requesters and care team members
 - `lib/firebase.js` starts the Firebase web app for project `code-challenge-zion`
 
 ## A short review path
 
 1. Submit an anonymous prayer request and save the reference code.
 2. Open the hospital status link above and confirm Pastor Ellis and room 312 are absent. Open `ZC-MEAL-1002` and confirm the meal-team note is present and Ruth Alvarez is not.
-3. Sign in with `zion-care-team`. Leave the sort on Urgency and confirm Samir Haddad is above Margaret Hale, and the anonymous prayer request is last.
+3. Sign in with a care team account. Leave the sort on Urgency and confirm Samir Haddad is above Margaret Hale, and the anonymous prayer request is last.
 4. Open Margaret Hale, add a note for the member, and set the status to In Review.
 5. Open Notifications and confirm the logged email names the code, the new status, and the member note, and does not name the diagnosis.
 6. Check `ZC-HOSP-1001` again and confirm the member note is visible and the staff note is still absent.
