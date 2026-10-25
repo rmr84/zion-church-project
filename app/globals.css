@@ -1457,8 +1457,6 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 .badge-assigned { color: var(--teal); background: var(--mist); }
 .badge-completed { color: #3e4a54; background: #e7ecef; }
 
-.desk-nav { margin-bottom: 0.4rem; }
-
 .sort-nav,
 .desk-nav { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
 
@@ -1482,6 +1480,168 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   border-color: var(--gold);
   color: var(--ink);
 }
+
+.queue-filters { margin: 0 0 1.1rem; }
+.queue-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+.queue-search {
+  position: relative;
+  flex: 1 1 14rem;
+  min-width: 0;
+  margin: 0;
+}
+.queue-search svg {
+  position: absolute;
+  top: 50%;
+  left: 0.75rem;
+  width: 1.05rem;
+  height: 1.05rem;
+  color: #8b95a1;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.queue-search input {
+  width: 100%;
+  padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+  border: 1px solid #e6ebef;
+  border-radius: 0.65rem;
+  background: white;
+  font-size: 0.98rem;
+}
+.queue-search input:focus { border-color: var(--teal); outline: none; }
+.queue-switch {
+  display: inline-flex;
+  padding: 0.2rem;
+  border: 1px solid #e6ebef;
+  border-radius: 999px;
+  background: #f7f8fa;
+}
+.queue-switch button {
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #4b5563;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+}
+.queue-switch button[aria-pressed="true"] {
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(36, 37, 40, 0.12);
+}
+.queue-filter { position: relative; }
+.queue-filter-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid #e6ebef;
+  border-radius: 0.65rem;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.queue-filter-button svg { width: 1.05rem; height: 1.05rem; color: #6b7280; }
+.queue-filter-button:hover { border-color: #d5dbe0; }
+.queue-filter-menu {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  z-index: 20;
+  width: min(17rem, calc(100vw - 2.5rem));
+  max-height: 22rem;
+  overflow: auto;
+  padding: 0.45rem;
+  background: white;
+  border: 1px solid #e6ebef;
+  border-radius: 0.8rem;
+  box-shadow: 0 14px 32px rgba(36, 37, 40, 0.14);
+}
+.queue-filter-label {
+  margin: 0.45rem 0.55rem 0.25rem;
+  color: #8b95a1;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.queue-filter-menu button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.queue-filter-menu button:hover { background: #f7f8fa; }
+.queue-filter-check {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid #c9d0d6;
+  border-radius: 0.28rem;
+  background: white;
+  color: var(--teal);
+}
+.queue-filter-check.is-on {
+  border-color: var(--teal);
+  background: #e8f4f8;
+}
+.queue-filter-check svg { width: 0.85rem; height: 0.85rem; }
+.queue-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.queue-pills li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.35rem 0.3rem 0.7rem;
+  border: 1px solid #e6ebef;
+  border-radius: 999px;
+  background: #f3f5f7;
+  color: var(--ink);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+.queue-pills button {
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+}
+.queue-pills button svg { width: 0.75rem; height: 0.75rem; }
+.queue-pills button:hover { background: white; color: var(--ink); }
 
 .request-table-wrap {
   width: min(100% - 2.5rem, var(--desk));
