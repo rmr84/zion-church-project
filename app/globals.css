@@ -1225,6 +1225,12 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   background: white;
   border-radius: 0.7rem;
   box-shadow: 0 10px 28px rgba(36, 37, 40, 0.16);
+  transform: translateX(calc(100% + 1.75rem));
+  transition: transform 0.35s ease;
+}
+.copy-toast.is-in { transform: translateX(0); }
+@media (prefers-reduced-motion: reduce) {
+  .copy-toast { transition: none; }
 }
 .copy-toast-icon {
   width: 1.65rem;

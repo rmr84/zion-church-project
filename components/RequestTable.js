@@ -10,9 +10,11 @@ const PHONE_PAGE_SIZE = 3;
 
 export function RequestTable({ requests }) {
   const dialogRef = useRef(null);
-  const toastTimer = useRef(null);
+  const hideTimer = useRef(null);
+  const leaveTimer = useRef(null);
   const [selected, setSelected] = useState(null);
-  const [copied, setCopied] = useState(false);
+  const [toastMounted, setToastMounted] = useState(false);
+  const [toastOpen, setToastOpen] = useState(false);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(WEB_PAGE_SIZE);
 
@@ -32,9 +34,50 @@ export function RequestTable({ requests }) {
   const currentPage = Math.min(page, pageCount - 1);
   const visible = requests.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
 
+  function prefersMotion() {
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
   function dismissCopy() {
-    window.clearTimeout(toastTimer.current);
-    setCopied(false);
+    window.clearTimeout(hideTimer.current);
+    if (!prefersMotion()) {
+      setToastOpen(false);
+      setToastMounted(false);
+      return;
+    }
+    setToastOpen(false);
+    window.clearTimeout(leaveTimer.current);
+    leaveTimer.current = window.setTimeout(() => setToastMounted(false), 380);
+  }
+
+  function showCopyToast() {
+    window.clearTimeout(hideTimer.current);
+    window.clearTimeout(leaveTimer.current);
+    if (toastMounted && toastOpen) {
+      hideTimer.current = window.setTimeout(dismissCopy, 10000);
+      return;
+    }
+    setToastMounted(true);
+    if (!prefersMotion()) {
+      setToastOpen(true);
+      hideTimer.current = window.setTimeout(dismissCopy, 10000);
+      return;
+    }
+    setToastOpen(false);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => setToastOpen(true));
+    });
+  }
+
+  function onToastTransitionEnd(event) {
+    if (event.propertyName !== 'transform' || event.target !== event.currentTarget) return;
+    if (toastOpen) {
+      window.clearTimeout(hideTimer.current);
+      hideTimer.current = window.setTimeout(dismissCopy, 10000);
+      return;
+    }
+    window.clearTimeout(leaveTimer.current);
+    setToastMounted(false);
   }
 
   async function copyCode(code) {
@@ -43,12 +86,13 @@ export function RequestTable({ requests }) {
     } catch {
       return;
     }
-    setCopied(true);
-    window.clearTimeout(toastTimer.current);
-    toastTimer.current = window.setTimeout(() => setCopied(false), 5000);
+    showCopyToast();
   }
 
-  useEffect(() => () => window.clearTimeout(toastTimer.current), []);
+  useEffect(() => () => {
+    window.clearTimeout(hideTimer.current);
+    window.clearTimeout(leaveTimer.current);
+  }, []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -205,8 +249,12 @@ export function RequestTable({ requests }) {
           </>
         ) : null}
       </dialog>
-      {copied ? (
-        <div className="copy-toast" role="status">
+      {toastMounted ? (
+        <div
+          className={toastOpen ? 'copy-toast is-in' : 'copy-toast'}
+          role="status"
+          onTransitionEnd={onToastTransitionEnd}
+        >
           <span className="copy-toast-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24">
               <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
