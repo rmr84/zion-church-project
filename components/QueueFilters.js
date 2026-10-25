@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CARE_TYPES, DESK_STATUSES, URGENCY_LEVELS } from '@/lib/constants';
+import { UNASSIGNED, memberLabel, memberValue } from '@/lib/members';
 
 export function QueueFilters({
   query,
@@ -14,6 +15,9 @@ export function QueueFilters({
   onCareTypesChange,
   statuses,
   onStatusesChange,
+  assignees,
+  onAssigneesChange,
+  members = [],
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
@@ -76,6 +80,13 @@ export function QueueFilters({
       key: `status-${value}`,
       label: DESK_STATUSES.find((item) => item.value === value)?.label || value,
       clear: () => onStatusesChange(statuses.filter((item) => item !== value)),
+    })),
+    ...assignees.map((value) => ({
+      key: `assignee-${value}`,
+      label: value === UNASSIGNED
+        ? 'Unassigned'
+        : memberLabel(members.find((member) => memberValue(member) === value) || { label: value }),
+      clear: () => onAssigneesChange(assignees.filter((item) => item !== value)),
     })),
   ];
 
@@ -148,6 +159,23 @@ export function QueueFilters({
                   onClick={() => toggle(statuses, item.value, onStatusesChange)}
                 />
               ))}
+              <p className="queue-filter-label">Assignee</p>
+              <FilterOption
+                checked={assignees.includes(UNASSIGNED)}
+                label="Unassigned"
+                onClick={() => toggle(assignees, UNASSIGNED, onAssigneesChange)}
+              />
+              {members.map((member) => {
+                const value = memberValue(member);
+                return (
+                  <FilterOption
+                    key={member.uid || member.email}
+                    checked={assignees.includes(value)}
+                    label={memberLabel(member)}
+                    onClick={() => toggle(assignees, value, onAssigneesChange)}
+                  />
+                );
+              })}
             </div>
           ) : null}
         </div>

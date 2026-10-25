@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { QueueFilters } from '@/components/QueueFilters';
 import { RequestTable } from '@/components/RequestTable';
 import { CARE_TYPES, DESK_STATUSES, labelFor } from '@/lib/constants';
+import { UNASSIGNED, findMember, memberValue } from '@/lib/members';
 
 const URGENCY_RANK = { urgent: 0, soon: 1, routine: 2 };
 
@@ -38,13 +39,22 @@ function matchesQuery(request, query) {
   return haystack.includes(term);
 }
 
-export function Queue({ openRequests, archivedRequests, initialArchive = false }) {
+function matchesAssignee(request, assignees, members) {
+  if (!assignees.length) return true;
+  if (!request.assignee) return assignees.includes(UNASSIGNED);
+  const member = findMember(members, request.assignee);
+  const value = member ? memberValue(member) : request.assignee;
+  return assignees.includes(value);
+}
+
+export function Queue({ openRequests, archivedRequests, members = [], initialArchive = false }) {
   const router = useRouter();
   const [archive, setArchive] = useState(initialArchive);
   const [query, setQuery] = useState('');
   const [urgencies, setUrgencies] = useState([]);
   const [careTypes, setCareTypes] = useState([]);
   const [statuses, setStatuses] = useState([]);
+  const [assignees, setAssignees] = useState([]);
 
   const source = archive ? archivedRequests : openRequests;
   const title = archive ? 'Archive' : 'Open Requests';
@@ -59,10 +69,11 @@ export function Queue({ openRequests, archivedRequests, initialArchive = false }
       if (urgencies.length && !urgencies.includes(request.urgency)) return false;
       if (careTypes.length && !careTypes.includes(request.careType)) return false;
       if (statuses.length && !statuses.includes(request.status)) return false;
+      if (!matchesAssignee(request, assignees, members)) return false;
       return true;
     });
     return sortByUrgency(filtered);
-  }, [source, query, urgencies, careTypes, statuses]);
+  }, [source, query, urgencies, careTypes, statuses, assignees, members]);
 
   function changeArchive(next) {
     setArchive(next);
@@ -89,10 +100,18 @@ export function Queue({ openRequests, archivedRequests, initialArchive = false }
           onCareTypesChange={setCareTypes}
           statuses={statuses}
           onStatusesChange={setStatuses}
+          assignees={assignees}
+          onAssigneesChange={setAssignees}
+          members={members}
         />
       </div>
       {requests.length ? (
-        <RequestTable key={`${archive}-${query}-${urgencies.join(',')}-${careTypes.join(',')}-${statuses.join(',')}`} requests={requests} desk />
+        <RequestTable
+          key={`${archive}-${query}-${urgencies.join(',')}-${careTypes.join(',')}-${statuses.join(',')}-${assignees.join(',')}`}
+          requests={requests}
+          desk
+          members={members}
+        />
       ) : (
         <p className="empty wrap wide">{empty}</p>
       )}
