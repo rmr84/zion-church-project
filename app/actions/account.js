@@ -1,13 +1,13 @@
 'use server';
 
-import { getRequester } from '@/lib/session';
+import { getAccount } from '@/lib/session';
 import { cleanProfileName, cleanProfilePhone, detectedPhotoType, photoProblem, profileNameProblem, profilePhoneProblem } from '@/lib/profile';
 import { deleteProfilePhoto, saveProfilePhoto, updateUserProfile } from '@/lib/users';
 
 const NOTIFICATION_FIELDS = new Set(['emailNotifications', 'inAppNotifications']);
 
 export async function saveRequesterProfile(formData) {
-  const requester = await getRequester();
+  const requester = await getAccount();
   if (!requester) return { ok: false, formError: 'Sign in again to update this account.' };
 
   const firstName = cleanProfileName(formData.get('firstName'));
@@ -50,7 +50,7 @@ export async function saveRequesterProfile(formData) {
 }
 
 export async function removeRequesterPhoto() {
-  const requester = await getRequester();
+  const requester = await getAccount();
   if (!requester) return { ok: false, formError: 'Sign in again to update this account.' };
   try {
     await deleteProfilePhoto(requester.uid);
@@ -63,7 +63,7 @@ export async function removeRequesterPhoto() {
 }
 
 export async function saveNotificationPreference(field, enabled) {
-  const requester = await getRequester();
+  const requester = await getAccount();
   if (!requester || !NOTIFICATION_FIELDS.has(field)) return { ok: false };
   try {
     await updateUserProfile(requester.uid, requester.email, { [field]: enabled === true });

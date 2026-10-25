@@ -374,6 +374,35 @@ body {
 }
 .menu-toggle svg { width: 1.55rem; height: 1.55rem; }
 .site-menu-panel { display: contents; }
+.site-menu.is-dropdown { position: relative; }
+.site-menu.is-dropdown .menu-toggle { display: grid; }
+.site-menu.is-dropdown .site-menu-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 0.55rem);
+  right: 0;
+  z-index: 30;
+  min-width: 16rem;
+  padding: 0.4rem;
+  background: white;
+  border: 1px solid #e6ebef;
+  border-radius: 0.8rem;
+  box-shadow: 0 14px 32px rgba(36, 37, 40, 0.16);
+}
+.site-menu.is-dropdown.is-open .site-menu-panel { display: block; }
+.site-menu.is-dropdown .primary-nav {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.15rem;
+}
+.site-menu.is-dropdown .primary-nav a {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0.8rem;
+  border-radius: 0.5rem;
+}
+.site-menu.is-dropdown .primary-nav a:hover,
+.site-menu.is-dropdown .primary-nav a[aria-current="page"] { background: #fff6ee; }
 
 .primary-nav {
   display: flex;
@@ -1152,6 +1181,7 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   table-layout: fixed;
   text-align: left;
 }
+.member-table { table-layout: auto; }
 .request-table th {
   padding: 0.45rem 0.85rem 0.7rem;
   border-bottom: 2px solid var(--line);

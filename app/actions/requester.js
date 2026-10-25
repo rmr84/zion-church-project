@@ -29,7 +29,7 @@ export async function establishRequesterSession(idToken) {
   if (!stored.ok) return stored;
   if (isDeskRole(await getUserRole(identity.uid))) {
     await signOutRequester();
-    await signInStaff();
+    await signInStaff(identity);
     redirect('/staff');
   }
   await signInRequester(identity);
