@@ -18,20 +18,21 @@ export async function Header() {
     photo: Boolean(staffProfile?.photoType),
     photoUpdatedAt: staffProfile?.photoUpdatedAt || '',
   };
-  const brandHref = staff ? '/staff' : '/';
-
   return (
     <header className="site-header">
       <div className="header-inner">
-        {isAdmin ? (
-          <Link href="/staff" className="wordmark desk-wordmark-phone" aria-label="Zion Church">
-            <img src="/zion-logo.png" alt="" width={293} height={80} />
-          </Link>
+        {staff ? (
+          isAdmin ? null : (
+            <Link href="/staff" className="wordmark desk-wordmark-web" aria-label="Zion Church">
+              <img src="/zion-logo.png" alt="" width={293} height={80} />
+            </Link>
+          )
         ) : (
-          <Link href={brandHref} className="wordmark" aria-label="Zion Church">
+          <Link href="/" className="wordmark" aria-label="Zion Church">
             <img src="/zion-logo.png" alt="" width={293} height={80} />
           </Link>
         )}
+        {staff ? <p className="desk-header-title">Care Team</p> : null}
         {staff ? <DeskMenu member={member} isAdmin={isAdmin} /> : (
           <SiteMenu>
             <nav className="primary-nav" aria-label="Primary">
