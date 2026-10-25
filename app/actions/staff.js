@@ -5,20 +5,20 @@ import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
 import { updateCareRequest } from '@/lib/requests';
 import { isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
-import { getUserRole, saveUser } from '@/lib/users';
+import { getUserRole, isDeskRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
 
 export async function establishStaffSession(idToken) {
   const identity = await lookupFirebaseUser(idToken);
   if (!identity) return { ok: false };
   if (!identity.emailVerified) return { ok: false, reason: 'unverified' };
+  if (!isDeskRole(await getUserRole(identity.uid))) return { ok: false, reason: 'not-staff' };
   try {
     await saveUser(identity);
   } catch (error) {
     console.error('Could not save the care team member.', error?.code || '');
     return { ok: false, reason: 'storage' };
   }
-  if (await getUserRole(identity.uid) !== 'staff') return { ok: false, reason: 'not-staff' };
   await signOutRequester();
   await signInStaff();
   redirect('/staff');

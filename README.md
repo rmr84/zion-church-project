@@ -23,7 +23,7 @@ Care requester sign-in is at [http://localhost:3000/sign-in](http://localhost:30
 
 Creating an account sends Firebase's confirmation email. The person is saved in the `users` collection. Sign-in opens after that email is confirmed.
 
-Care team sign-in is at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). It uses the same email and password accounts. An account opens the desk when its document in `users` has `role` set to `staff`. `STAFF_SESSION_SECRET` must be at least 16 characters and is in `.env.example`.
+Care team sign-in is at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). It uses the same email and password accounts. Each user document has a `role` of `requester`, `careTeam`, or `Admin`. A new requester account is stored as `requester`. `Admin` and `careTeam` open the desk. `STAFF_SESSION_SECRET` must be at least 16 characters and is in `.env.example`.
 
 `npm run seed` replaces the care requests in MongoDB with the demo requests.
 
