@@ -2,9 +2,27 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { lookupFirebaseUser } from '@/lib/firebase-identity';
 import { updateCareRequest } from '@/lib/requests';
-import { isStaffSignedIn, signOutStaff } from '@/lib/session';
+import { isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
+import { getUserRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
+
+export async function establishStaffSession(idToken) {
+  const identity = await lookupFirebaseUser(idToken);
+  if (!identity) return { ok: false };
+  if (!identity.emailVerified) return { ok: false, reason: 'unverified' };
+  try {
+    await saveUser(identity);
+  } catch (error) {
+    console.error('Could not save the care team member.', error?.code || '');
+    return { ok: false, reason: 'storage' };
+  }
+  if (await getUserRole(identity.uid) !== 'staff') return { ok: false, reason: 'not-staff' };
+  await signOutRequester();
+  await signInStaff();
+  redirect('/staff');
+}
 
 export async function logout() {
   await signOutStaff();
@@ -12,7 +30,7 @@ export async function logout() {
 }
 
 export async function updateRequest(_previous, formData) {
-  if (!(await isStaffSignedIn())) redirect('/sign-in');
+  if (!(await isStaffSignedIn())) redirect('/staff/login');
 
   const result = validateStaffUpdate({
     referenceCode: formData.get('referenceCode'),

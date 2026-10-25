@@ -23,7 +23,7 @@ Care requester sign-in is at [http://localhost:3000/sign-in](http://localhost:30
 
 Creating an account sends Firebase's confirmation email. The person is saved in the `users` collection. Sign-in opens after that email is confirmed.
 
-Care team members use that same email and password sign-in. An account opens the desk when its document in `users` has `role` set to `staff`. `STAFF_SESSION_SECRET` must be at least 16 characters and is in `.env.example`.
+Care team sign-in is at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). It uses the same email and password accounts. An account opens the desk when its document in `users` has `role` set to `staff`. `STAFF_SESSION_SECRET` must be at least 16 characters and is in `.env.example`.
 
 `npm run seed` replaces the care requests in MongoDB with the demo requests.
 
@@ -84,7 +84,7 @@ If the care-requests collection is empty, startup seeds the codes above. Later r
 - `lib/requests.js` is the only place that reads and writes requests
 - `lib/notify.js` is the email stub
 - `lib/session-token.js` is the HMAC-signed staff session and the separate requester session
-- `/sign-in` is the email and password sign-in for care requesters and care team members
+- `/sign-in` is the care requester sign-in. `/staff/login` is the care team sign-in
 - `lib/firebase.js` starts the Firebase web app for project `code-challenge-zion`
 
 ## A short review path
