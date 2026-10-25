@@ -1135,6 +1135,10 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
 }
+.request-table .request-type {
+  width: 12rem;
+  white-space: nowrap;
+}
 .request-table .request-description {
   width: 22rem;
   overflow: hidden;
@@ -1151,15 +1155,78 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 }
 .request-table tbody tr { position: relative; }
 .request-table tbody tr:hover { background: #f3f9fc; }
-.request-table tbody a {
+.request-table tbody .request-open {
   color: var(--ink);
+  font: inherit;
   font-weight: 800;
-  text-decoration: none;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
-.request-table tbody a::after {
+.request-table tbody .request-open::after {
   content: "";
   position: absolute;
   inset: 0;
+}
+.cell-label { display: none; }
+
+@media (max-width: 759px) {
+  .request-table-wrap { overflow: visible; }
+  .request-table { table-layout: auto; }
+  .request-table thead { display: none; }
+  .request-table,
+  .request-table tbody,
+  .request-table tr,
+  .request-table td { display: block; width: auto; }
+  .request-table tr {
+    margin: 0 0 0.85rem;
+    padding: 0.4rem 0;
+    background: white;
+    border: 1px solid #e6ebef;
+    border-radius: 0.9rem;
+  }
+  .request-table td {
+    border: 0;
+    padding: 0.4rem 0.95rem;
+  }
+  .request-table .request-type,
+  .request-table .request-description {
+    width: auto;
+    max-width: none;
+    white-space: normal;
+    overflow: visible;
+  }
+  .cell-label {
+    display: block;
+    margin-bottom: 0.15rem;
+    color: var(--teal);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .request-table td.request-description { overflow: hidden; }
+  .request-table .request-open { white-space: nowrap; }
+  .request-table .request-description span:not(.cell-label) {
+    min-width: 0;
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.request-dialog {
+  max-height: min(40rem, calc(100vh - 2rem));
+  overflow: auto;
+}
+.request-dialog .sign-out-head { justify-content: flex-end; }
+.request-dialog .eyebrow { margin-bottom: 0.2rem; }
+.request-dialog h2 {
+  font-family: var(--mono);
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
 }
 
 .request-list { list-style: none; margin: 0.4rem 0 0; padding: 0; }
