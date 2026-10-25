@@ -7,7 +7,27 @@ import { formatDay, formatWhen } from '@/lib/format';
 
 export function RequestTable({ requests }) {
   const dialogRef = useRef(null);
+  const toastTimer = useRef(null);
   const [selected, setSelected] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  function dismissCopy() {
+    window.clearTimeout(toastTimer.current);
+    setCopied(false);
+  }
+
+  async function copyCode(code) {
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      return;
+    }
+    setCopied(true);
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setCopied(false), 5000);
+  }
+
+  useEffect(() => () => window.clearTimeout(toastTimer.current), []);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -28,11 +48,11 @@ export function RequestTable({ requests }) {
           <thead>
             <tr>
               <th scope="col" className="request-type">Type of Care</th>
-              <th scope="col" className="request-description">Description</th>
-              <th scope="col">Urgency</th>
-              <th scope="col">Reference Code</th>
-              <th scope="col">Status</th>
-              <th scope="col">Date</th>
+              <th scope="col" className="request-urgency">Urgency</th>
+              <th scope="col" className="request-code">Ref. Code</th>
+              <th scope="col" className="request-status">Status</th>
+              <th scope="col" className="request-date">Date</th>
+              <th scope="col" className="request-more"><span className="sr-only">Details</span></th>
             </tr>
           </thead>
           <tbody>
@@ -40,29 +60,44 @@ export function RequestTable({ requests }) {
               <tr key={request.referenceCode}>
                 <td className="request-type">
                   <span className="cell-label">Type of Care</span>
-                  <button className="request-open" type="button" onClick={() => setSelected(request)}>
-                    {labelFor(CARE_TYPES, request.careType)}
-                  </button>
+                  {labelFor(CARE_TYPES, request.careType)}
                 </td>
-                <td className="request-description">
-              
-                  <span>{request.description}</span>
-                </td>
-                <td>
+                <td className="request-urgency">
                   <span className="cell-label">Urgency</span>
                   {request.urgency ? <UrgencyBadge urgency={request.urgency} /> : null}
                 </td>
-                <td>
+                <td className="request-code">
                   <span className="cell-label">Reference Code</span>
-                  {request.referenceCode}
+                  <button
+                    type="button"
+                    className="ref-code"
+                    aria-label={`Copy reference code ${request.referenceCode}`}
+                    onClick={() => copyCode(request.referenceCode)}
+                  >
+                    {request.referenceCode}
+                  </button>
                 </td>
-                <td>
+                <td className="request-status">
                   <span className="cell-label">Status</span>
                   <StatusBadge status={request.status} />
                 </td>
-                <td>
+                <td className="request-date">
                   <span className="cell-label">Date</span>
                   <time dateTime={request.createdAt}>{formatDay(request.createdAt)}</time>
+                </td>
+                <td className="request-more">
+                  <span className="cell-label">Details</span>
+                  <button
+                    className="request-view"
+                    type="button"
+                    aria-label={`View ${labelFor(CARE_TYPES, request.careType)} request`}
+                    onClick={() => setSelected(request)}
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="M2.2 12s3.6-6.2 9.8-6.2S21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                      <circle cx="12" cy="12" r="2.7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                    </svg>
+                  </button>
                 </td>
               </tr>
             ))}
@@ -129,6 +164,24 @@ export function RequestTable({ requests }) {
           </>
         ) : null}
       </dialog>
+      {copied ? (
+        <div className="copy-toast" role="status">
+          <span className="copy-toast-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <div className="copy-toast-body">
+            <p>Reference code copied</p>
+            <button type="button" className="copy-toast-dismiss" onClick={dismissCopy}>Dismiss</button>
+          </div>
+          <button type="button" className="copy-toast-close" aria-label="Dismiss" onClick={dismissCopy}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+      ) : null}
     </>
   );
 }
