@@ -1115,6 +1115,37 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   margin: 0 auto;
   overflow-x: auto;
 }
+.request-pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+  margin-top: 1rem;
+}
+.request-pager button {
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border: 2px solid var(--mist);
+  border-radius: 999px;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.request-pager button[aria-current="page"] {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.request-pager button:hover:not(:disabled) { border-color: var(--orange); }
+.request-pager button:disabled { opacity: 0.4; cursor: default; }
+.request-pager button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
 .request-table {
   width: 100%;
   border-collapse: collapse;
@@ -1278,6 +1309,7 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
     text-transform: uppercase;
   }
   .request-table .request-more { text-align: left; }
+  .request-pager { justify-content: center; }
 }
 .request-dialog {
   max-height: min(40rem, calc(100vh - 2rem));

@@ -5,11 +5,32 @@ import { StatusBadge, UrgencyBadge } from '@/components/Badges';
 import { CARE_TYPES, CONTACT_METHODS, STATUSES, URGENCY_LEVELS, labelFor } from '@/lib/constants';
 import { formatDay, formatWhen } from '@/lib/format';
 
+const WEB_PAGE_SIZE = 5;
+const PHONE_PAGE_SIZE = 3;
+
 export function RequestTable({ requests }) {
   const dialogRef = useRef(null);
   const toastTimer = useRef(null);
   const [selected, setSelected] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(WEB_PAGE_SIZE);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 759px)');
+    function apply() {
+      const nextSize = media.matches ? PHONE_PAGE_SIZE : WEB_PAGE_SIZE;
+      setPageSize(nextSize);
+      setPage((value) => Math.min(value, Math.max(0, Math.ceil(requests.length / nextSize) - 1)));
+    }
+    apply();
+    media.addEventListener('change', apply);
+    return () => media.removeEventListener('change', apply);
+  }, [requests.length]);
+
+  const pageCount = Math.max(1, Math.ceil(requests.length / pageSize));
+  const currentPage = Math.min(page, pageCount - 1);
+  const visible = requests.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
 
   function dismissCopy() {
     window.clearTimeout(toastTimer.current);
@@ -56,7 +77,7 @@ export function RequestTable({ requests }) {
             </tr>
           </thead>
           <tbody>
-            {requests.map((request) => (
+            {visible.map((request) => (
               <tr key={request.referenceCode}>
                 <td className="request-type">
                   <span className="cell-label">Type of Care</span>
@@ -103,6 +124,26 @@ export function RequestTable({ requests }) {
             ))}
           </tbody>
         </table>
+        {pageCount > 1 ? (
+          <nav className="request-pager" aria-label="Request pages">
+            <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 0}>
+              Previous
+            </button>
+            {Array.from({ length: pageCount }, (_, index) => (
+              <button
+                key={index}
+                type="button"
+                aria-current={index === currentPage ? 'page' : undefined}
+                onClick={() => setPage(index)}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount - 1}>
+              Next
+            </button>
+          </nav>
+        ) : null}
       </div>
       <dialog
         ref={dialogRef}
