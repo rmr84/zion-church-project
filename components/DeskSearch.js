@@ -16,7 +16,7 @@ const requestIcon = (
 const ACTIONS = [
   {
     href: '/staff',
-    title: 'Care requests',
+    title: 'Care Requests',
     detail: 'View and manage open care requests.',
     icon: requestIcon,
   },
@@ -33,7 +33,7 @@ const ACTIONS = [
   },
   {
     href: '/staff/users',
-    title: 'User management',
+    title: 'User Management',
     detail: 'View care team and admin members.',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -85,7 +85,7 @@ export function DeskSearch() {
     title: labelFor(CARE_TYPES, result.careType),
     detail: `${result.name} · ${result.referenceCode}`,
     icon: requestIcon,
-    group: 'Care requests',
+    group: 'Care Requests',
   }));
   const choices = [
     ...actions.map((action) => ({ ...action, group: 'Common Actions' })),

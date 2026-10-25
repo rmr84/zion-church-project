@@ -2,7 +2,7 @@ import { Queue } from "@/components/Queue";
 import { parseSort } from "@/lib/constants";
 import { listRequests } from "@/lib/requests";
 
-export const metadata = { title: "Open requests" };
+export const metadata = { title: "Open Requests" };
 
 export default async function OpenQueuePage({ searchParams }) {
   const params = await searchParams;
@@ -11,7 +11,7 @@ export default async function OpenQueuePage({ searchParams }) {
 
   return (
     <Queue
-      title="Open requests"
+      title="Open Requests"
       intro="Completed requests move to the archive. They are not deleted."
       requests={requests}
       sort={sort}

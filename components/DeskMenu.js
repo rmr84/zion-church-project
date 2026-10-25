@@ -9,7 +9,7 @@ import { SiteMenu } from '@/components/SiteMenu';
 const ITEMS = [
   {
     href: '/staff',
-    label: 'Care requests',
+    label: 'Care Requests',
     current: (pathname) => pathname === '/staff'
       || pathname.startsWith('/staff/requests')
       || pathname.startsWith('/staff/archive'),
@@ -33,7 +33,7 @@ const ITEMS = [
   },
   {
     href: '/staff/users',
-    label: 'User management',
+    label: 'User Management',
     current: (pathname) => pathname.startsWith('/staff/users'),
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -61,7 +61,7 @@ export function DeskMenu({ member, isAdmin = false }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [photoFailed, setPhotoFailed] = useState(false);
-  const label = member?.label || 'Care team';
+  const label = member?.label || 'Care Team';
 
   const links = ITEMS.map((item) => (
     <Link key={item.href} href={item.href} aria-current={item.current(pathname) ? 'page' : undefined}>
@@ -74,7 +74,7 @@ export function DeskMenu({ member, isAdmin = false }) {
     <>
       <div className="desk-menu-phone">
         <SiteMenu dropdown>
-          <nav className="primary-nav" aria-label="Care team">
+          <nav className="primary-nav" aria-label="Care Team">
             {ITEMS.map((item) => (
               <Link key={item.href} href={item.href} aria-current={item.current(pathname) ? 'page' : undefined}>
                 {item.label}
@@ -94,7 +94,7 @@ export function DeskMenu({ member, isAdmin = false }) {
             </Link>
           ) : null}
           <DeskSearch />
-          <nav className="desk-rail-nav" aria-label="Care team">
+          <nav className="desk-rail-nav" aria-label="Care Team">
             {links}
           </nav>
           <div className="desk-rail-foot">

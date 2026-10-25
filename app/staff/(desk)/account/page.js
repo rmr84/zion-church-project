@@ -28,7 +28,7 @@ export default async function StaffAccountPage() {
   return (
     <section className="page-frame">
       <div className="page-heading">
-        <p className="eyebrow">{role === ADMIN_ROLE ? 'Admin' : 'Care team'}</p>
+        <p className="eyebrow">{role === ADMIN_ROLE ? 'Admin' : 'Care Team'}</p>
         <h1>Account</h1>
       </div>
       <div className="wrap settings">

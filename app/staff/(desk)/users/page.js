@@ -1,6 +1,6 @@
 import { listDeskMembers } from '@/lib/users';
 
-export const metadata = { title: 'User management' };
+export const metadata = { title: 'User Management' };
 
 export default async function UserManagementPage() {
   const members = await listDeskMembers();
@@ -8,8 +8,8 @@ export default async function UserManagementPage() {
   return (
     <section className="page-frame">
       <div className="page-heading">
-        <p className="eyebrow">Care team</p>
-        <h1>User management</h1>
+        <p className="eyebrow">Care Team</p>
+        <h1>User Management</h1>
       </div>
       {members.length === 0 ? (
         <p className="hint request-table-wrap">No care team members are on file yet.</p>

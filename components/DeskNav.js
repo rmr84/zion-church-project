@@ -19,7 +19,7 @@ export function DeskNav() {
   if (!isCareRequestPath(pathname)) return null;
 
   return (
-    <nav className="desk-nav" aria-label="Care requests">
+    <nav className="desk-nav" aria-label="Care Requests">
       {ITEMS.map((item) => {
         const current = item.href === '/staff'
           ? pathname === '/staff' || pathname.startsWith('/staff/requests')

@@ -14,7 +14,7 @@ export async function Header() {
   const isAdmin = role === ADMIN_ROLE;
   const staffName = [staffProfile?.firstName, staffProfile?.lastName].filter(Boolean).join(' ');
   const member = {
-    label: staffName || staffIdentity?.email || 'Care team',
+    label: staffName || staffIdentity?.email || 'Care Team',
     photo: Boolean(staffProfile?.photoType),
     photoUpdatedAt: staffProfile?.photoUpdatedAt || '',
   };

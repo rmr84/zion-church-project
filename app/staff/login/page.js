@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { StaffSignIn } from '@/components/StaffSignIn';
 import { isStaffSignedIn } from '@/lib/session';
 
-export const metadata = { title: 'Care team sign in' };
+export const metadata = { title: 'Care Team Sign In' };
 
 export default async function StaffLoginPage({ searchParams }) {
   const params = await searchParams;
@@ -13,7 +13,7 @@ export default async function StaffLoginPage({ searchParams }) {
   return (
     <section className="page-frame">
       <div className="page-heading centered">
-        <p className="eyebrow">Care team</p>
+        <p className="eyebrow">Care Team</p>
         <h1>Sign In</h1>
       </div>
       <div className="wrap narrow">

@@ -36,7 +36,7 @@ test('saveUser writes the requester and can mark the email confirmed', async () 
   await users.updateOne({ uid }, { $set: { role: 'careTeam', firstName: 'Desk', lastName: 'Member' } });
   assert.equal(await getUserRole(uid), 'careTeam');
   const members = await listDeskMembers();
-  assert.ok(members.some((member) => member.email === email && member.role === 'Care team' && member.name === 'Desk Member'));
+  assert.ok(members.some((member) => member.email === email && member.role === 'Care Team' && member.name === 'Desk Member'));
   assert.equal(confirmed.createdAt, created.createdAt);
   assert.ok(confirmed.updatedAt >= created.updatedAt);
 });
