@@ -40,7 +40,7 @@ function PersonIcon() {
   );
 }
 
-export function AccountSettings({ profile }) {
+export function AccountSettings({ profile, signOutAction }) {
   const router = useRouter();
   const showToast = useToast();
   const [saved, setSaved] = useState(profile);
@@ -290,7 +290,7 @@ export function AccountSettings({ profile }) {
         </div>
       </form>
 
-      <div className="account-sign-out"><SignOutButton /></div>
+      <div className="account-sign-out"><SignOutButton action={signOutAction} /></div>
     </div>
   );
 }
