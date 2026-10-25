@@ -24,7 +24,7 @@ export default async function RequestDetailPage({ params }) {
       <div className="title-row">
         <h1>{labelFor(CARE_TYPES, request.careType)}</h1>
         <UrgencyBadge urgency={request.urgency} />
-        <StatusBadge status={request.status} />
+        <StatusBadge status={request.status} desk />
       </div>
       <p>
         <Link href={backHref}>Back</Link>

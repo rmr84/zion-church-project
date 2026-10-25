@@ -1452,7 +1452,7 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 .badge-urgent { color: var(--ink); background: var(--orange); }
 .badge-soon { color: var(--ink); background: var(--gold); }
 .badge-routine { color: var(--teal); background: var(--mist); }
-.badge-received { color: var(--teal); background: #e2f4fc; }
+.badge-received { color: #3d2f6b; background: #ebe6fb; }
 .badge-in_review { color: #5c4810; background: #ffe89a; }
 .badge-assigned { color: var(--teal); background: var(--mist); }
 .badge-completed { color: #3e4a54; background: #e7ecef; }

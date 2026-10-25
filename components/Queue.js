@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { RequestList } from './RequestList';
+import { RequestTable } from './RequestTable';
 
 const SORTS = [
   { id: 'urgency', label: 'Urgency' },
@@ -15,22 +15,27 @@ function sortHint(sort) {
 
 export function Queue({ title, intro, requests, sort, basePath, empty }) {
   return (
-    <section className="wrap wide">
-      <h1>{title}</h1>
-      <p>{intro}</p>
-      <nav className="sort-nav" aria-label="Sort requests">
-        {SORTS.map((item) => (
-          <Link
-            key={item.id}
-            href={`${basePath}?sort=${item.id}`}
-            aria-current={sort === item.id ? 'page' : undefined}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      <p className="hint">{sortHint(sort)}</p>
-      {requests.length ? <RequestList requests={requests} /> : <p className="empty">{empty}</p>}
+    <section className="page-frame">
+      <div className="page-heading">
+        <p className="eyebrow">Care Team</p>
+        <h1>{title}</h1>
+        <p className="lede">{intro}</p>
+      </div>
+      <div className="wrap wide">
+        <nav className="sort-nav" aria-label="Sort requests">
+          {SORTS.map((item) => (
+            <Link
+              key={item.id}
+              href={`${basePath}?sort=${item.id}`}
+              aria-current={sort === item.id ? 'page' : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+        <p className="hint">{sortHint(sort)}</p>
+      </div>
+      {requests.length ? <RequestTable requests={requests} desk /> : <p className="empty wrap wide">{empty}</p>}
     </section>
   );
 }

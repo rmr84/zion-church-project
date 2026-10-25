@@ -2,7 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { updateRequest } from '@/app/actions/staff';
-import { STATUSES } from '@/lib/constants';
+import { DESK_STATUSES } from '@/lib/constants';
 
 export function StaffEditor({ referenceCode, status, assignee, memberNote, internalNote }) {
   const [state, action, pending] = useActionState(updateRequest, { errors: {}, saved: false });
@@ -49,7 +49,7 @@ export function StaffEditor({ referenceCode, status, assignee, memberNote, inter
           value={values.status}
           onChange={(event) => setField('status', event.target.value)}
         >
-          {STATUSES.map((item) => (
+          {DESK_STATUSES.map((item) => (
             <option key={item.value} value={item.value}>{item.label}</option>
           ))}
         </select>
