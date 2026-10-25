@@ -1,14 +1,17 @@
 'use client';
 
 import { useState } from 'react';
+import { useToast } from '@/components/Toast';
 
 export function CopyCode({ code }) {
+  const showToast = useToast();
   const [message, setMessage] = useState('Copy code');
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(code);
-      setMessage('Copied');
+      setMessage('Copy code');
+      showToast?.('Reference code copied');
     } catch {
       setMessage('Select the code and copy it');
     }

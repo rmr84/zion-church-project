@@ -1212,7 +1212,7 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   .request-table .request-date { width: 11rem; white-space: nowrap; }
   .request-table .request-more { width: 4.5rem; }
 }
-.copy-toast {
+.toast {
   position: fixed;
   right: 1.25rem;
   bottom: 1.25rem;
@@ -1228,11 +1228,11 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   transform: translateX(calc(100% + 1.75rem));
   transition: transform 0.35s ease;
 }
-.copy-toast.is-in { transform: translateX(0); }
+.toast.is-in { transform: translateX(0); }
 @media (prefers-reduced-motion: reduce) {
-  .copy-toast { transition: none; }
+  .toast { transition: none; }
 }
-.copy-toast-icon {
+.toast-icon {
   width: 1.65rem;
   height: 1.65rem;
   flex: 0 0 auto;
@@ -1243,16 +1243,16 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   background: #1f9d55;
   color: white;
 }
-.copy-toast-icon svg { width: 0.95rem; height: 0.95rem; }
-.copy-toast-body { flex: 1; min-width: 0; }
-.copy-toast-body p {
+.toast-icon svg { width: 0.95rem; height: 0.95rem; }
+.toast-body { flex: 1; min-width: 0; }
+.toast-body p {
   margin: 0;
   color: var(--ink);
   font-size: 0.95rem;
   font-weight: 700;
   line-height: 1.35;
 }
-.copy-toast-dismiss {
+.toast-dismiss {
   margin-top: 0.15rem;
   padding: 0;
   border: 0;
@@ -1262,8 +1262,8 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   font-size: 0.88rem;
   cursor: pointer;
 }
-.copy-toast-dismiss:hover { color: var(--ink); }
-.copy-toast-close {
+.toast-dismiss:hover { color: var(--ink); }
+.toast-close {
   width: 1.7rem;
   height: 1.7rem;
   flex: 0 0 auto;
@@ -1276,8 +1276,8 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   color: #6b7280;
   cursor: pointer;
 }
-.copy-toast-close svg { width: 1rem; height: 1rem; }
-.copy-toast-close:hover { color: var(--ink); }
+.toast-close svg { width: 1rem; height: 1rem; }
+.toast-close:hover { color: var(--ink); }
 .cell-label { display: none; }
 
 @media (max-width: 759px) {

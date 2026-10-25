@@ -12,6 +12,7 @@ import {
 import { removeRequesterPhoto, saveNotificationPreference, saveRequesterProfile } from '@/app/actions/account';
 import { PasswordInput } from '@/components/PasswordInput';
 import { SignOutButton } from '@/components/SignOutButton';
+import { useToast } from '@/components/Toast';
 import { firebaseApp } from '@/lib/firebase';
 import { passwordProblem } from '@/lib/password-rules';
 import { photoProblem } from '@/lib/profile';
@@ -41,6 +42,7 @@ function PersonIcon() {
 
 export function AccountSettings({ profile }) {
   const router = useRouter();
+  const showToast = useToast();
   const [saved, setSaved] = useState(profile);
   const [firstName, setFirstName] = useState(profile.firstName);
   const [lastName, setLastName] = useState(profile.lastName);
@@ -108,7 +110,8 @@ export function AccountSettings({ profile }) {
     setPicture(null);
     if (result.photoUpdatedAt) setPreview(photoUrl(result.photoUpdatedAt));
     setProfileErrors({});
-    setProfileMessage('Profile saved.');
+    setProfileMessage('');
+    showToast?.('Profile saved.');
     router.refresh();
   }
 
@@ -172,7 +175,8 @@ export function AccountSettings({ profile }) {
       }
       await updatePassword(user, passwords.next);
       setPasswords({ current: '', next: '', confirm: '' });
-      setPasswordMessage('Password updated.');
+      setPasswordMessage('');
+      showToast?.('Password updated.');
     } catch (caught) {
       const code = caught?.code;
       if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/invalid-login-credentials') {
@@ -197,7 +201,7 @@ export function AccountSettings({ profile }) {
           <p>Update the name, phone, and picture on this account.</p>
         </div>
         <div className="settings-fields">
-          {profileMessage && !profileErrors.photo ? <p className={profileMessage === 'Profile saved.' ? 'banner ok' : 'banner error'} role="status">{profileMessage}</p> : null}
+          {profileMessage ? <p className="banner error" role="alert">{profileMessage}</p> : null}
           <div className="settings-names">
             <div className="field">
               <label htmlFor="firstName">First name</label>
@@ -275,7 +279,7 @@ export function AccountSettings({ profile }) {
           <p>Update the password for this account.</p>
         </div>
         <div className="settings-fields">
-          {passwordMessage ? <p className={passwordMessage === 'Password updated.' ? 'banner ok' : 'banner error'} role="status">{passwordMessage}</p> : null}
+          {passwordMessage ? <p className="banner error" role="alert">{passwordMessage}</p> : null}
           <PasswordField id="current-password" label="Current password" autoComplete="current-password" value={passwords.current} onChange={(event) => setPasswords((current) => ({ ...current, current: event.target.value }))} invalid={Boolean(passwordErrors.current)} error={passwordErrors.current} />
           <PasswordField id="new-password" label="New password" autoComplete="new-password" value={passwords.next} onChange={(event) => setPasswords((current) => ({ ...current, next: event.target.value }))} invalid={Boolean(passwordErrors.next)} error={passwordErrors.next} />
           <PasswordField id="confirm-password" label="Confirm password" autoComplete="new-password" value={passwords.confirm} onChange={(event) => setPasswords((current) => ({ ...current, confirm: event.target.value }))} invalid={Boolean(passwordErrors.confirm)} error={passwordErrors.confirm} />
