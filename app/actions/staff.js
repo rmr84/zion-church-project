@@ -20,7 +20,7 @@ export async function establishStaffSession(idToken) {
     return { ok: false, reason: 'storage' };
   }
   await signOutRequester();
-  await signInStaff();
+  await signInStaff(identity);
   redirect('/staff');
 }
 
