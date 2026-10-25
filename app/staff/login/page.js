@@ -5,8 +5,10 @@ import { isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Care team sign in' };
 
-export default async function StaffLoginPage() {
+export default async function StaffLoginPage({ searchParams }) {
+  const params = await searchParams;
   if (await isStaffSignedIn()) redirect('/staff');
+  const again = params?.again === 'account';
 
   return (
     <section className="page-frame">
@@ -15,6 +17,7 @@ export default async function StaffLoginPage() {
         <h1>Sign In</h1>
       </div>
       <div className="wrap narrow">
+        {again ? <p className="hint">Sign in again to open your account.</p> : null}
         <StaffSignIn />
         <p className="or-divider">or</p>
         <p className="sign-in-alt">

@@ -1,22 +1,16 @@
 import { redirect } from 'next/navigation';
 import { logout } from '@/app/actions/staff';
 import { AccountSettings } from '@/components/AccountSettings';
-import { getStaff, isStaffSignedIn, signOutStaff } from '@/lib/session';
+import { getStaff } from '@/lib/session';
 import { ADMIN_ROLE, CARE_TEAM_ROLE, getUser, getUserRole } from '@/lib/users';
 
 export const metadata = { title: 'Account' };
 
 export default async function StaffAccountPage() {
   const staff = await getStaff();
-  if (!staff) {
-    if (await isStaffSignedIn()) await signOutStaff();
-    redirect('/staff/login');
-  }
-
-  const role = await getUserRole(staff.uid);
-  if (role !== ADMIN_ROLE && role !== CARE_TEAM_ROLE) {
-    await signOutStaff();
-    redirect('/staff/login');
+  const role = staff ? await getUserRole(staff.uid) : '';
+  if (!staff || (role !== ADMIN_ROLE && role !== CARE_TEAM_ROLE)) {
+    redirect('/staff/account/renew');
   }
 
   const stored = await getUser(staff.uid).catch(() => null);
@@ -39,7 +33,7 @@ export default async function StaffAccountPage() {
       </div>
       <div className="wrap settings">
         <p className="lede">View and update the information on this account.</p>
-        <AccountSettings profile={profile} signOutAction={logout} />
+        <AccountSettings profile={profile} signOutAction={logout} accountScope="desk" />
       </div>
     </section>
   );

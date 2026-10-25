@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { searchCareRequests } from '@/app/actions/staff';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { DeskSearch } from '@/components/DeskSearch';
 import { SiteMenu } from '@/components/SiteMenu';
-import { CARE_TYPES, labelFor } from '@/lib/constants';
 
 const ITEMS = [
   {
@@ -50,43 +49,9 @@ const ITEMS = [
 
 export function DeskMenu({ member }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(true);
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState(null);
   const [photoFailed, setPhotoFailed] = useState(false);
   const label = member?.label || 'Care team';
-
-  useEffect(() => {
-    setQuery('');
-    setResults(null);
-  }, [pathname]);
-
-  useEffect(() => {
-    const term = query.trim();
-    if (term.length < 2) return undefined;
-    let active = true;
-    const timer = setTimeout(async () => {
-      const rows = await searchCareRequests(term);
-      if (active) setResults(rows);
-    }, 250);
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
-  }, [query]);
-
-  function onSearch(event) {
-    const next = event.target.value;
-    setQuery(next);
-    if (next.trim().length < 2) setResults(null);
-  }
-
-  function openResult(code) {
-    setQuery('');
-    setResults(null);
-    router.push(`/staff/requests/${code}`);
-  }
 
   const links = ITEMS.map((item) => (
     <Link key={item.href} href={item.href} aria-current={item.current(pathname) ? 'page' : undefined}>
@@ -110,42 +75,7 @@ export function DeskMenu({ member }) {
       </div>
       <div className={`desk-rail-slot${open ? ' is-open' : ''}`}>
         <aside id="desk-rail" className="desk-rail" inert={open ? undefined : true}>
-          <form
-            className="desk-search"
-            role="search"
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (results?.[0]) openResult(results[0].referenceCode);
-            }}
-          >
-            <label className="sr-only" htmlFor="desk-search">Search care requests</label>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M15.5 15.5 20 20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-            <input
-              id="desk-search"
-              type="search"
-              placeholder="Search"
-              value={query}
-              onChange={onSearch}
-              autoComplete="off"
-              aria-controls="desk-search-results"
-              aria-expanded={results ? true : undefined}
-            />
-            {results ? (
-              <ul id="desk-search-results" className="desk-search-results">
-                {results.length === 0 ? <li className="desk-search-empty">No matching requests.</li> : results.map((result) => (
-                  <li key={result.referenceCode}>
-                    <button type="button" onClick={() => openResult(result.referenceCode)}>
-                      <strong>{labelFor(CARE_TYPES, result.careType)}</strong>
-                      <span>{result.name} · {result.referenceCode}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </form>
+          <DeskSearch />
           <nav className="desk-rail-nav" aria-label="Care team">
             {links}
           </nav>
