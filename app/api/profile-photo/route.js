@@ -1,8 +1,9 @@
-import { getAccount } from '@/lib/session';
+import { getAccount, getStaff } from '@/lib/session';
 import { getUser, readProfilePhoto } from '@/lib/users';
 
-export async function GET() {
-  const requester = await getAccount();
+export async function GET(request) {
+  const desk = new URL(request.url).searchParams.get('desk') === '1';
+  const requester = desk ? await getStaff() : await getAccount();
   if (!requester) return new Response(null, { status: 401 });
 
   const profile = await getUser(requester.uid);

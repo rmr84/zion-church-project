@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
-import { updateCareRequest } from '@/lib/requests';
+import { searchRequests, updateCareRequest } from '@/lib/requests';
 import { isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
 import { getUserRole, isDeskRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
@@ -22,6 +22,16 @@ export async function establishStaffSession(idToken) {
   await signOutRequester();
   await signInStaff(identity);
   redirect('/staff');
+}
+
+export async function searchCareRequests(query) {
+  if (!(await isStaffSignedIn())) return [];
+  try {
+    return await searchRequests(query);
+  } catch (error) {
+    console.error('Could not search care requests.', error?.code || '');
+    return [];
+  }
 }
 
 export async function logout() {
