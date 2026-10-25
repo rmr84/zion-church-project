@@ -2,8 +2,8 @@
 
 import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
-import { signInRequester, signOutRequester } from '@/lib/session';
-import { saveUser } from '@/lib/users';
+import { signInRequester, signInStaff, signOutRequester } from '@/lib/session';
+import { getUserRole, saveUser } from '@/lib/users';
 
 async function storeRequester(identity) {
   try {
@@ -27,6 +27,11 @@ export async function establishRequesterSession(idToken) {
   if (!identity.emailVerified) return { ok: false, reason: 'unverified' };
   const stored = await storeRequester(identity);
   if (!stored.ok) return stored;
+  if (await getUserRole(identity.uid) === 'staff') {
+    await signOutRequester();
+    await signInStaff();
+    redirect('/staff');
+  }
   await signInRequester(identity);
   redirect('/account');
 }
