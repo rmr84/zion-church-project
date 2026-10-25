@@ -11,8 +11,8 @@ import {
 const secret = 'demo-only-change-this-secret';
 
 test('password comparison ignores length differences', () => {
-  assert.equal(secretsMatch('zion-care-team', 'zion-care-team'), true);
-  assert.equal(secretsMatch('a', 'zion-care-team'), false);
+  assert.equal(secretsMatch('correct-secret', 'correct-secret'), true);
+  assert.equal(secretsMatch('a', 'correct-secret'), false);
 });
 
 test('session tokens reject tampering and expiry', () => {
