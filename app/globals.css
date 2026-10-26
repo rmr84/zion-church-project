@@ -2380,6 +2380,56 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   background: #f3f5f7;
   color: var(--orange);
 }
+.queue-filter-dialog {
+  width: min(24rem, calc(100vw - 2rem));
+  max-height: min(40rem, calc(100vh - 2rem));
+  overflow: hidden;
+  flex-direction: column;
+}
+.queue-filter-dialog[open] {
+  display: flex;
+}
+.queue-filter-dialog p {
+  margin-bottom: 0.85rem;
+}
+.queue-filter-dialog-body {
+  flex: 1 1 auto;
+  overflow: auto;
+  margin: 0 -0.15rem 1rem;
+  padding: 0.15rem;
+}
+.queue-filter-dialog-body .queue-filter-label:first-child {
+  margin-top: 0;
+}
+.queue-filter-dialog-body button {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.queue-filter-dialog-body button:hover { background: #f7f8fa; }
+.queue-filter-dialog-body .queue-filter-clear {
+  margin-top: 0.35rem;
+  border-top: 1px solid #e6ebef;
+  border-radius: 0 0 0.45rem 0.45rem;
+  color: var(--teal);
+  font-weight: 800;
+  justify-content: center;
+}
+.queue-filter-dialog-body .queue-filter-clear:hover {
+  background: #f3f5f7;
+  color: var(--orange);
+}
 .queue-filter-check {
   width: 1.15rem;
   height: 1.15rem;
@@ -2556,6 +2606,7 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 }
 .request-actions-menu button:hover { background: #f3f5f7; }
 .request-actions-menu button:hover svg { color: var(--teal); }
+.request-actions-buttons { display: none; }
 .request-table-wrap:has(.request-actions.is-open) { overflow: visible; }
 .request-actions.is-open { z-index: 28; }
 .assign-dialog {
@@ -2851,8 +2902,9 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   .request-table tr,
   .request-table td { display: block; width: auto; }
   .request-table tr {
+    position: relative;
     margin: 0 0 0.85rem;
-    padding: 0.4rem 0;
+    padding: 0.4rem 0 0.65rem;
     background: white;
     border: 1px solid #e6ebef;
     border-radius: 0.9rem;
@@ -2864,8 +2916,26 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   .request-table .request-type {
     width: auto;
     max-width: none;
+    padding-right: 4.25rem;
     white-space: nowrap;
     overflow: visible;
+  }
+  .request-table td.request-assignee {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.85rem;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    width: auto;
+    padding: 0;
+    text-align: center;
+  }
+  .request-table td.request-assignee .cell-label {
+    text-align: center;
+  }
+  .request-table td.request-assignee .request-assignee-mark {
+    justify-content: center;
   }
   .cell-label {
     display: block;
@@ -2876,7 +2946,55 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .request-table .request-more { text-align: left; }
+  .request-table .request-more {
+    width: auto;
+    text-align: left;
+    white-space: normal;
+  }
+  .request-actions {
+    display: block;
+    width: 100%;
+  }
+  .request-actions-trigger,
+  .request-actions-menu { display: none !important; }
+  .request-actions-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    width: 100%;
+  }
+  .request-actions-buttons button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    width: 100%;
+    min-height: 2.55rem;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid #e6ebef;
+    border-radius: 0.65rem;
+    background: #f7f8fa;
+    color: var(--ink);
+    font: inherit;
+    font-size: 0.92rem;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .request-actions-buttons button:only-child {
+    grid-column: 1 / -1;
+  }
+  .request-actions-buttons button svg {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex: 0 0 auto;
+    color: var(--teal);
+  }
+  .request-actions-buttons button:hover {
+    border-color: #d5dbe0;
+    background: white;
+  }
   .request-pager { justify-content: center; }
 }
 .request-dialog {

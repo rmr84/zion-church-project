@@ -101,6 +101,28 @@ export function RequestActions({ request, members = [], allowAssign = true }) {
     finishAssign(note ? { internalNote: note } : {});
   }
 
+  function ActionOption({ onClick, children, menu = false }) {
+    return (
+      <button type="button" role={menu ? 'menuitem' : undefined} onClick={onClick}>
+        {children}
+      </button>
+    );
+  }
+
+  const assignIcon = (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M4.8 17.2c.8-2.2 2.3-3.3 4.2-3.3s3.4 1.1 4.2 3.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M15.5 11.5h5M18 9v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+  const viewIcon = (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M2.2 12s3.6-6.2 9.8-6.2S21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12z" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="12" cy="12" r="2.7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+  );
+
   return (
     <div className={`request-actions${menuOpen ? ' is-open' : ''}`} ref={rootRef}>
       <button
@@ -121,24 +143,17 @@ export function RequestActions({ request, members = [], allowAssign = true }) {
       {menuOpen ? (
         <div className="request-actions-menu" id={menuId} role="menu">
           {allowAssign ? (
-            <button type="button" role="menuitem" onClick={openAssign}>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
-                <path d="M4.8 17.2c.8-2.2 2.3-3.3 4.2-3.3s3.4 1.1 4.2 3.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                <path d="M15.5 11.5h5M18 9v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              </svg>
-              Assign
-            </button>
+            <ActionOption menu onClick={openAssign}>{assignIcon}Assign</ActionOption>
           ) : null}
-          <button type="button" role="menuitem" onClick={openView}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M2.2 12s3.6-6.2 9.8-6.2S21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12z" fill="none" stroke="currentColor" strokeWidth="1.8" />
-              <circle cx="12" cy="12" r="2.7" fill="none" stroke="currentColor" strokeWidth="1.8" />
-            </svg>
-            View
-          </button>
+          <ActionOption menu onClick={openView}>{viewIcon}View</ActionOption>
         </div>
       ) : null}
+      <div className="request-actions-buttons" role="group" aria-label={`Actions for ${request.referenceCode}`}>
+        {allowAssign ? (
+          <ActionOption onClick={openAssign}>{assignIcon}Assign</ActionOption>
+        ) : null}
+        <ActionOption onClick={openView}>{viewIcon}View</ActionOption>
+      </div>
 
       <dialog
         ref={dialogRef}

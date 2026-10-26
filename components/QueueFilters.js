@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { CARE_TYPES, DESK_STATUSES, URGENCY_LEVELS } from '@/lib/constants';
 import { formatDateInput } from '@/lib/format';
 import { UNASSIGNED, activeMembers, memberLabel, memberValue } from '@/lib/members';
@@ -34,13 +34,26 @@ export function QueueFilters({
   members = [],
 }) {
   const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState(false);
   const rootRef = useRef(null);
+  const dialogRef = useRef(null);
+  const titleId = useId();
   const statusOptions = DESK_STATUSES.filter((item) => (
     archive ? item.value === 'completed' : item.value !== 'completed'
   ));
 
   useEffect(() => {
-    if (!open) return undefined;
+    const media = window.matchMedia('(max-width: 759px)');
+    function apply() {
+      setPhone(media.matches);
+    }
+    apply();
+    media.addEventListener('change', apply);
+    return () => media.removeEventListener('change', apply);
+  }, []);
+
+  useEffect(() => {
+    if (!open || phone) return undefined;
     function closeOnOutside(event) {
       if (!rootRef.current?.contains(event.target)) setOpen(false);
     }
@@ -53,10 +66,26 @@ export function QueueFilters({
       document.removeEventListener('pointerdown', closeOnOutside);
       document.removeEventListener('keydown', closeOnEscape);
     };
-  }, [open]);
+  }, [open, phone]);
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (open && phone && !dialog.open) dialog.showModal();
+    if ((!open || !phone) && dialog.open) dialog.close();
+  }, [open, phone]);
 
   function toggle(list, value, onChange) {
     onChange(list.includes(value) ? list.filter((item) => item !== value) : [...list, value]);
+  }
+
+  function clearFilters() {
+    onUrgenciesChange([]);
+    onCareTypesChange([]);
+    onStatusesChange([]);
+    onAssigneesChange([]);
+    onDateFromChange('');
+    onDateToChange('');
   }
 
   function FilterOption({ checked, label, onClick }) {
@@ -113,6 +142,81 @@ export function QueueFilters({
     }] : []),
   ];
 
+  const filterBody = (
+    <>
+      <p className="queue-filter-label">Date submitted</p>
+      <div className="queue-filter-dates">
+        <label>
+          <span>From</span>
+          <input
+            type="date"
+            value={dateFrom}
+            max={dateTo || undefined}
+            onChange={(event) => onDateFromChange(event.target.value)}
+          />
+        </label>
+        <label>
+          <span>To</span>
+          <input
+            type="date"
+            value={dateTo}
+            min={dateFrom || undefined}
+            onChange={(event) => onDateToChange(event.target.value)}
+          />
+        </label>
+      </div>
+      <p className="queue-filter-label">Urgency</p>
+      {URGENCY_LEVELS.map((item) => (
+        <FilterOption
+          key={item.value}
+          checked={urgencies.includes(item.value)}
+          label={item.label}
+          onClick={() => toggle(urgencies, item.value, onUrgenciesChange)}
+        />
+      ))}
+      <p className="queue-filter-label">Type of Care</p>
+      {CARE_TYPES.map((item) => (
+        <FilterOption
+          key={item.value}
+          checked={careTypes.includes(item.value)}
+          label={item.label}
+          onClick={() => toggle(careTypes, item.value, onCareTypesChange)}
+        />
+      ))}
+      <p className="queue-filter-label">Status</p>
+      {statusOptions.map((item) => (
+        <FilterOption
+          key={item.value}
+          checked={statuses.includes(item.value)}
+          label={item.label}
+          onClick={() => toggle(statuses, item.value, onStatusesChange)}
+        />
+      ))}
+      <p className="queue-filter-label">Assignee</p>
+      <FilterOption
+        checked={assignees.includes(UNASSIGNED)}
+        label="Unassigned"
+        onClick={() => toggle(assignees, UNASSIGNED, onAssigneesChange)}
+      />
+      {activeMembers(members).map((member) => {
+        const value = memberValue(member);
+        return (
+          <FilterOption
+            key={member.uid || member.email}
+            checked={assignees.includes(value)}
+            label={memberLabel(member)}
+            onClick={() => toggle(assignees, value, onAssigneesChange)}
+          />
+        );
+      })}
+      {pills.length > 0 ? (
+        <button className="queue-filter-clear" type="button" onClick={clearFilters}>
+          Clear filters
+        </button>
+      ) : null}
+    </>
+  );
+
   return (
     <div className="queue-filters" ref={rootRef}>
       <div className="queue-toolbar">
@@ -145,7 +249,7 @@ export function QueueFilters({
             className="queue-filter-button"
             type="button"
             aria-expanded={open}
-            aria-haspopup="menu"
+            aria-haspopup={phone ? 'dialog' : 'menu'}
             onClick={() => setOpen((current) => !current)}
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -153,93 +257,55 @@ export function QueueFilters({
             </svg>
             Filter
           </button>
-          {open ? (
+          {open && !phone ? (
             <div className="queue-filter-menu" role="menu">
-              <p className="queue-filter-label">Date submitted</p>
-              <div className="queue-filter-dates">
-                <label>
-                  <span>From</span>
-                  <input
-                    type="date"
-                    value={dateFrom}
-                    max={dateTo || undefined}
-                    onChange={(event) => onDateFromChange(event.target.value)}
-                  />
-                </label>
-                <label>
-                  <span>To</span>
-                  <input
-                    type="date"
-                    value={dateTo}
-                    min={dateFrom || undefined}
-                    onChange={(event) => onDateToChange(event.target.value)}
-                  />
-                </label>
-              </div>
-              <p className="queue-filter-label">Urgency</p>
-              {URGENCY_LEVELS.map((item) => (
-                <FilterOption
-                  key={item.value}
-                  checked={urgencies.includes(item.value)}
-                  label={item.label}
-                  onClick={() => toggle(urgencies, item.value, onUrgenciesChange)}
-                />
-              ))}
-              <p className="queue-filter-label">Type of Care</p>
-              {CARE_TYPES.map((item) => (
-                <FilterOption
-                  key={item.value}
-                  checked={careTypes.includes(item.value)}
-                  label={item.label}
-                  onClick={() => toggle(careTypes, item.value, onCareTypesChange)}
-                />
-              ))}
-              <p className="queue-filter-label">Status</p>
-              {statusOptions.map((item) => (
-                <FilterOption
-                  key={item.value}
-                  checked={statuses.includes(item.value)}
-                  label={item.label}
-                  onClick={() => toggle(statuses, item.value, onStatusesChange)}
-                />
-              ))}
-              <p className="queue-filter-label">Assignee</p>
-              <FilterOption
-                checked={assignees.includes(UNASSIGNED)}
-                label="Unassigned"
-                onClick={() => toggle(assignees, UNASSIGNED, onAssigneesChange)}
-              />
-              {activeMembers(members).map((member) => {
-                const value = memberValue(member);
-                return (
-                  <FilterOption
-                    key={member.uid || member.email}
-                    checked={assignees.includes(value)}
-                    label={memberLabel(member)}
-                    onClick={() => toggle(assignees, value, onAssigneesChange)}
-                  />
-                );
-              })}
-              {pills.length > 0 ? (
-                <button
-                  className="queue-filter-clear"
-                  type="button"
-                  onClick={() => {
-                    onUrgenciesChange([]);
-                    onCareTypesChange([]);
-                    onStatusesChange([]);
-                    onAssigneesChange([]);
-                    onDateFromChange('');
-                    onDateToChange('');
-                  }}
-                >
-                  Clear filters
-                </button>
-              ) : null}
+              {filterBody}
             </div>
           ) : null}
         </div>
       </div>
+
+      <dialog
+        ref={dialogRef}
+        className="sign-out-dialog queue-filter-dialog"
+        aria-labelledby={titleId}
+        onClose={() => setOpen(false)}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) setOpen(false);
+        }}
+      >
+        <div className="sign-out-head">
+          <span className="sign-out-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </span>
+          <button className="sign-out-close" type="button" aria-label="Close filters" onClick={() => setOpen(false)}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+            </svg>
+          </button>
+        </div>
+        <h2 id={titleId}>Filter</h2>
+        <p>Narrow the care request list by date, urgency, type, status, or assignee.</p>
+        <div className="queue-filter-dialog-body">
+          {filterBody}
+        </div>
+        <div className="modal-actions">
+          {pills.length > 0 ? (
+            <button className="button secondary" type="button" onClick={clearFilters}>
+              Clear
+            </button>
+          ) : (
+            <button className="button secondary" type="button" onClick={() => setOpen(false)}>
+              Cancel
+            </button>
+          )}
+          <button className="button" type="button" onClick={() => setOpen(false)}>
+            Done
+          </button>
+        </div>
+      </dialog>
 
       {pills.length > 0 ? (
         <ul className="queue-pills">
