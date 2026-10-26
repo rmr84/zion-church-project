@@ -9,7 +9,7 @@ import {
   signInWithEmailAndPassword,
   updatePassword,
 } from 'firebase/auth';
-import { removeRequesterPhoto, saveNotificationPreference, saveRequesterProfile } from '@/app/actions/account';
+import { saveNotificationPreference, saveRequesterProfile } from '@/app/actions/account';
 import { PasswordInput } from '@/components/PasswordInput';
 import { SignOutButton } from '@/components/SignOutButton';
 import { useToast } from '@/components/Toast';
@@ -50,6 +50,7 @@ export function AccountSettings({ profile, signOutAction, accountScope }) {
   const [lastName, setLastName] = useState(profile.lastName);
   const [phone, setPhone] = useState(profile.phone || '');
   const [picture, setPicture] = useState(null);
+  const [photoRemoved, setPhotoRemoved] = useState(false);
   const [preview, setPreview] = useState(photoUrl(profile.photoUpdatedAt, accountScope));
   const [over, setOver] = useState(false);
   const [profileErrors, setProfileErrors] = useState({});
@@ -73,6 +74,7 @@ export function AccountSettings({ profile, signOutAction, accountScope }) {
       return;
     }
     setProfileErrors((current) => ({ ...current, photo: '' }));
+    setPhotoRemoved(false);
     setPicture(file);
     setPreview(URL.createObjectURL(file));
   }
@@ -82,6 +84,7 @@ export function AccountSettings({ profile, signOutAction, accountScope }) {
     setLastName(saved.lastName);
     setPhone(saved.phone || '');
     setPicture(null);
+    setPhotoRemoved(false);
     setPreview(photoUrl(saved.photoUpdatedAt, accountScope));
     setProfileErrors({});
     setProfileMessage('');
@@ -93,6 +96,7 @@ export function AccountSettings({ profile, signOutAction, accountScope }) {
     setProfilePending(true);
     const data = new FormData(event.currentTarget);
     if (picture) data.set('photo', picture);
+    if (photoRemoved && !picture) data.set('removePhoto', '1');
     if (accountScope) data.set('accountScope', accountScope);
     const result = await saveRequesterProfile(data);
     setProfilePending(false);
@@ -106,39 +110,24 @@ export function AccountSettings({ profile, signOutAction, accountScope }) {
       firstName: String(data.get('firstName') || '').trim(),
       lastName: String(data.get('lastName') || '').trim(),
       phone: String(data.get('phone') || '').trim(),
-      photoUpdatedAt: result.photoUpdatedAt || saved.photoUpdatedAt,
-      photoType: result.photoUpdatedAt ? 'saved' : saved.photoType,
+      photoUpdatedAt: result.photoRemoved ? '' : (result.photoUpdatedAt || saved.photoUpdatedAt),
+      photoType: result.photoRemoved ? '' : (result.photoUpdatedAt ? 'saved' : saved.photoType),
     };
     setSaved(nextSaved);
     setPicture(null);
-    if (result.photoUpdatedAt) setPreview(photoUrl(result.photoUpdatedAt, accountScope));
+    setPhotoRemoved(false);
+    setPreview(nextSaved.photoUpdatedAt ? photoUrl(nextSaved.photoUpdatedAt, accountScope) : '');
     setProfileErrors({});
     setProfileMessage('');
     showToast?.('Profile Saved!');
     router.refresh();
   }
 
-  async function removePicture() {
+  function removePicture() {
     setProfileErrors((current) => ({ ...current, photo: '' }));
-    if (picture) {
-      setPicture(null);
-      setPreview(saved.photoType ? photoUrl(saved.photoUpdatedAt, accountScope) : '');
-      return;
-    }
-    if (!saved.photoType) {
-      setPreview('');
-      return;
-    }
+    setPicture(null);
+    setPhotoRemoved(Boolean(saved.photoType));
     setPreview('');
-    const result = await removeRequesterPhoto(accountScope);
-    if (!result?.ok) {
-      setPreview(photoUrl(saved.photoUpdatedAt, accountScope));
-      setProfileMessage(result?.formError || 'That picture could not be removed. Try again.');
-      return;
-    }
-    setSaved((current) => ({ ...current, photoType: '', photoUpdatedAt: '' }));
-    setProfileMessage('');
-    router.refresh();
   }
 
   async function toggleNote(field, enabled) {
