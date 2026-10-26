@@ -105,7 +105,7 @@ export async function inviteUser({ email, role, firstName = '', lastName = '' } 
   }));
 
   revalidatePath('/staff/users');
-  revalidatePath('/staff/notifications');
+  revalidatePath('/staff/email-logs');
   return { ok: true };
 }
 

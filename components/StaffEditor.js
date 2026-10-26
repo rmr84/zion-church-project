@@ -154,7 +154,7 @@ export function StaffEditor({
       <div className="private-panel">
         <label htmlFor="internalNote">Care Team Note</label>
         <p className="hint" id="internalNote-hint">
-          Never Shown On The Status Page, And Left Out Of The Notification Log.
+          Never Shown On The Status Page, And Left Out Of The Email Log.
         </p>
         <textarea
           id="internalNote"

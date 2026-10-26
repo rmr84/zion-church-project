@@ -4,9 +4,10 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
 import { STATUSES } from '@/lib/constants';
+import { createAssignmentNotification } from '@/lib/desk-notifications';
 import { getStaffRequest, searchRequests, updateCareRequest } from '@/lib/requests';
 import { getStaff, isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
-import { ADMIN_ROLE, acceptDeskInvite, getUserRole, isDeskRole, saveUser } from '@/lib/users';
+import { ADMIN_ROLE, acceptDeskInvite, getUser, getUserRole, isDeskRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
 
 async function canReopenCompleted() {
@@ -19,6 +20,33 @@ async function reopenDenied(currentStatus, nextStatus) {
   if (currentStatus !== 'completed' || nextStatus === 'completed') return null;
   if (await canReopenCompleted()) return null;
   return 'Only an admin can move a completed request out of the archive.';
+}
+
+async function notifyNewAssignee(current, nextAssignee) {
+  const staff = await getStaff();
+  let assignedByLabel = '';
+  if (staff?.uid) {
+    try {
+      const profile = await getUser(staff.uid);
+      assignedByLabel = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ')
+        || staff.email
+        || '';
+    } catch {
+      assignedByLabel = staff.email || '';
+    }
+  }
+  try {
+    await createAssignmentNotification({
+      assignee: nextAssignee,
+      previousAssignee: current.assignee || '',
+      referenceCode: current.referenceCode,
+      careType: current.careType,
+      assignedByUid: staff?.uid || '',
+      assignedByLabel,
+    });
+  } catch (error) {
+    console.error('Could not create the assignment notification.', error?.code || '');
+  }
 }
 
 export async function establishStaffSession(idToken) {
@@ -84,9 +112,13 @@ export async function updateRequestAssignee(referenceCode, assignee, options = {
     return { ok: false, formError: 'That assignment could not be saved. Try again.' };
   }
 
+  await notifyNewAssignee(current, name);
+
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
   revalidatePath(`/staff/requests/${current.referenceCode}`);
+  revalidatePath('/staff/email-logs');
+  revalidatePath('/staff/notifications');
   return { ok: true };
 }
 
@@ -118,6 +150,7 @@ export async function updateRequestStatus(referenceCode, status) {
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
   revalidatePath(`/staff/requests/${current.referenceCode}`);
+  revalidatePath('/staff/email-logs');
   return { ok: true, status };
 }
 
@@ -161,9 +194,15 @@ export async function updateRequest(_previous, formData) {
     };
   }
 
+  if (String(result.values.assignee || '').trim() !== String(current.assignee || '').trim()) {
+    await notifyNewAssignee(current, result.values.assignee);
+  }
+
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
   revalidatePath(`/staff/requests/${updated.referenceCode}`);
+  revalidatePath('/staff/email-logs');
+  revalidatePath('/staff/notifications');
 
   return { errors: {}, values: result.values, saved: true };
 }

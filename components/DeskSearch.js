@@ -45,6 +45,17 @@ const ACTIONS = [
     ),
   },
   {
+    href: '/staff/email-logs',
+    title: 'Email Logs',
+    detail: 'Review outbound requester and invite emails.',
+    icon: (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M4.2 7.2 12 12.4 19.8 7.2" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    ),
+  },
+  {
     href: '/staff/account',
     title: 'Account',
     detail: 'View and update the information on this account.',
@@ -58,7 +69,7 @@ const ACTIONS = [
   {
     href: '/staff/notifications',
     title: 'Notifications',
-    detail: 'See updates for the care desk.',
+    detail: 'Desk alerts for assignments and new reviews.',
     icon: (
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4.2 1.5 5.5 1.5 5.5H5s1.5-1.3 1.5-5.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />

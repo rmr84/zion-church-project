@@ -201,7 +201,7 @@ export function RequestActions({ request, members = [], allowAssign = true }) {
               <div className="field">
                 <label htmlFor={noteId}>Note</label>
                 <p className="hint" id={`${noteId}-hint`}>
-                  Never shown on the status page, and left out of the notification log.
+                  Never shown on the status page, and left out of the email log.
                 </p>
                 <textarea
                   id={noteId}

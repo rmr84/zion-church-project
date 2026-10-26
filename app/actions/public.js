@@ -1,5 +1,6 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { createRequest } from '@/lib/requests';
 import { getRequester, isStaffSignedIn } from '@/lib/session';
@@ -29,5 +30,6 @@ export async function submitCareRequest(_previous, formData) {
       values: result.values,
     };
   }
+  revalidatePath('/staff/email-logs');
   redirect(`/request/sent?code=${encodeURIComponent(code)}`);
 }

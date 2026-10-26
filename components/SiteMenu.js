@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
-export function SiteMenu({ children, dropdown = false }) {
+export function SiteMenu({ children, dropdown = false, badgeCount = 0 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const pathname = usePathname();
+  const badgeLabel = badgeCount > 99 ? '99+' : String(badgeCount);
 
   useEffect(() => {
     setOpen(false);
@@ -47,6 +48,11 @@ export function SiteMenu({ children, dropdown = false }) {
             <path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
           </svg>
         )}
+        {!open && badgeCount > 0 ? (
+          <span className="desk-note-badge menu-toggle-badge" aria-label={`${badgeLabel} new notifications`}>
+            {badgeLabel}
+          </span>
+        ) : null}
       </button>
       <div className="site-menu-panel" id="primary-menu">
         {children}
