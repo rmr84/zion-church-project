@@ -57,7 +57,17 @@ const ITEMS = [
   },
 ];
 
-export function DeskMenu({ member, isAdmin = false }) {
+function NotificationBadge({ count }) {
+  if (!count) return null;
+  const label = count > 99 ? '99+' : String(count);
+  return (
+    <span className="desk-note-badge" aria-label={`${label} new notifications`}>
+      {label}
+    </span>
+  );
+}
+
+export function DeskMenu({ member, isAdmin = false, notificationCount = 0 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(true);
   const [photoFailed, setPhotoFailed] = useState(false);
@@ -82,6 +92,7 @@ export function DeskMenu({ member, isAdmin = false }) {
             ))}
             <Link href="/staff/notifications" aria-current={pathname.startsWith('/staff/notifications') ? 'page' : undefined}>
               Notifications
+              <NotificationBadge count={notificationCount} />
             </Link>
           </nav>
         </SiteMenu>
@@ -107,7 +118,10 @@ export function DeskMenu({ member, isAdmin = false }) {
                 <path d="M6.5 9.5a5.5 5.5 0 0 1 11 0c0 4.2 1.5 5.5 1.5 5.5H5s1.5-1.3 1.5-5.5Z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
                 <path d="M10 18.2a2 2 0 0 0 4 0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
               </svg>
-              Notifications
+              <span className="desk-rail-note-label">
+                Notifications
+                <NotificationBadge count={notificationCount} />
+              </span>
             </Link>
             <Link href="/staff/account" className="desk-rail-user" aria-current={pathname.startsWith('/staff/account') ? 'page' : undefined}>
               {member?.photo && !photoFailed ? (

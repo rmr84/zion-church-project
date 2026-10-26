@@ -555,6 +555,27 @@ body {
     flex: 0 0 auto;
     color: #6b7280;
   }
+  .desk-rail-note-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.45rem;
+    flex: 1;
+    min-width: 0;
+  }
+  .desk-note-badge {
+    display: inline-grid;
+    place-items: center;
+    min-width: 1.2rem;
+    height: 1.2rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    background: #d92d20;
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 800;
+    line-height: 1;
+  }
   .desk-rail-note:hover,
   .desk-rail-note[aria-current="page"] {
     background: #f3f5f7;
@@ -824,6 +845,21 @@ body {
   padding: 0.55rem 1rem;
   font-size: 0.92rem;
 }
+.review-notifications-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.review-notifications-count { margin: 0; }
+.review-notification-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+.primary-nav .desk-note-badge { margin-left: 0.35rem; }
 .status-feedback {
   margin-top: 1.15rem;
 }

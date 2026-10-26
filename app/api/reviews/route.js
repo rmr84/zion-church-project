@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { createPendingReview } from '@/lib/reviews';
 
@@ -20,5 +21,7 @@ export async function POST(request) {
   if (!result.ok) {
     return NextResponse.json(result, { status: 400 });
   }
+  revalidatePath('/staff/notifications');
+  revalidatePath('/staff/reviews');
   return NextResponse.json(result, { status: 201 });
 }
