@@ -26,12 +26,29 @@ test('description, care type, contact method, and urgency are required', () => {
   assert.equal(result.errors.urgency, 'Choose an urgency.');
 });
 
-test('phone, email, and text require a way to reach the person', () => {
-  for (const contactMethod of ['phone', 'email', 'text']) {
-    const result = validateSubmission({ ...valid, contactMethod, contactDetail: '  ' });
-    assert.equal(result.ok, false);
-    assert.equal(result.errors.contactDetail, 'Enter how we should reach you.');
+test('phone, email, and text require a valid way to reach the person', () => {
+  for (const contactMethod of ['phone', 'text']) {
+    const empty = validateSubmission({ ...valid, contactMethod, contactDetail: '  ' });
+    assert.equal(empty.ok, false);
+    assert.equal(empty.errors.contactDetail, 'Enter a 10-digit phone number.');
+    const bad = validateSubmission({ ...valid, contactMethod, contactDetail: 'asdf' });
+    assert.equal(bad.ok, false);
+    assert.equal(bad.errors.contactDetail, 'Enter a 10-digit phone number.');
+    const short = validateSubmission({ ...valid, contactMethod, contactDetail: '555-0148' });
+    assert.equal(short.ok, false);
+    assert.equal(short.errors.contactDetail, 'Enter a 10-digit phone number.');
+    const ok = validateSubmission({ ...valid, contactMethod, contactDetail: '(555) 010-0148' });
+    assert.equal(ok.ok, true);
   }
+
+  const emptyEmail = validateSubmission({ ...valid, contactMethod: 'email', contactDetail: '  ' });
+  assert.equal(emptyEmail.ok, false);
+  assert.equal(emptyEmail.errors.contactDetail, 'Enter an email address.');
+  const badEmail = validateSubmission({ ...valid, contactMethod: 'email', contactDetail: 'not-an-email' });
+  assert.equal(badEmail.ok, false);
+  assert.equal(badEmail.errors.contactDetail, 'Enter a valid email address.');
+  const okEmail = validateSubmission({ ...valid, contactMethod: 'email', contactDetail: 'care@example.com' });
+  assert.equal(okEmail.ok, true);
 });
 
 test('in person and no contact needed do not keep a contact detail', () => {

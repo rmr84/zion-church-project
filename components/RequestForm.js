@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { submitCareRequest } from '@/app/actions/public';
 import { CARE_TYPES, CONTACT_METHODS, URGENCY_LEVELS, labelFor } from '@/lib/constants';
+import { contactDetailProblem } from '@/lib/validate';
 
 function RequiredMark() {
   return <span className="required" aria-hidden="true">*</span>;
@@ -59,6 +60,9 @@ const STEPS = [
 ];
 
 function problemFor(step, values) {
+  if (step.key === 'contactDetail') {
+    return contactDetailProblem(values.contactMethod, values.contactDetail);
+  }
   const text = String(values[step.key] ?? '').trim();
   if (text) return '';
   return step.empty;
@@ -69,9 +73,9 @@ function skipsContactDetail(method) {
 }
 
 function contactDetailHint(method) {
-  if (method === 'email') return 'Enter an email address.';
-  if (method === 'text') return 'Enter a number for text messages.';
-  return 'Enter a phone number.';
+  if (method === 'email') return 'Enter a valid email address.';
+  if (method === 'text') return 'Enter a 10-digit number for text messages.';
+  return 'Enter a 10-digit phone number.';
 }
 
 function stepsFor(values) {
