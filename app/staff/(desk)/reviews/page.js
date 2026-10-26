@@ -8,9 +8,7 @@ export default async function ReviewsPage() {
   return (
     <section className="page-frame">
       <div className="page-heading">
-        <p className="eyebrow">Care Team</p>
         <h1>Reviews</h1>
-        <p className="lede">What members say about the care desk.</p>
       </div>
       <div className="wrap wide reviews-desk">
         {reviews.length === 0 ? (
