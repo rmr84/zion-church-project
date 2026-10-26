@@ -11,7 +11,7 @@ This is not an emergency line. Urgent form copy points people to 911 when needed
 | Audience | How they get in | What they do |
 | --- | --- | --- |
 | **Public** | No account | Read the home page, submit a care request, look up a request by reference code, leave feedback after a completed request |
-| **Requester** | Firebase account at `/sign-in` or `/create-account` | Same as public, plus **My Requests**, request detail pages, and account settings (profile, photo, notification prefs) |
+| **Requester** | Firebase account at `/sign-in` or `/create-account` | Same as public, plus **My Requests**, request detail pages, and account settings (profile, photo, general prefs) |
 | **Care Team** (`careTeam`) | Firebase account invited into the desk, then `/staff/login` | Open queue, archive, assign, status and notes, email logs, in-app assignment notifications, own desk account |
 | **Admin** (`Admin`) | Same desk login with Admin role | Everything Care Team can do, plus invite/delete pending desk users, moderate reviews, reopen completed requests, and see pending-review alerts |
 
