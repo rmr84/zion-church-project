@@ -80,8 +80,8 @@ export default async function StatusPage({ searchParams }) {
                 <dd>{labelFor(STATUSES, request.status)}</dd>
               </div>
               <div>
-                <dt>Note for you</dt>
-                <dd>{request.memberNote.trim() || 'The care team has not added a note yet.'}</dd>
+                <dt>Note For You</dt>
+                <dd>{String(request.memberNote || '').trim() || 'The care team has not added a note yet.'}</dd>
               </div>
             </dl>
           </article>

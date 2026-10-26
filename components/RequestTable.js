@@ -244,7 +244,7 @@ export function RequestTable({ requests, desk = false, members = [] }) {
                   <dd>{labelFor(STATUSES, selected.status)}</dd>
                 </div>
                 <div>
-                  <dt>Note for you</dt>
+                  <dt>Note For You</dt>
                   <dd>{selected.memberNote.trim() || 'The care team has not added a note yet.'}</dd>
                 </div>
               </dl>
