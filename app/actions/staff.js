@@ -147,6 +147,10 @@ export async function updateRequestStatus(referenceCode, status) {
   const denied = await reopenDenied(current.status, status);
   if (denied) return { ok: false, formError: denied };
 
+  if (status === 'completed' && !String(current.assignee || '').trim()) {
+    return { ok: false, formError: 'Assign a care team member before marking this completed.' };
+  }
+
   try {
     const updated = await updateCareRequest(current.referenceCode, {
       status,
@@ -207,6 +211,13 @@ export async function updateRequest(_previous, formData) {
     };
   }
   const nextValues = { ...result.values, assignee: assigned.value };
+  if (nextValues.status === 'completed' && !String(nextValues.assignee || '').trim()) {
+    return {
+      errors: { assignee: 'Assign a care team member before marking this completed.' },
+      values: nextValues,
+      saved: false,
+    };
+  }
 
   const updated = await updateCareRequest(result.values.referenceCode, nextValues);
   if (!updated) {
