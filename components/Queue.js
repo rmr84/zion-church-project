@@ -105,6 +105,7 @@ export function Queue({ openRequests, archivedRequests, members = [], initialArc
           requests={requests}
           desk
           members={members}
+          allowAssign={!archive}
         />
       ) : (
         <p className="empty wrap wide">{empty}</p>

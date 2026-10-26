@@ -15,7 +15,7 @@ import { findMember, memberLabel } from '@/lib/members';
 const WEB_PAGE_SIZE = 5;
 const PHONE_PAGE_SIZE = 3;
 
-export function RequestTable({ requests, desk = false, members = [] }) {
+export function RequestTable({ requests, desk = false, members = [], allowAssign = true }) {
   const dialogRef = useRef(null);
   const router = useRouter();
   const showToast = useToast();
@@ -149,7 +149,11 @@ export function RequestTable({ requests, desk = false, members = [] }) {
                 <td className="request-more">
                   <span className="cell-label">{desk ? 'Actions' : 'Details'}</span>
                   {desk ? (
-                    <RequestActions request={request} members={members} />
+                    <RequestActions
+                      request={request}
+                      members={members}
+                      allowAssign={allowAssign}
+                    />
                   ) : (
                     <button
                       className="request-view"

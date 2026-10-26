@@ -119,7 +119,7 @@ export function UserTable({ members = [], canInvite = false }) {
       return;
     }
     setConfirmMember(null);
-    showToast?.('Pending user deleted.');
+    showToast?.(result.warning || 'Pending user deleted.');
     router.refresh();
   }
 

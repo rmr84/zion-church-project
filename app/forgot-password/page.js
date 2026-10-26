@@ -5,9 +5,11 @@ import { getRequester, isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Forgot Password' };
 
-export default async function ForgotPasswordPage() {
+export default async function ForgotPasswordPage({ searchParams }) {
   if (await isStaffSignedIn()) redirect('/staff');
   if (await getRequester()) redirect('/account');
+  const params = await searchParams;
+  const defaultEmail = String(params?.email || '').trim();
 
   return (
     <section className="page-frame">
@@ -19,7 +21,7 @@ export default async function ForgotPasswordPage() {
         <p className="lede">
           Enter the email on the account. A link in that inbox sets a new password.
         </p>
-        <ForgotPassword />
+        <ForgotPassword defaultEmail={defaultEmail} />
         <p className="sign-in-alt">
           <Link href="/sign-in">Back to Sign In</Link>
         </p>

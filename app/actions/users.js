@@ -61,7 +61,8 @@ export async function inviteUser({ email, role, firstName = '', lastName = '' } 
     return { ok: false, formError: 'An account with that email already exists.' };
   }
 
-  const authUser = await createFirebaseAuthUser(address);
+  // Temporary fixed invite password for testing Firebase reset delivery.
+  const authUser = await createFirebaseAuthUser(address, 'Test12345!');
   if (!authUser.ok) return authUser;
   if (!authUser.created) {
     return { ok: false, formError: 'An account with that email already exists.' };
@@ -87,7 +88,15 @@ export async function inviteUser({ email, role, firstName = '', lastName = '' } 
 
   const loginUrl = await staffLoginUrl();
   const mailed = await sendFirebasePasswordReset(address, loginUrl);
-  if (!mailed.ok) return mailed;
+  if (!mailed.ok) {
+    await deleteFirebaseAuthUser({
+      email: address,
+      password: authUser.password,
+      refreshToken: authUser.refreshToken,
+    }).catch(() => {});
+    await removeDeskUserRecord({ uid: authUser.uid, email: address }).catch(() => {});
+    return mailed;
+  }
 
   logNotice(buildInviteNotice({
     email: address,
@@ -117,13 +126,19 @@ export async function deletePendingUser({ uid = '', email = '' } = {}) {
 
   const firebaseUid = String(pending.uid || '');
   const hasFirebaseAccount = Boolean(firebaseUid) && !firebaseUid.startsWith('invite');
+  let firebaseWarning = '';
   if (hasFirebaseAccount) {
     const removed = await deleteFirebaseAuthUser({
       email: pending.email,
       password: pending.invitePassword,
       refreshToken: pending.inviteRefreshToken,
+      passwords: ['Test12345!'],
     });
-    if (!removed.ok) return removed;
+    if (!removed.ok) {
+      // Still clear the desk record so pending invites are not stuck.
+      firebaseWarning = removed.formError
+        || 'Desk invite removed, but the Firebase Auth user is still there. Delete it in the Firebase console.';
+    }
   }
 
   const deleted = await removeDeskUserRecord({
@@ -133,5 +148,8 @@ export async function deletePendingUser({ uid = '', email = '' } = {}) {
   if (!deleted.ok) return deleted;
 
   revalidatePath('/staff/users');
+  if (firebaseWarning) {
+    return { ok: true, warning: firebaseWarning };
+  }
   return { ok: true };
 }
