@@ -176,6 +176,20 @@ export function QueueFilters({
                   />
                 );
               })}
+              {pills.length > 0 ? (
+                <button
+                  className="queue-filter-clear"
+                  type="button"
+                  onClick={() => {
+                    onUrgenciesChange([]);
+                    onCareTypesChange([]);
+                    onStatusesChange([]);
+                    onAssigneesChange([]);
+                  }}
+                >
+                  Clear filters
+                </button>
+              ) : null}
             </div>
           ) : null}
         </div>

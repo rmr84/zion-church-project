@@ -57,10 +57,6 @@ export function Queue({ openRequests, archivedRequests, members = [], initialArc
   const [assignees, setAssignees] = useState([]);
 
   const source = archive ? archivedRequests : openRequests;
-  const title = archive ? 'Archive' : 'Open Requests';
-  const intro = archive
-    ? 'Completed requests stay here. The desk cannot delete them.'
-    : 'Completed requests move to the archive. They are not deleted.';
   const empty = archive ? 'No completed requests yet.' : 'No open requests.';
 
   const requests = useMemo(() => {
@@ -84,9 +80,7 @@ export function Queue({ openRequests, archivedRequests, members = [], initialArc
   return (
     <section className="page-frame">
       <div className="page-heading">
-        <p className="eyebrow">Care Team</p>
-        <h1>{title}</h1>
-        <p className="lede">{intro}</p>
+        <h1>Care Requests</h1>
       </div>
       <div className="wrap wide">
         <QueueFilters

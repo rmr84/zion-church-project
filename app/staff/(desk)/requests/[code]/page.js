@@ -23,18 +23,20 @@ export default async function RequestDetailPage({ params }) {
   const backHref = request.status === 'completed' ? '/staff/archive' : '/staff';
 
   return (
-    <section className="page-frame">
+    <section className="page-frame request-detail">
       <div className="page-heading">
-        <p className="eyebrow">Care Team</p>
+        <Link href={backHref} className="desk-back" aria-label="Back to care requests">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span>Back</span>
+        </Link>
         <div className="title-row">
           <h1>{labelFor(CARE_TYPES, request.careType)}</h1>
           <UrgencyBadge urgency={request.urgency} />
           <StatusBadge status={request.status} desk />
         </div>
         <p className="lede">{request.referenceCode}</p>
-        <p>
-          <Link href={backHref}>Back</Link>
-        </p>
       </div>
       <div className="wrap wide detail-panel">
         <div className="detail-grid">

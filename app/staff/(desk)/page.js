@@ -2,7 +2,7 @@ import { Queue } from "@/components/Queue";
 import { listRequests } from "@/lib/requests";
 import { listDeskMembers } from "@/lib/users";
 
-export const metadata = { title: "Open Requests" };
+export const metadata = { title: "Care Requests" };
 
 export default async function OpenQueuePage() {
   const [openRequests, archivedRequests, members] = await Promise.all([
