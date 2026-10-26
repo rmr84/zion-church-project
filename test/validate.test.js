@@ -71,3 +71,24 @@ test('staff updates only accept known statuses', () => {
   assert.equal(result.values.referenceCode, 'ZC-MEAL-1002');
   assert.equal(result.errors.status, 'Choose a status.');
 });
+
+test('completed staff updates require an assignee', () => {
+  const missing = validateStaffUpdate({
+    referenceCode: 'ZC-MEAL-1002',
+    status: 'completed',
+    assignee: '',
+    memberNote: '',
+    internalNote: '',
+  });
+  assert.equal(missing.ok, false);
+  assert.equal(missing.errors.assignee, 'Assign a care team member before marking this completed.');
+
+  const assigned = validateStaffUpdate({
+    referenceCode: 'ZC-MEAL-1002',
+    status: 'completed',
+    assignee: 'Pastor Ellis',
+    memberNote: '',
+    internalNote: '',
+  });
+  assert.equal(assigned.ok, true);
+});

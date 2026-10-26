@@ -88,7 +88,7 @@ export function StaffSignIn() {
 
   if (pending) {
     return (
-      <div className="sign-in-loading" role="status" aria-live="polite">
+      <div className="sign-in-loading sign-in-loading-page" role="status" aria-live="polite">
         <span className="sign-in-spinner" aria-hidden="true" />
         <p>Signing you in…</p>
       </div>

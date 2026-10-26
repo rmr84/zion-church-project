@@ -19,7 +19,9 @@ export function MemberPicker({
   const rootRef = useRef(null);
   const listId = useId();
   const options = activeMembers(members);
-  const selected = findMember(members, value) || members.find((member) => memberValue(member) === value);
+  const selected = value
+    ? (findMember(members, value) || options.find((member) => memberValue(member) === value) || null)
+    : null;
 
   useEffect(() => {
     if (!open) return undefined;

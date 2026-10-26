@@ -36,6 +36,8 @@ export function StaffEditor({
   });
   const errorEntries = Object.entries(errors);
   const notesLocked = values.status === 'completed';
+  // Completed requests lock assignee once set; unassigned completed rows can still be fixed.
+  const assigneeLocked = notesLocked && Boolean(String(assignee || '').trim());
 
   function setField(name, value) {
     setValues((current) => ({ ...current, [name]: value }));
@@ -127,7 +129,8 @@ export function StaffEditor({
           members={members}
           value={values.assignee}
           onChange={(value) => setField('assignee', value)}
-          disabled={pending || notesLocked}
+          disabled={pending || assigneeLocked}
+          placeholder="Select a care team member"
           aria-describedby="assignee-hint"
           aria-invalid={Boolean(errors.assignee)}
         />
