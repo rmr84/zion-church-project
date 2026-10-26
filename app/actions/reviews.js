@@ -8,7 +8,8 @@ import {
   markReviewNotificationSeen,
   setReviewStatus,
 } from '@/lib/reviews';
-import { isStaffSignedIn } from '@/lib/session';
+import { getStaff, isStaffSignedIn } from '@/lib/session';
+import { ADMIN_ROLE, getUserRole } from '@/lib/users';
 
 function revalidateReviewPaths() {
   revalidatePath('/');
@@ -16,10 +17,20 @@ function revalidateReviewPaths() {
   revalidatePath('/staff/notifications');
 }
 
-export async function approveReview(id) {
+async function requireAdmin(action = 'update reviews') {
   if (!(await isStaffSignedIn())) {
-    return { ok: false, formError: 'Sign in again to update this review.' };
+    return { ok: false, formError: `Sign in again to ${action}.` };
   }
+  const staff = await getStaff();
+  if (!staff || (await getUserRole(staff.uid)) !== ADMIN_ROLE) {
+    return { ok: false, formError: `Only an Admin can ${action}.` };
+  }
+  return { ok: true };
+}
+
+export async function approveReview(id) {
+  const access = await requireAdmin('update reviews');
+  if (!access.ok) return access;
   const result = await setReviewStatus(id, REVIEW_STATUS_APPROVED);
   if (!result.ok) return result;
   revalidateReviewPaths();
@@ -27,9 +38,8 @@ export async function approveReview(id) {
 }
 
 export async function rejectReview(id) {
-  if (!(await isStaffSignedIn())) {
-    return { ok: false, formError: 'Sign in again to update this review.' };
-  }
+  const access = await requireAdmin('update reviews');
+  if (!access.ok) return access;
   const result = await setReviewStatus(id, REVIEW_STATUS_REJECTED);
   if (!result.ok) return result;
   revalidateReviewPaths();
@@ -37,9 +47,8 @@ export async function rejectReview(id) {
 }
 
 export async function markReviewSeen(id) {
-  if (!(await isStaffSignedIn())) {
-    return { ok: false, formError: 'Sign in again to update notifications.' };
-  }
+  const access = await requireAdmin('update notifications');
+  if (!access.ok) return access;
   const result = await markReviewNotificationSeen(id);
   if (!result.ok) return result;
   revalidatePath('/staff/notifications');
@@ -47,9 +56,8 @@ export async function markReviewSeen(id) {
 }
 
 export async function markAllReviewsSeen() {
-  if (!(await isStaffSignedIn())) {
-    return { ok: false, formError: 'Sign in again to update notifications.' };
-  }
+  const access = await requireAdmin('update notifications');
+  if (!access.ok) return access;
   await markAllReviewNotificationsSeen();
   revalidatePath('/staff/notifications');
   return { ok: true };

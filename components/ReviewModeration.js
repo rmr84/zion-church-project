@@ -34,7 +34,7 @@ const CONFIRM = {
   },
 };
 
-export function ReviewModeration({ reviews = [] }) {
+export function ReviewModeration({ reviews = [], canModerate = false }) {
   const router = useRouter();
   const showToast = useToast();
   const titleId = useId();
@@ -81,12 +81,12 @@ export function ReviewModeration({ reviews = [] }) {
   }
 
   function askApprove(review) {
-    if (busy || review.status === 'approved') return;
+    if (!canModerate || busy || review.status === 'approved') return;
     setConfirm({ kind: 'approve', id: review.id });
   }
 
   function askReject(review) {
-    if (busy || review.status === 'rejected') return;
+    if (!canModerate || busy || review.status === 'rejected') return;
     if (review.status === 'approved' && !canRemoveApproved) {
       showToast?.(`Keep at least ${MIN_APPROVED_REVIEWS} approved reviews for the homepage carousel.`);
       return;
@@ -139,39 +139,41 @@ export function ReviewModeration({ reviews = [] }) {
           <ul className="reviews-desk-list">
             {paged.map((review) => (
               <li key={review.id || `${review.name}-${review.createdAt}`} className="review-card">
-                <div className="review-card-actions">
-                  <button
-                    className="review-card-action is-approve"
-                    type="button"
-                    aria-label="Approve review"
-                    disabled={busy || review.status === 'approved'}
-                    onClick={() => askApprove(review)}
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </button>
-                  <button
-                    className="review-card-action is-reject"
-                    type="button"
-                    aria-label={review.status === 'approved' ? 'Remove review' : 'Reject review'}
-                    title={
-                      review.status === 'approved' && !canRemoveApproved
-                        ? `Keep at least ${MIN_APPROVED_REVIEWS} approved reviews for the homepage carousel.`
-                        : undefined
-                    }
-                    disabled={
-                      busy
-                      || review.status === 'rejected'
-                      || (review.status === 'approved' && !canRemoveApproved)
-                    }
-                    onClick={() => askReject(review)}
-                  >
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-                    </svg>
-                  </button>
-                </div>
+                {canModerate ? (
+                  <div className="review-card-actions">
+                    <button
+                      className="review-card-action is-approve"
+                      type="button"
+                      aria-label="Approve review"
+                      disabled={busy || review.status === 'approved'}
+                      onClick={() => askApprove(review)}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    <button
+                      className="review-card-action is-reject"
+                      type="button"
+                      aria-label={review.status === 'approved' ? 'Remove review' : 'Reject review'}
+                      title={
+                        review.status === 'approved' && !canRemoveApproved
+                          ? `Keep at least ${MIN_APPROVED_REVIEWS} approved reviews for the homepage carousel.`
+                          : undefined
+                      }
+                      disabled={
+                        busy
+                        || review.status === 'rejected'
+                        || (review.status === 'approved' && !canRemoveApproved)
+                      }
+                      onClick={() => askReject(review)}
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : null}
                 <blockquote>
                   <p>{review.quote}</p>
                   <footer>
@@ -206,48 +208,50 @@ export function ReviewModeration({ reviews = [] }) {
         </>
       )}
 
-      <dialog
-        ref={dialogRef}
-        className="sign-out-dialog review-confirm-dialog"
-        aria-labelledby={titleId}
-        onClose={closeConfirm}
-        onClick={(event) => {
-          if (event.target === event.currentTarget) closeConfirm();
-        }}
-      >
-        {copy ? (
-          <>
-            <div className="sign-out-head">
-              <span className="sign-out-icon" aria-hidden="true">
-                {confirm.kind === 'approve' ? (
-                  <svg viewBox="0 0 24 24">
-                    <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                ) : (
-                  <svg viewBox="0 0 24 24">
+      {canModerate ? (
+        <dialog
+          ref={dialogRef}
+          className="sign-out-dialog review-confirm-dialog"
+          aria-labelledby={titleId}
+          onClose={closeConfirm}
+          onClick={(event) => {
+            if (event.target === event.currentTarget) closeConfirm();
+          }}
+        >
+          {copy ? (
+            <>
+              <div className="sign-out-head">
+                <span className="sign-out-icon" aria-hidden="true">
+                  {confirm.kind === 'approve' ? (
+                    <svg viewBox="0 0 24 24">
+                      <path d="M5 12.5l4.2 4.2L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24">
+                      <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                  )}
+                </span>
+                <button className="sign-out-close" type="button" aria-label="Close" onClick={closeConfirm}>
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
-                )}
-              </span>
-              <button className="sign-out-close" type="button" aria-label="Close" onClick={closeConfirm}>
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-            <h2 id={titleId}>{copy.title}</h2>
-            <p>{copy.body}</p>
-            <div className="modal-actions">
-              <button className="button secondary" type="button" disabled={busy} onClick={closeConfirm}>
-                Cancel
-              </button>
-              <button className="button" type="button" disabled={busy} onClick={confirmAction}>
-                {busy ? 'Saving…' : copy.confirmLabel}
-              </button>
-            </div>
-          </>
-        ) : null}
-      </dialog>
+                </button>
+              </div>
+              <h2 id={titleId}>{copy.title}</h2>
+              <p>{copy.body}</p>
+              <div className="modal-actions">
+                <button className="button secondary" type="button" disabled={busy} onClick={closeConfirm}>
+                  Cancel
+                </button>
+                <button className="button" type="button" disabled={busy} onClick={confirmAction}>
+                  {busy ? 'Saving…' : copy.confirmLabel}
+                </button>
+              </div>
+            </>
+          ) : null}
+        </dialog>
+      ) : null}
     </div>
   );
 }

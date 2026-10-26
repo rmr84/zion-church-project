@@ -6,14 +6,14 @@ import { useState } from 'react';
 import { markAllReviewsSeen, markReviewSeen } from '@/app/actions/reviews';
 import { useToast } from '@/components/Toast';
 
-export function ReviewNotifications({ notifications = [] }) {
+export function ReviewNotifications({ notifications = [], canModerate = false }) {
   const router = useRouter();
   const showToast = useToast();
   const [pendingId, setPendingId] = useState('');
   const [pendingAll, setPendingAll] = useState(false);
 
   async function onMarkSeen(id) {
-    if (pendingId || pendingAll) return;
+    if (!canModerate || pendingId || pendingAll) return;
     setPendingId(id);
     const result = await markReviewSeen(id);
     setPendingId('');
@@ -26,7 +26,7 @@ export function ReviewNotifications({ notifications = [] }) {
   }
 
   async function onMarkAll() {
-    if (pendingId || pendingAll) return;
+    if (!canModerate || pendingId || pendingAll) return;
     setPendingAll(true);
     const result = await markAllReviewsSeen();
     setPendingAll(false);
@@ -52,9 +52,11 @@ export function ReviewNotifications({ notifications = [] }) {
             ? '1 new review is waiting.'
             : `${notifications.length} new reviews are waiting.`}
         </p>
-        <button className="button secondary" type="button" disabled={pendingAll} onClick={onMarkAll}>
-          {pendingAll ? 'Saving…' : 'Mark All As Seen'}
-        </button>
+        {canModerate ? (
+          <button className="button secondary" type="button" disabled={pendingAll} onClick={onMarkAll}>
+            {pendingAll ? 'Saving…' : 'Mark All As Seen'}
+          </button>
+        ) : null}
       </div>
       <ul className="reviews-desk-list">
         {notifications.map((review) => (
@@ -69,14 +71,16 @@ export function ReviewNotifications({ notifications = [] }) {
             </blockquote>
             <div className="review-notification-actions">
               <Link className="button secondary" href="/staff/reviews">Review</Link>
-              <button
-                className="button"
-                type="button"
-                disabled={pendingId === review.id}
-                onClick={() => onMarkSeen(review.id)}
-              >
-                {pendingId === review.id ? 'Saving…' : 'Mark As Seen'}
-              </button>
+              {canModerate ? (
+                <button
+                  className="button"
+                  type="button"
+                  disabled={pendingId === review.id}
+                  onClick={() => onMarkSeen(review.id)}
+                >
+                  {pendingId === review.id ? 'Saving…' : 'Mark As Seen'}
+                </button>
+              ) : null}
             </div>
           </li>
         ))}

@@ -2,6 +2,8 @@ import fs from 'node:fs';
 import { ReviewNotifications } from '@/components/ReviewNotifications';
 import { defaultLogPath } from '@/lib/notify';
 import { listUnseenReviewNotifications } from '@/lib/reviews';
+import { getStaff } from '@/lib/session';
+import { ADMIN_ROLE, getUserRole } from '@/lib/users';
 
 export const metadata = { title: 'Notifications' };
 
@@ -20,10 +22,12 @@ function readEntries() {
 }
 
 export default async function NotificationsPage() {
-  const [entries, reviewNotifications] = await Promise.all([
+  const [entries, reviewNotifications, staff] = await Promise.all([
     Promise.resolve(readEntries()),
     listUnseenReviewNotifications(),
+    getStaff(),
   ]);
+  const role = staff ? await getUserRole(staff.uid) : '';
 
   return (
     <section className="page-frame">
@@ -33,7 +37,10 @@ export default async function NotificationsPage() {
       <div className="wrap wide">
         <section className="reviews-desk-section">
           <h2>New Reviews</h2>
-          <ReviewNotifications notifications={reviewNotifications} />
+          <ReviewNotifications
+            notifications={reviewNotifications}
+            canModerate={role === ADMIN_ROLE}
+          />
         </section>
 
         <section className="reviews-desk-section">

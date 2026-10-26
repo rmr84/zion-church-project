@@ -824,6 +824,8 @@ body {
 }
 .reviews-desk-list li.review-card {
   position: relative;
+}
+.reviews-desk-list li.review-card:has(.review-card-actions) {
   padding-top: 2.65rem;
 }
 .review-card-actions {
