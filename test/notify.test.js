@@ -1,9 +1,23 @@
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-import { test } from 'node:test';
-import { buildStatusNotice, logNotice } from '../lib/notify.js';
+import { after, test } from 'node:test';
+import { closeDb } from '../lib/db.js';
+import {
+  buildStatusNotice,
+  listEmailLogEntries,
+  logNotice,
+  notificationsCollection,
+} from '../lib/notify.js';
+
+process.env.MONGODB_DB = 'zion-care-test';
+
+after(async () => {
+  try {
+    const collection = await notificationsCollection();
+    await collection.deleteMany({ body: 'Hello from the desk' });
+  } finally {
+    await closeDb();
+  }
+});
 
 test('status mail omits staff-only fields even if they are passed in', () => {
   const text = buildStatusNotice({
@@ -22,10 +36,9 @@ test('status mail omits staff-only fields even if they are passed in', () => {
   assert.match(text, /not sent|address omitted|Private care team notes/);
 });
 
-test('the email stub is written to a log file', () => {
-  const file = path.join(os.tmpdir(), `zion-log-${process.pid}-${Date.now()}.log`);
-  logNotice('Hello from the desk', file);
-  const text = fs.readFileSync(file, 'utf8');
-  assert.match(text, /EMAIL \(not sent\)/);
-  assert.match(text, /Hello from the desk/);
+test('the email stub is written to the notifications collection', async () => {
+  await logNotice('Hello from the desk');
+  const entries = await listEmailLogEntries();
+  assert.ok(entries.some((entry) => entry.includes('EMAIL (not sent)')));
+  assert.ok(entries.some((entry) => entry.includes('Hello from the desk')));
 });

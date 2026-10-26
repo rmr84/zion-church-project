@@ -98,7 +98,7 @@ export async function inviteUser({ email, role, firstName = '', lastName = '' } 
     return mailed;
   }
 
-  logNotice(buildInviteNotice({
+  await logNotice(buildInviteNotice({
     email: address,
     roleLabel: roleLabel(nextRole),
     loginUrl,
