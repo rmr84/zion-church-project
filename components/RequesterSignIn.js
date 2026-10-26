@@ -17,6 +17,10 @@ function messageFor(code) {
   return 'Something went wrong. Try again.';
 }
 
+function isNextRedirect(error) {
+  return typeof error?.digest === 'string' && error.digest.startsWith('NEXT_REDIRECT');
+}
+
 function fieldsFrom(form) {
   const data = new FormData(form);
   return {
@@ -58,28 +62,40 @@ export function RequesterSignIn() {
             : 'Confirm your email before signing in.');
         }
         await signOut(auth);
+        setPending(false);
         return;
       }
       const result = await establishRequesterSession(idToken);
       if (result?.reason === 'unverified') {
         await signOut(auth);
         setError('Confirm your email before signing in. Use the link already in your inbox.');
+        setPending(false);
       } else if (result?.reason === 'storage') {
         setError('That account could not be saved. Try again.');
+        setPending(false);
       } else if (result && result.ok === false) {
         setError('That sign-in could not be confirmed. Try again.');
+        setPending(false);
       }
     } catch (caught) {
+      if (isNextRedirect(caught)) return;
       setError(messageFor(caught?.code));
-    } finally {
       setPending(false);
     }
+  }
+
+  if (pending) {
+    return (
+      <div className="sign-in-loading" role="status" aria-live="polite">
+        <span className="sign-in-spinner" aria-hidden="true" />
+        <p>Signing you in…</p>
+      </div>
+    );
   }
 
   return (
     <form
       className="stack"
-      aria-busy={pending}
       onSubmit={(event) => {
         event.preventDefault();
         void submit(event.currentTarget);
@@ -112,7 +128,7 @@ export function RequesterSignIn() {
         {error ? <p className="banner error sign-in-error" id="sign-in-error" role="alert">{error}</p> : null}
       </div>
       <div className="sign-in-actions">
-        <button className="button block" type="submit" disabled={pending}>Sign in</button>
+        <button className="button block" type="submit">Sign in</button>
         <Link className="button secondary block" href="/create-account">Create Account</Link>
       </div>
     </form>

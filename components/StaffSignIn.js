@@ -18,6 +18,10 @@ function messageFor(code) {
   return 'Something went wrong. Try again.';
 }
 
+function isNextRedirect(error) {
+  return typeof error?.digest === 'string' && error.digest.startsWith('NEXT_REDIRECT');
+}
+
 function fieldsFrom(form) {
   const data = new FormData(form);
   return {
@@ -48,44 +52,52 @@ export function StaffSignIn() {
       const credential = await signInWithEmailAndPassword(auth, email, password);
       await credential.user.reload();
       const idToken = await credential.user.getIdToken(true);
-      if (!credential.user.emailVerified) {
-        await registerRequester(idToken);
-        try {
-          await sendAccountVerification(credential.user);
-          setError('Confirm your email before signing in. We sent another link to that address.');
-        } catch (caught) {
-          setError(caught?.code === 'auth/too-many-requests'
-            ? 'Confirm your email before signing in. Use the link already in your inbox.'
-            : 'Confirm your email before signing in.');
+      const result = await establishStaffSession(idToken);
+      if (result?.reason === 'not-staff') {
+        if (!credential.user.emailVerified) {
+          await registerRequester(idToken);
+          try {
+            await sendAccountVerification(credential.user);
+            setError('Confirm your email before signing in. We sent another link to that address.');
+          } catch (caught) {
+            setError(caught?.code === 'auth/too-many-requests'
+              ? 'Confirm your email before signing in. Use the link already in your inbox.'
+              : 'Confirm your email before signing in.');
+          }
+        } else {
+          setError('That account is not on the care team.');
         }
         await signOut(auth);
-        return;
-      }
-      const result = await establishStaffSession(idToken);
-      if (result?.reason === 'unverified') {
-        await signOut(auth);
-        setError('Confirm your email before signing in. Use the link already in your inbox.');
-      } else if (result?.reason === 'not-staff') {
-        await signOut(auth);
-        setError('That account is not on the care team.');
+        setPending(false);
       } else if (result?.reason === 'storage') {
         await signOut(auth);
         setError('That account could not be saved. Try again.');
+        setPending(false);
       } else if (result && result.ok === false) {
         await signOut(auth);
         setError('That sign-in could not be confirmed. Try again.');
+        setPending(false);
       }
+      // Successful redirect keeps the loading state until navigation finishes.
     } catch (caught) {
+      if (isNextRedirect(caught)) return;
       setError(messageFor(caught?.code));
-    } finally {
       setPending(false);
     }
+  }
+
+  if (pending) {
+    return (
+      <div className="sign-in-loading" role="status" aria-live="polite">
+        <span className="sign-in-spinner" aria-hidden="true" />
+        <p>Signing you in…</p>
+      </div>
+    );
   }
 
   return (
     <form
       className="stack"
-      aria-busy={pending}
       onSubmit={(event) => {
         event.preventDefault();
         void submit(event.currentTarget);
@@ -118,7 +130,7 @@ export function StaffSignIn() {
         {error ? <p className="banner error sign-in-error" id="staff-sign-in-error" role="alert">{error}</p> : null}
       </div>
       <div className="sign-in-actions">
-        <button className="button block" type="submit" disabled={pending}>Sign in</button>
+        <button className="button block" type="submit">Sign in</button>
       </div>
     </form>
   );

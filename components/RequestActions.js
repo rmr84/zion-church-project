@@ -6,7 +6,7 @@ import { updateRequestAssignee } from '@/app/actions/staff';
 import { MemberPicker } from '@/components/MemberPicker';
 import { useToast } from '@/components/Toast';
 
-export function RequestActions({ request, members = [] }) {
+export function RequestActions({ request, members = [], allowAssign = true }) {
   const router = useRouter();
   const showToast = useToast();
   const menuId = useId();
@@ -120,14 +120,16 @@ export function RequestActions({ request, members = [] }) {
       </button>
       {menuOpen ? (
         <div className="request-actions-menu" id={menuId} role="menu">
-          <button type="button" role="menuitem" onClick={openAssign}>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M4.8 17.2c.8-2.2 2.3-3.3 4.2-3.3s3.4 1.1 4.2 3.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              <path d="M15.5 11.5h5M18 9v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-            Assign
-          </button>
+          {allowAssign ? (
+            <button type="button" role="menuitem" onClick={openAssign}>
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M4.8 17.2c.8-2.2 2.3-3.3 4.2-3.3s3.4 1.1 4.2 3.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path d="M15.5 11.5h5M18 9v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+              Assign
+            </button>
+          ) : null}
           <button type="button" role="menuitem" onClick={openView}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M2.2 12s3.6-6.2 9.8-6.2S21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12z" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -199,7 +201,7 @@ export function RequestActions({ request, members = [] }) {
               <div className="field">
                 <label htmlFor={noteId}>Note</label>
                 <p className="hint" id={`${noteId}-hint`}>
-                  Never shown on the status page, and left out of the notification log.
+                  Never shown on the status page, and left out of the email log.
                 </p>
                 <textarea
                   id={noteId}

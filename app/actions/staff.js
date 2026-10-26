@@ -4,21 +4,67 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
 import { STATUSES } from '@/lib/constants';
+import { createAssignmentNotification } from '@/lib/desk-notifications';
 import { getStaffRequest, searchRequests, updateCareRequest } from '@/lib/requests';
-import { isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
-import { getUserRole, isDeskRole, saveUser } from '@/lib/users';
+import { getStaff, isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
+import { ADMIN_ROLE, acceptDeskInvite, getUser, getUserRole, isDeskRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
+
+async function canReopenCompleted() {
+  const staff = await getStaff();
+  if (!staff) return false;
+  return (await getUserRole(staff.uid)) === ADMIN_ROLE;
+}
+
+async function reopenDenied(currentStatus, nextStatus) {
+  if (currentStatus !== 'completed' || nextStatus === 'completed') return null;
+  if (await canReopenCompleted()) return null;
+  return 'Only an admin can move a completed request out of the archive.';
+}
+
+async function notifyNewAssignee(current, nextAssignee) {
+  const staff = await getStaff();
+  let assignedByLabel = '';
+  if (staff?.uid) {
+    try {
+      const profile = await getUser(staff.uid);
+      assignedByLabel = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ')
+        || staff.email
+        || '';
+    } catch {
+      assignedByLabel = staff.email || '';
+    }
+  }
+  try {
+    await createAssignmentNotification({
+      assignee: nextAssignee,
+      previousAssignee: current.assignee || '',
+      referenceCode: current.referenceCode,
+      careType: current.careType,
+      assignedByUid: staff?.uid || '',
+      assignedByLabel,
+    });
+  } catch (error) {
+    console.error('Could not create the assignment notification.', error?.code || '');
+  }
+}
 
 export async function establishStaffSession(idToken) {
   const identity = await lookupFirebaseUser(idToken);
   if (!identity) return { ok: false };
-  if (!identity.emailVerified) return { ok: false, reason: 'unverified' };
-  if (!isDeskRole(await getUserRole(identity.uid))) return { ok: false, reason: 'not-staff' };
   try {
     await saveUser(identity);
   } catch (error) {
     console.error('Could not save the care team member.', error?.code || '');
     return { ok: false, reason: 'storage' };
+  }
+  if (!isDeskRole(await getUserRole(identity.uid))) {
+    return { ok: false, reason: 'not-staff' };
+  }
+  try {
+    await acceptDeskInvite(identity);
+  } catch (error) {
+    console.error('Could not mark the desk invite accepted.', error?.code || '');
   }
   await signOutRequester();
   await signInStaff(identity);
@@ -66,9 +112,13 @@ export async function updateRequestAssignee(referenceCode, assignee, options = {
     return { ok: false, formError: 'That assignment could not be saved. Try again.' };
   }
 
+  await notifyNewAssignee(current, name);
+
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
   revalidatePath(`/staff/requests/${current.referenceCode}`);
+  revalidatePath('/staff/email-logs');
+  revalidatePath('/staff/notifications');
   return { ok: true };
 }
 
@@ -80,6 +130,9 @@ export async function updateRequestStatus(referenceCode, status) {
 
   const current = await getStaffRequest(referenceCode);
   if (!current) return { ok: false, formError: 'That request is not on file.' };
+
+  const denied = await reopenDenied(current.status, status);
+  if (denied) return { ok: false, formError: denied };
 
   try {
     const updated = await updateCareRequest(current.referenceCode, {
@@ -97,6 +150,7 @@ export async function updateRequestStatus(referenceCode, status) {
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
   revalidatePath(`/staff/requests/${current.referenceCode}`);
+  revalidatePath('/staff/email-logs');
   return { ok: true, status };
 }
 
@@ -113,6 +167,24 @@ export async function updateRequest(_previous, formData) {
 
   if (!result.ok) return { errors: result.errors, values: result.values, saved: false };
 
+  const current = await getStaffRequest(result.values.referenceCode);
+  if (!current) {
+    return {
+      errors: { form: 'That request is not on file.' },
+      values: result.values,
+      saved: false,
+    };
+  }
+
+  const denied = await reopenDenied(current.status, result.values.status);
+  if (denied) {
+    return {
+      errors: { status: denied },
+      values: result.values,
+      saved: false,
+    };
+  }
+
   const updated = await updateCareRequest(result.values.referenceCode, result.values);
   if (!updated) {
     return {
@@ -122,9 +194,15 @@ export async function updateRequest(_previous, formData) {
     };
   }
 
+  if (String(result.values.assignee || '').trim() !== String(current.assignee || '').trim()) {
+    await notifyNewAssignee(current, result.values.assignee);
+  }
+
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
   revalidatePath(`/staff/requests/${updated.referenceCode}`);
+  revalidatePath('/staff/email-logs');
+  revalidatePath('/staff/notifications');
 
   return { errors: {}, values: result.values, saved: true };
 }

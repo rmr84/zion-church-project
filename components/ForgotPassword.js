@@ -11,7 +11,7 @@ function messageFor(code) {
   return 'Something went wrong. Try again.';
 }
 
-export function ForgotPassword() {
+export function ForgotPassword({ defaultEmail = '' }) {
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
   const [pending, setPending] = useState(false);
@@ -63,6 +63,7 @@ export function ForgotPassword() {
           type="email"
           autoComplete="email"
           required
+          defaultValue={defaultEmail}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? 'reset-error' : sent ? 'reset-sent' : undefined}
         />

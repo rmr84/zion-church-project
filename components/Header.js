@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { DeskMenu } from '@/components/DeskMenu';
 import { SiteMenu } from '@/components/SiteMenu';
-import { countUnseenReviewNotifications } from '@/lib/reviews';
+import { listUnseenAssignmentNotifications } from '@/lib/desk-notifications';
+import { listUnseenReviewNotifications } from '@/lib/reviews';
 import { getRequester, getStaff, isStaffSignedIn } from '@/lib/session';
 import { ADMIN_ROLE, getUser, getUserRole } from '@/lib/users';
 
@@ -13,7 +14,15 @@ export async function Header() {
   const staffProfile = staffIdentity ? await getUser(staffIdentity.uid).catch(() => null) : null;
   const role = staffIdentity ? await getUserRole(staffIdentity.uid).catch(() => '') : '';
   const isAdmin = role === ADMIN_ROLE;
-  const notificationCount = staff ? await countUnseenReviewNotifications().catch(() => 0) : 0;
+  const [assignmentNotifications, reviewNotifications] = await Promise.all([
+    staffIdentity
+      ? listUnseenAssignmentNotifications(staffIdentity.uid).catch(() => [])
+      : Promise.resolve([]),
+    staff && isAdmin
+      ? listUnseenReviewNotifications().catch(() => [])
+      : Promise.resolve([]),
+  ]);
+  const notificationCount = assignmentNotifications.length + reviewNotifications.length;
   const staffName = [staffProfile?.firstName, staffProfile?.lastName].filter(Boolean).join(' ');
   const member = {
     label: staffName || staffIdentity?.email || 'Care Team',
@@ -23,19 +32,21 @@ export async function Header() {
   return (
     <header className="site-header">
       <div className="header-inner">
-        {staff ? (
-          isAdmin ? null : (
-            <Link href="/staff" className="wordmark desk-wordmark-web" aria-label="Zion Church">
-              <img src="/zion-logo.png" alt="" width={293} height={80} />
-            </Link>
-          )
-        ) : (
+        {staff ? null : (
           <Link href="/" className="wordmark" aria-label="Zion Church">
             <img src="/zion-logo.png" alt="" width={293} height={80} />
           </Link>
         )}
         {staff ? <p className="desk-header-title">Care Team</p> : null}
-        {staff ? <DeskMenu member={member} isAdmin={isAdmin} notificationCount={notificationCount} /> : (
+        {staff ? (
+          <DeskMenu
+            member={member}
+            notificationCount={notificationCount}
+            assignmentNotifications={assignmentNotifications}
+            reviewNotifications={reviewNotifications}
+            isAdmin={isAdmin}
+          />
+        ) : (
           <SiteMenu>
             <nav className="primary-nav" aria-label="Primary">
               <Link href="/request">Request Care</Link>

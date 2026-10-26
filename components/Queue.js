@@ -47,7 +47,13 @@ function matchesAssignee(request, assignees, members) {
   return assignees.includes(value);
 }
 
-export function Queue({ openRequests, archivedRequests, members = [], initialArchive = false }) {
+export function Queue({
+  openRequests,
+  archivedRequests,
+  members = [],
+  initialArchive = false,
+  isAdmin = false,
+}) {
   const router = useRouter();
   const [archive, setArchive] = useState(initialArchive);
   const [query, setQuery] = useState('');
@@ -105,6 +111,8 @@ export function Queue({ openRequests, archivedRequests, members = [], initialArc
           requests={requests}
           desk
           members={members}
+          allowAssign={!archive}
+          allowReopen={isAdmin}
         />
       ) : (
         <p className="empty wrap wide">{empty}</p>

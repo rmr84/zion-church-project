@@ -7,6 +7,7 @@ import { DESK_STATUSES, statusLabel } from '@/lib/constants';
 export function StatusPicker({
   status,
   disabled = false,
+  allowReopen = true,
   onChange,
   'aria-labelledby': ariaLabelledBy,
   'aria-describedby': ariaDescribedBy,
@@ -15,6 +16,10 @@ export function StatusPicker({
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const listId = useId();
+  const reopenLocked = status === 'completed' && !allowReopen;
+  const options = reopenLocked
+    ? DESK_STATUSES.filter((item) => item.value === 'completed')
+    : DESK_STATUSES;
 
   useEffect(() => {
     if (!open) return undefined;
@@ -34,6 +39,7 @@ export function StatusPicker({
 
   function choose(value) {
     setOpen(false);
+    if (reopenLocked && value !== 'completed') return;
     if (value !== status) onChange?.(value);
   }
 
@@ -48,7 +54,7 @@ export function StatusPicker({
         aria-labelledby={ariaLabelledBy}
         aria-describedby={ariaDescribedBy}
         aria-invalid={ariaInvalid}
-        disabled={disabled}
+        disabled={disabled || reopenLocked}
         onClick={() => setOpen((current) => !current)}
       >
         <StatusBadge status={status} desk />
@@ -58,7 +64,7 @@ export function StatusPicker({
       </button>
       {open ? (
         <ul className="status-picker-menu" id={listId} role="listbox" aria-label="Status">
-          {DESK_STATUSES.map((item) => (
+          {options.map((item) => (
             <li key={item.value} role="option" aria-selected={item.value === status}>
               <button type="button" onClick={() => choose(item.value)}>
                 <StatusBadge status={item.value} desk />

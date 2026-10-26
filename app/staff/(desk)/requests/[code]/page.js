@@ -5,7 +5,8 @@ import { StaffEditor } from '@/components/StaffEditor';
 import { CARE_TYPES, CONTACT_METHODS, labelFor } from '@/lib/constants';
 import { formatWhen } from '@/lib/format';
 import { getStaffRequest } from '@/lib/requests';
-import { listDeskMembers } from '@/lib/users';
+import { getStaff } from '@/lib/session';
+import { ADMIN_ROLE, getUserRole, listDeskMembers } from '@/lib/users';
 
 export async function generateMetadata({ params }) {
   const { code } = await params;
@@ -22,11 +23,14 @@ function titleCase(value) {
 
 export default async function RequestDetailPage({ params }) {
   const { code } = await params;
-  const [request, members] = await Promise.all([
+  const [request, members, staff] = await Promise.all([
     getStaffRequest(code),
     listDeskMembers(),
+    getStaff(),
   ]);
   if (!request) notFound();
+  const role = staff ? await getUserRole(staff.uid) : '';
+  const isAdmin = role === ADMIN_ROLE;
 
   const backHref = request.status === 'completed' ? '/staff/archive' : '/staff';
   const contact = [
@@ -88,6 +92,7 @@ export default async function RequestDetailPage({ params }) {
             memberNote={request.memberNote}
             internalNote={request.internalNote}
             members={members}
+            isAdmin={isAdmin}
           />
         </div>
       </div>
