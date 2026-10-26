@@ -33,10 +33,10 @@ These codes are seeded when the care-requests collection is empty, including a f
 
 | Code | Who | Type | Urgency | Status | What to notice |
 | --- | --- | --- | --- | --- | --- |
-| ZC-OTHR-1005 | Samir Haddad | Other | Urgent | Assigned | Older urgent request, so it sorts first. Member note names a driver time. Staff note names the driver |
+| ZC-OTHR-1005 | Samir Haddad | Other | Urgent | In Review | Older urgent request, so it sorts first. Member note names a driver time. Staff note names the driver |
 | ZC-HOSP-1001 | Margaret Hale | Hospital Visit | Urgent | Received | Staff note mentions Pastor Ellis and a diagnosis. Neither appears on the status page |
 | ZC-MEAL-1002 | Daniel Cho | Meal Delivery | Soon | In Review | Member note mentions the meal team. Staff note mentions Ruth Alvarez and must stay off the status page |
-| ZC-ANON-1003 | Name not given | Prayer Support | Routine | Assigned | Anonymous. The status page shows the prayer-team note, not the staff caution |
+| ZC-ANON-1003 | Name not given | Prayer Support | Routine | In Review | Anonymous. The status page shows the prayer-team note, not the staff caution |
 | ZC-COUN-1004 | Alicia Grant | Counseling Referral | Soon | Completed | Archive only. It is not on the open queue |
 
 Member status for the hospital request: [http://localhost:3000/status?code=ZC-HOSP-1001](http://localhost:3000/status?code=ZC-HOSP-1001)

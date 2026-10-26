@@ -1518,7 +1518,6 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 .badge-soft.badge-routine .badge-dot { background: #8b5e3c; }
 .badge-received { color: #3d2f6b; background: #ebe6fb; }
 .badge-in_review { color: #5c4810; background: #ffe89a; }
-.badge-assigned { color: #1f4d7a; background: #dceaf8; }
 .badge-completed { color: #1a5c3a; background: #d9f2e5; }
 .status-picker { position: relative; display: inline-flex; max-width: 100%; }
 .status-picker-trigger {
