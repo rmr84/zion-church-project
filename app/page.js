@@ -1,13 +1,16 @@
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { ReviewCarousel } from '@/components/ReviewCarousel';
-import { REVIEWS } from '@/lib/reviews';
+import { listReviews } from '@/lib/reviews';
 import { isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Care Desk' };
 
 export default async function HomePage() {
-  const staff = await isStaffSignedIn();
+  const [staff, reviews] = await Promise.all([
+    isStaffSignedIn(),
+    listReviews(),
+  ]);
 
   return (
     <>
@@ -64,7 +67,7 @@ export default async function HomePage() {
       <section className="wrap home home-reviews">
         <Reveal>
           <h2 className="rise">What Members Say</h2>
-          <ReviewCarousel reviews={REVIEWS} />
+          <ReviewCarousel reviews={reviews} />
         </Reveal>
       </section>
     </>

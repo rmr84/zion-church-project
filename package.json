@@ -14,7 +14,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "seed": "node scripts/mongo_database.js",
+    "seed": "node --env-file=.env scripts/mongo_database.js",
     "test": "node --env-file=.env --test"
   },
   "dependencies": {
