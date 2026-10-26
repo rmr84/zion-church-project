@@ -6,7 +6,7 @@ import { lookupFirebaseUser } from '@/lib/firebase-identity';
 import { STATUSES } from '@/lib/constants';
 import { getStaffRequest, searchRequests, updateCareRequest } from '@/lib/requests';
 import { isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
-import { getUserRole, isDeskRole, saveUser } from '@/lib/users';
+import { acceptDeskInvite, getUserRole, isDeskRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
 
 export async function establishStaffSession(idToken) {
@@ -20,6 +20,11 @@ export async function establishStaffSession(idToken) {
   }
   if (!isDeskRole(await getUserRole(identity.uid))) {
     return { ok: false, reason: 'not-staff' };
+  }
+  try {
+    await acceptDeskInvite(identity);
+  } catch (error) {
+    console.error('Could not mark the desk invite accepted.', error?.code || '');
   }
   await signOutRequester();
   await signInStaff(identity);

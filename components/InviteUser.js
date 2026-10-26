@@ -3,25 +3,24 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { inviteUser } from '@/app/actions/users';
+import { RolePicker } from '@/components/RolePicker';
 import { useToast } from '@/components/Toast';
 
 const CARE_TEAM_ROLE = 'careTeam';
-const ADMIN_ROLE = 'Admin';
-
-const ROLES = [
-  { value: CARE_TEAM_ROLE, label: 'Care Team' },
-  { value: ADMIN_ROLE, label: 'Admin' },
-];
 
 export function InviteUser({ canInvite = false }) {
   const router = useRouter();
   const showToast = useToast();
   const titleId = useId();
+  const firstNameId = useId();
+  const lastNameId = useId();
   const emailId = useId();
   const roleId = useId();
   const dialogRef = useRef(null);
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(false);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [role, setRole] = useState(CARE_TEAM_ROLE);
   const [error, setError] = useState('');
@@ -35,10 +34,18 @@ export function InviteUser({ canInvite = false }) {
 
   if (!canInvite) return null;
 
+  function resetForm() {
+    setFirstName('');
+    setLastName('');
+    setEmail('');
+    setRole(CARE_TEAM_ROLE);
+    setError('');
+  }
+
   function close() {
     if (pending) return;
     setOpen(false);
-    setError('');
+    resetForm();
   }
 
   async function onSubmit(event) {
@@ -46,16 +53,15 @@ export function InviteUser({ canInvite = false }) {
     if (pending) return;
     setPending(true);
     setError('');
-    const result = await inviteUser(email, role);
+    const result = await inviteUser({ email, role, firstName, lastName });
     setPending(false);
     if (!result?.ok) {
       setError(result?.formError || 'That invitation could not be sent.');
       return;
     }
-    setEmail('');
-    setRole(CARE_TEAM_ROLE);
     setOpen(false);
-    showToast?.(result.alreadyMember ? 'Invite email sent again.' : 'Invitation sent.');
+    resetForm();
+    showToast?.('Invitation sent.');
     router.refresh();
   }
 
@@ -70,7 +76,7 @@ export function InviteUser({ canInvite = false }) {
 
       <dialog
         ref={dialogRef}
-        className="sign-out-dialog assign-dialog"
+        className="sign-out-dialog assign-dialog invite-dialog"
         aria-labelledby={titleId}
         onClose={close}
         onClick={(event) => {
@@ -95,6 +101,32 @@ export function InviteUser({ canInvite = false }) {
         <p>Send an email so they can set a password and join the care desk.</p>
         <form className="assign-form" onSubmit={onSubmit}>
           {error ? <p className="banner error" role="alert">{error}</p> : null}
+          <div className="invite-name-fields">
+            <div className="field">
+              <label htmlFor={firstNameId}>First Name <span className="hint-inline">(optional)</span></label>
+              <input
+                id={firstNameId}
+                type="text"
+                autoComplete="given-name"
+                maxLength={80}
+                value={firstName}
+                disabled={pending}
+                onChange={(event) => setFirstName(event.target.value)}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor={lastNameId}>Last Name <span className="hint-inline">(optional)</span></label>
+              <input
+                id={lastNameId}
+                type="text"
+                autoComplete="family-name"
+                maxLength={80}
+                value={lastName}
+                disabled={pending}
+                onChange={(event) => setLastName(event.target.value)}
+              />
+            </div>
+          </div>
           <div className="field">
             <label htmlFor={emailId}>Email</label>
             <input
@@ -109,17 +141,13 @@ export function InviteUser({ canInvite = false }) {
             />
           </div>
           <div className="field">
-            <label htmlFor={roleId}>Role</label>
-            <select
-              id={roleId}
-              value={role}
+            <label id={roleId}>Role</label>
+            <RolePicker
+              role={role}
               disabled={pending}
-              onChange={(event) => setRole(event.target.value)}
-            >
-              {ROLES.map((item) => (
-                <option key={item.value} value={item.value}>{item.label}</option>
-              ))}
-            </select>
+              aria-labelledby={roleId}
+              onChange={setRole}
+            />
           </div>
           <div className="modal-actions">
             <button className="button secondary" type="button" disabled={pending} onClick={close}>
