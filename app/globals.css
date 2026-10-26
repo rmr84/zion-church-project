@@ -1081,7 +1081,7 @@ p { margin: 0 0 1rem; }
 }
 .status-result {
   margin-top: 1.25rem;
-  padding: 0.35rem 1.15rem 0.2rem;
+  padding: 0.35rem 1.15rem 1.15rem;
   background: white;
   border: 1px solid #e6ebef;
   border-radius: 0.9rem;

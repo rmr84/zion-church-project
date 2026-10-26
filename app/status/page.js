@@ -4,6 +4,7 @@ import { CARE_TYPES, CONTACT_METHODS, STATUSES, URGENCY_LEVELS, labelFor } from 
 import { formatWhen } from '@/lib/format';
 import { normalizeReferenceCode } from '@/lib/reference';
 import { getMemberRequest } from '@/lib/requests';
+import { hasFeedbackForRequest } from '@/lib/reviews';
 import { isStaffSignedIn } from '@/lib/session';
 
 export const metadata = { title: 'Check a Request' };
@@ -15,6 +16,16 @@ export default async function StatusPage({ searchParams }) {
   const code = normalizeReferenceCode(raw);
   const request = code ? await getMemberRequest(code) : null;
   const missed = raw.trim() && !request;
+  const feedbackOnFile = Boolean(
+    request
+    && request.status === 'completed'
+    && (await hasFeedbackForRequest(request.referenceCode)),
+  );
+  const canSubmitFeedback = Boolean(
+    request
+    && request.status === 'completed'
+    && !feedbackOnFile,
+  );
 
   return (
     <section className="page-frame status-page">
@@ -85,11 +96,14 @@ export default async function StatusPage({ searchParams }) {
                 <dd>{String(request.memberNote || '').trim() || 'The care team has not added a note yet.'}</dd>
               </div>
             </dl>
-            {request.status === 'completed' ? (
+            {canSubmitFeedback ? (
               <StatusFeedback
                 referenceCode={request.referenceCode}
                 defaultName={request.name || ''}
               />
+            ) : null}
+            {feedbackOnFile ? (
+              <p className="hint feedback-sent">Thank you. The care team will review your feedback.</p>
             ) : null}
           </article>
         ) : null}
