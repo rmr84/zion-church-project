@@ -5,9 +5,21 @@ import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
 import { STATUSES } from '@/lib/constants';
 import { getStaffRequest, searchRequests, updateCareRequest } from '@/lib/requests';
-import { isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
-import { acceptDeskInvite, getUserRole, isDeskRole, saveUser } from '@/lib/users';
+import { getStaff, isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
+import { ADMIN_ROLE, acceptDeskInvite, getUserRole, isDeskRole, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
+
+async function canReopenCompleted() {
+  const staff = await getStaff();
+  if (!staff) return false;
+  return (await getUserRole(staff.uid)) === ADMIN_ROLE;
+}
+
+async function reopenDenied(currentStatus, nextStatus) {
+  if (currentStatus !== 'completed' || nextStatus === 'completed') return null;
+  if (await canReopenCompleted()) return null;
+  return 'Only an admin can move a completed request out of the archive.';
+}
 
 export async function establishStaffSession(idToken) {
   const identity = await lookupFirebaseUser(idToken);
@@ -87,6 +99,9 @@ export async function updateRequestStatus(referenceCode, status) {
   const current = await getStaffRequest(referenceCode);
   if (!current) return { ok: false, formError: 'That request is not on file.' };
 
+  const denied = await reopenDenied(current.status, status);
+  if (denied) return { ok: false, formError: denied };
+
   try {
     const updated = await updateCareRequest(current.referenceCode, {
       status,
@@ -118,6 +133,24 @@ export async function updateRequest(_previous, formData) {
   });
 
   if (!result.ok) return { errors: result.errors, values: result.values, saved: false };
+
+  const current = await getStaffRequest(result.values.referenceCode);
+  if (!current) {
+    return {
+      errors: { form: 'That request is not on file.' },
+      values: result.values,
+      saved: false,
+    };
+  }
+
+  const denied = await reopenDenied(current.status, result.values.status);
+  if (denied) {
+    return {
+      errors: { status: denied },
+      values: result.values,
+      saved: false,
+    };
+  }
 
   const updated = await updateCareRequest(result.values.referenceCode, result.values);
   if (!updated) {

@@ -20,6 +20,7 @@ export function StaffEditor({
   memberNote,
   internalNote,
   members = [],
+  isAdmin = false,
 }) {
   const router = useRouter();
   const showToast = useToast();
@@ -34,6 +35,7 @@ export function StaffEditor({
     internalNote: internalNote || '',
   });
   const errorEntries = Object.entries(errors);
+  const notesLocked = values.status === 'completed';
 
   function setField(name, value) {
     setValues((current) => ({ ...current, [name]: value }));
@@ -108,6 +110,7 @@ export function StaffEditor({
         <StatusPicker
           status={values.status}
           disabled={pending}
+          allowReopen={isAdmin}
           onChange={(value) => setField('status', value)}
           aria-labelledby={statusId}
           aria-describedby="status-hint"
@@ -124,14 +127,14 @@ export function StaffEditor({
           members={members}
           value={values.assignee}
           onChange={(value) => setField('assignee', value)}
-          disabled={pending}
+          disabled={pending || notesLocked}
           aria-describedby="assignee-hint"
           aria-invalid={Boolean(errors.assignee)}
         />
       </div>
 
       <div className="field">
-        <label htmlFor="memberNote">Note For The Member</label>
+        <label htmlFor="memberNote">Note to the requester</label>
         <p className="hint" id="memberNote-hint">
           Anyone With The Reference Code Can Read This. Leave Medical Details Out Of It.
         </p>
@@ -143,6 +146,7 @@ export function StaffEditor({
           aria-describedby="memberNote-hint"
           aria-invalid={Boolean(errors.memberNote)}
           value={values.memberNote}
+          disabled={pending || notesLocked}
           onChange={(event) => setField('memberNote', event.target.value)}
         />
       </div>
@@ -161,6 +165,7 @@ export function StaffEditor({
           aria-describedby="internalNote-hint"
           aria-invalid={Boolean(errors.internalNote)}
           value={values.internalNote}
+          disabled={pending || notesLocked}
           onChange={(event) => setField('internalNote', event.target.value)}
         />
       </div>

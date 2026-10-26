@@ -15,7 +15,13 @@ import { findMember, memberLabel } from '@/lib/members';
 const WEB_PAGE_SIZE = 5;
 const PHONE_PAGE_SIZE = 3;
 
-export function RequestTable({ requests, desk = false, members = [], allowAssign = true }) {
+export function RequestTable({
+  requests,
+  desk = false,
+  members = [],
+  allowAssign = true,
+  allowReopen = true,
+}) {
   const dialogRef = useRef(null);
   const router = useRouter();
   const showToast = useToast();
@@ -127,6 +133,7 @@ export function RequestTable({ requests, desk = false, members = [], allowAssign
                     <StatusPicker
                       status={statuses[request.referenceCode] || request.status}
                       disabled={pendingCode === request.referenceCode}
+                      allowReopen={allowReopen}
                       onChange={(nextStatus) => changeStatus(request, nextStatus)}
                     />
                   ) : (
