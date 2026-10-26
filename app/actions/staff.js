@@ -12,13 +12,14 @@ import { validateStaffUpdate } from '@/lib/validate';
 export async function establishStaffSession(idToken) {
   const identity = await lookupFirebaseUser(idToken);
   if (!identity) return { ok: false };
-  if (!identity.emailVerified) return { ok: false, reason: 'unverified' };
-  if (!isDeskRole(await getUserRole(identity.uid))) return { ok: false, reason: 'not-staff' };
   try {
     await saveUser(identity);
   } catch (error) {
     console.error('Could not save the care team member.', error?.code || '');
     return { ok: false, reason: 'storage' };
+  }
+  if (!isDeskRole(await getUserRole(identity.uid))) {
+    return { ok: false, reason: 'not-staff' };
   }
   await signOutRequester();
   await signInStaff(identity);

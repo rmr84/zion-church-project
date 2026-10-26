@@ -46,9 +46,9 @@ export default async function NotificationsPage() {
         <section className="reviews-desk-section">
           <h2>Email Log</h2>
           <p className="lede">
-            When a request is received, or its status changes, the email we would send is written
-            here and printed in the server console. No email service is connected. Care team notes
-            are left out.
+            When a request is received, its status changes, or a desk invite is sent, the email we
+            would send is written here and printed in the server console. Invite password links are
+            still delivered by Firebase. Care team notes are left out.
           </p>
           {entries.length === 0 ? (
             <p className="empty">Nothing has been logged yet. Save a status change to write the first one.</p>
