@@ -235,21 +235,20 @@ Stubs are prefixed `EMAIL (not sent)` in the console. Nothing is sent through an
 
 ## Demo reference codes
 
-These codes are seeded into `care_requests` when that collection is empty (including via `getDb()` on first use of that path) and whenever `npm run seed` successfully reseeds care requests.
+These codes are live sample requests on the deployed desk ([zion-church-project.vercel.app](https://zion-church-project.vercel.app)). Use them to review public status lookup and the care-team queue. Local `npm run seed` still loads a separate fictional set into `care_requests` for development and tests.
 
 | Code | Who | Type | Urgency | Status | What to notice |
 | --- | --- | --- | --- | --- | --- |
-| ZC-OTHR-1005 | Samir Haddad | Other | Urgent | In Review | Older urgent request, so it sorts first. Member note names a driver time. Staff note names the driver |
-| ZC-HOSP-1001 | Margaret Hale | Hospital Visit | Urgent | Received | Staff note mentions Pastor Ellis and a diagnosis. Neither appears as a care-team note on the status page |
-| ZC-MEAL-1002 | Daniel Cho | Meal Delivery | Soon | In Review | Member note mentions the meal team. Staff note mentions Ruth Alvarez and must stay off member-facing care-team notes |
-| ZC-ANON-1003 | Name not given | Prayer Support | Routine | In Review | Anonymous. The status page shows the prayer-team note, not the staff caution |
-| ZC-COUN-1004 | Alicia Grant | Counseling Referral | Soon | Completed | Archive only. It is not on the open queue |
+| ZC-KYSF-3ERD | Name not given | Meal Delivery | Urgent | In Review | Anonymous meal request with a member-facing note (“we are investigating…”) |
+| ZC-Q2YQ-YL57 | Ryan Testing | Hospital Visit | Urgent | In Review | Named hospital-visit request; contact is text |
+| ZC-P8V9-6VD3 | Name not given | Prayer Support | Routine | Received | Anonymous prayer request still at Received |
+| ZC-XF96-R9SM | Ryan Test | Counseling Referral | Soon | Completed | Archive only. It is not on the open queue |
 
-Member status for the hospital request: [http://localhost:3000/status?code=ZC-HOSP-1001](http://localhost:3000/status?code=ZC-HOSP-1001)
+Member status for the meal request: [https://zion-church-project.vercel.app/status?code=ZC-KYSF-3ERD](https://zion-church-project.vercel.app/status?code=ZC-KYSF-3ERD)
 
-JSON lookup: [http://localhost:3000/api/status?code=ZC-HOSP-1001](http://localhost:3000/api/status?code=ZC-HOSP-1001). The JSON path uses the member view helpers, so it cannot include a staff (`internalNote`) field.
+JSON lookup: [https://zion-church-project.vercel.app/api/status?code=ZC-KYSF-3ERD](https://zion-church-project.vercel.app/api/status?code=ZC-KYSF-3ERD). The JSON path uses the member view helpers, so it cannot include a staff (`internalNote`) field.
 
-On the open queue (urgency sort), order is ZC-OTHR-1005, ZC-HOSP-1001, ZC-MEAL-1002, then ZC-ANON-1003. Urgent comes before Routine even when the routine request is older.
+On the open queue (urgency sort), the two Urgent items (ZC-KYSF-3ERD, ZC-Q2YQ-YL57) come before the Routine prayer request (ZC-P8V9-6VD3). ZC-XF96-R9SM is completed and only appears under Archive.
 
 ## How privacy is enforced in code
 
@@ -298,7 +297,7 @@ Notable modules:
 npm test
 ```
 
-Coverage includes member vs staff field exposure, urgency and date sorting, archive behavior, smuggled staff fields on create, reference codes, validation (including phone/email), signed sessions, notification stub contents, users/roles helpers, profile helpers, password rules, and that this README still lists every seeded reference code. Request / notify / users tests that hit Mongo use the **`zion-care-test`** database (`MONGODB_DB` overridden in those files).
+Coverage includes member vs staff field exposure, urgency and date sorting, archive behavior, smuggled staff fields on create, reference codes, validation (including phone/email), signed sessions, notification stub contents, users/roles helpers, profile helpers, password rules, and that this README still lists every live demo reference code. Request / notify / users tests that hit Mongo use the **`zion-care-test`** database (`MONGODB_DB` overridden in those files).
 
 ## Deploy
 
@@ -309,15 +308,15 @@ npm start
 
 Set `STAFF_SESSION_SECRET`, `MONGODB_URI`, `MONGODB_DB`, and all `NEXT_PUBLIC_FIREBASE_*` values on the host. Because the filesystem on typical serverless hosts is not durable for logs or uploads, email stubs and profile photos are stored in MongoDB—not under `logs/` or ephemeral disk.
 
-If `care_requests` is empty when `getDb()` runs, it seeds the demo codes above. Later live traffic that uses the `requests` collection stays in Atlas independently of that helper path.
+If `care_requests` is empty when `getDb()` runs, it seeds a local fictional request set. Live traffic (and the demo codes above) lives in the `requests` collection on Atlas.
 
 ## A short review path
 
 1. Submit an anonymous prayer request and save the reference code.
-2. Open the hospital status link above and confirm Pastor Ellis and the diagnosis from the **staff** note are absent as care-team-only content. Open `ZC-MEAL-1002` and confirm the meal-team **member** note is present and Ruth Alvarez (staff note) is not.
-3. Sign in with a care team account. Leave the sort on Urgency and confirm Samir Haddad is above Margaret Hale, and the anonymous prayer request is last among open items.
-4. Open Margaret Hale, add a note for the member, and set the status to In Review.
-5. Open **Email Logs** and confirm the logged email names the code, the new status, and the member note, and does not name the diagnosis.
-6. Check `ZC-HOSP-1001` again on `/status` and confirm the member note is visible and the staff note is still absent.
+2. Open the meal status link above (`ZC-KYSF-3ERD`) and confirm the member note is visible and no care-team-only (`internalNote`) field appears. Open `ZC-P8V9-6VD3` and confirm an anonymous prayer request shows without a name.
+3. Sign in with a care team account. On Urgency sort, confirm the two Urgent items (`ZC-KYSF-3ERD`, `ZC-Q2YQ-YL57`) sit above the Routine prayer request (`ZC-P8V9-6VD3`), and that `ZC-XF96-R9SM` is only in Archive.
+4. Open `ZC-Q2YQ-YL57`, add a note for the member, and leave or set status to In Review.
+5. Open **Email Logs** and confirm the logged email names the code, the new status, and the member note when one was added—and does not include the care-team note.
+6. Check `ZC-KYSF-3ERD` again on `/status` and confirm the member note is visible and staff-only notes are still absent.
 7. Mark a request Completed and find it in the archive, gone from the open queue. Confirm notes/assignee lock for non-admins.
 8. Assign a request to another active care team member and confirm it appears under **Notifications** for that person.
