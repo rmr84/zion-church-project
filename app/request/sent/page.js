@@ -14,11 +14,11 @@ export default async function SentPage({ searchParams }) {
 
   return (
     <section className="page-frame">
-      <div className="page-heading">
+      <div className="page-heading centered-web">
         <p className="eyebrow">Received</p>
         <h1>Request Received!</h1>
       </div>
-      <div className="wrap narrow">
+      <div className="wrap narrow sent-confirm">
       {code ? (
         <>
           <ArrivalToast message="Request received." />
@@ -30,8 +30,8 @@ export default async function SentPage({ searchParams }) {
             <p className="code">{code}</p>
             <CopyCode code={code} />
           </div>
-          <p>
-            <Link href={`/status?code=${encodeURIComponent(code)}`}>Check this request</Link>
+          <p className="sent-confirm-link">
+            <Link href={`/status?code=${encodeURIComponent(code)}`}>Check This Request</Link>
           </p>
         </>
       ) : (

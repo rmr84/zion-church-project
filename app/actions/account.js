@@ -34,13 +34,19 @@ export async function saveRequesterProfile(formData) {
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
   const fields = { firstName, lastName, phone };
+  let photoUpdatedAt = '';
   if (hasPicture) {
     const bytes = new Uint8Array(await picture.arrayBuffer());
     const type = detectedPhotoType(bytes, picture.type);
     if (!type) return { ok: false, errors: { photo: 'Use a PNG, JPG, GIF, or SVG.' } };
-    await saveProfilePhoto(requester.uid, bytes, type);
-    fields.photoType = type;
-    fields.photoUpdatedAt = new Date().toISOString();
+    try {
+      photoUpdatedAt = await saveProfilePhoto(requester.uid, bytes, type);
+      fields.photoType = type;
+      fields.photoUpdatedAt = photoUpdatedAt;
+    } catch (error) {
+      console.error('Could not store the profile picture.', error?.code || error?.message || '');
+      return { ok: false, errors: { photo: 'That picture could not be saved. Try again.' } };
+    }
   }
 
   try {
@@ -50,7 +56,7 @@ export async function saveRequesterProfile(formData) {
     return { ok: false, formError: 'That profile could not be saved. Try again.' };
   }
 
-  return { ok: true, photoUpdatedAt: fields.photoUpdatedAt || '' };
+  return { ok: true, photoUpdatedAt };
 }
 
 export async function removeRequesterPhoto(scope) {
