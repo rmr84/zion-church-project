@@ -1646,19 +1646,26 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
   text-align: right;
 }
 .user-delete {
-  display: inline-grid;
-  place-items: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
   width: 2.35rem;
   height: 2.35rem;
   border: 0;
   border-radius: 0.5rem;
   background: #fdecea;
   color: #b42318;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 700;
   cursor: pointer;
 }
+.user-delete-label { display: none; }
 .user-delete svg {
   width: 1.3rem;
   height: 1.3rem;
+  flex: 0 0 auto;
 }
 .user-delete:hover {
   background: #fdecea;
@@ -1691,6 +1698,14 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
 }
 @media (max-width: 759px) {
   .request-table .user-actions { text-align: left; width: auto; }
+  .request-table td.user-actions.is-empty { display: none; }
+  .user-delete {
+    width: 100%;
+    height: auto;
+    min-height: 2.55rem;
+    padding: 0.55rem 0.85rem;
+  }
+  .user-delete-label { display: inline; }
 }
 .users-search {
   min-width: min(100%, 16rem);

@@ -208,18 +208,21 @@ export function UserTable({ members = [], canInvite = false }) {
                       <RoleBadge role={member.role} />
                     </td>
                     {showActions ? (
-                      <td className="user-actions">
-                        <span className="cell-label">Actions</span>
+                      <td className={`user-actions${pending ? '' : ' is-empty'}`}>
                         {pending ? (
-                          <button
-                            className="user-delete"
-                            type="button"
-                            aria-label={`Delete ${member.name || member.email}`}
-                            disabled={busy}
-                            onClick={() => setConfirmMember(member)}
-                          >
-                            <TrashIcon />
-                          </button>
+                          <>
+                            <span className="cell-label">Actions</span>
+                            <button
+                              className="user-delete"
+                              type="button"
+                              aria-label={`Delete ${member.name || member.email}`}
+                              disabled={busy}
+                              onClick={() => setConfirmMember(member)}
+                            >
+                              <TrashIcon />
+                              <span className="user-delete-label">Delete user</span>
+                            </button>
+                          </>
                         ) : null}
                       </td>
                     ) : null}
