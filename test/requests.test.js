@@ -8,6 +8,7 @@ import {
   getStaffRequest,
   listRequesterRequests,
   listRequests,
+  searchRequests,
   updateCareRequest,
 } from '../lib/requests.js';
 
@@ -276,4 +277,28 @@ test('completing a request archives it, keeps the document, and logs only the me
   assert.equal((await getStaffRequest('ZC-HOSP-1001', db)).status, 'completed');
   assert.equal(notices.length, 2);
   assert.equal(notices[1].includes('PORCH-CODE-441'), false);
+});
+
+test('search finds care requests by name, care type, or reference code', async () => {
+  const db = await openTestDb();
+  await add(db, {
+    referenceCode: 'ZC-MEAL-2201',
+    name: 'Ada Meal',
+    careType: 'meal_delivery',
+    description: 'Needs dinner this week.',
+    createdAt: '2026-10-01T00:00:00.000Z',
+  });
+  await add(db, {
+    referenceCode: 'ZC-PRAY-2202',
+    name: 'Other Person',
+    careType: 'prayer_support',
+    description: 'A quiet request.',
+    createdAt: '2026-10-02T00:00:00.000Z',
+  });
+
+  assert.deepEqual((await searchRequests('ada meal', db)).map((row) => row.referenceCode), ['ZC-MEAL-2201']);
+  assert.deepEqual((await searchRequests('Meal Delivery', db)).map((row) => row.referenceCode), ['ZC-MEAL-2201']);
+  assert.deepEqual((await searchRequests('zc-pray-2202', db)).map((row) => row.referenceCode), ['ZC-PRAY-2202']);
+  assert.equal(await searchRequests('a', db).then((rows) => rows.length), 0);
+  assert.equal(JSON.stringify(await searchRequests('dinner', db)).includes('Needs dinner'), false);
 });

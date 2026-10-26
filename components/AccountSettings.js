@@ -17,8 +17,10 @@ import { firebaseApp } from '@/lib/firebase';
 import { passwordProblem } from '@/lib/password-rules';
 import { photoProblem } from '@/lib/profile';
 
-function photoUrl(stamp) {
-  return stamp ? `/api/profile-photo?v=${encodeURIComponent(stamp)}` : '';
+function photoUrl(stamp, scope) {
+  if (!stamp) return '';
+  const desk = scope === 'desk' ? 'desk=1&' : '';
+  return `/api/profile-photo?${desk}v=${encodeURIComponent(stamp)}`;
 }
 
 function PasswordField({ id, label, autoComplete, value, onChange, invalid, error }) {
@@ -40,7 +42,7 @@ function PersonIcon() {
   );
 }
 
-export function AccountSettings({ profile }) {
+export function AccountSettings({ profile, signOutAction, accountScope }) {
   const router = useRouter();
   const showToast = useToast();
   const [saved, setSaved] = useState(profile);
@@ -48,7 +50,7 @@ export function AccountSettings({ profile }) {
   const [lastName, setLastName] = useState(profile.lastName);
   const [phone, setPhone] = useState(profile.phone || '');
   const [picture, setPicture] = useState(null);
-  const [preview, setPreview] = useState(photoUrl(profile.photoUpdatedAt));
+  const [preview, setPreview] = useState(photoUrl(profile.photoUpdatedAt, accountScope));
   const [over, setOver] = useState(false);
   const [profileErrors, setProfileErrors] = useState({});
   const [profileMessage, setProfileMessage] = useState('');
@@ -80,7 +82,7 @@ export function AccountSettings({ profile }) {
     setLastName(saved.lastName);
     setPhone(saved.phone || '');
     setPicture(null);
-    setPreview(photoUrl(saved.photoUpdatedAt));
+    setPreview(photoUrl(saved.photoUpdatedAt, accountScope));
     setProfileErrors({});
     setProfileMessage('');
   }
@@ -91,6 +93,7 @@ export function AccountSettings({ profile }) {
     setProfilePending(true);
     const data = new FormData(event.currentTarget);
     if (picture) data.set('photo', picture);
+    if (accountScope) data.set('accountScope', accountScope);
     const result = await saveRequesterProfile(data);
     setProfilePending(false);
     if (!result?.ok) {
@@ -108,10 +111,10 @@ export function AccountSettings({ profile }) {
     };
     setSaved(nextSaved);
     setPicture(null);
-    if (result.photoUpdatedAt) setPreview(photoUrl(result.photoUpdatedAt));
+    if (result.photoUpdatedAt) setPreview(photoUrl(result.photoUpdatedAt, accountScope));
     setProfileErrors({});
     setProfileMessage('');
-    showToast?.('Profile saved.');
+    showToast?.('Profile Saved!');
     router.refresh();
   }
 
@@ -119,7 +122,7 @@ export function AccountSettings({ profile }) {
     setProfileErrors((current) => ({ ...current, photo: '' }));
     if (picture) {
       setPicture(null);
-      setPreview(saved.photoType ? photoUrl(saved.photoUpdatedAt) : '');
+      setPreview(saved.photoType ? photoUrl(saved.photoUpdatedAt, accountScope) : '');
       return;
     }
     if (!saved.photoType) {
@@ -127,9 +130,9 @@ export function AccountSettings({ profile }) {
       return;
     }
     setPreview('');
-    const result = await removeRequesterPhoto();
+    const result = await removeRequesterPhoto(accountScope);
     if (!result?.ok) {
-      setPreview(photoUrl(saved.photoUpdatedAt));
+      setPreview(photoUrl(saved.photoUpdatedAt, accountScope));
       setProfileMessage(result?.formError || 'That picture could not be removed. Try again.');
       return;
     }
@@ -142,7 +145,7 @@ export function AccountSettings({ profile }) {
     const previous = notes[field];
     setNotes((current) => ({ ...current, [field]: enabled }));
     setNoteError('');
-    const result = await saveNotificationPreference(field, enabled);
+    const result = await saveNotificationPreference(field, enabled, accountScope);
     if (!result?.ok) {
       setNotes((current) => ({ ...current, [field]: previous }));
       setNoteError('That setting could not be saved. Try again.');
@@ -290,7 +293,7 @@ export function AccountSettings({ profile }) {
         </div>
       </form>
 
-      <div className="account-sign-out"><SignOutButton /></div>
+      <div className="account-sign-out"><SignOutButton action={signOutAction} /></div>
     </div>
   );
 }

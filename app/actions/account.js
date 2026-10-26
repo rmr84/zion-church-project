@@ -1,13 +1,17 @@
 'use server';
 
-import { getRequester } from '@/lib/session';
+import { getRequester, getStaff } from '@/lib/session';
 import { cleanProfileName, cleanProfilePhone, detectedPhotoType, photoProblem, profileNameProblem, profilePhoneProblem } from '@/lib/profile';
 import { deleteProfilePhoto, saveProfilePhoto, updateUserProfile } from '@/lib/users';
 
 const NOTIFICATION_FIELDS = new Set(['emailNotifications', 'inAppNotifications']);
 
+async function signedInAccount(scope) {
+  return scope === 'desk' ? getStaff() : getRequester();
+}
+
 export async function saveRequesterProfile(formData) {
-  const requester = await getRequester();
+  const requester = await signedInAccount(formData.get('accountScope'));
   if (!requester) return { ok: false, formError: 'Sign in again to update this account.' };
 
   const firstName = cleanProfileName(formData.get('firstName'));
@@ -49,8 +53,8 @@ export async function saveRequesterProfile(formData) {
   return { ok: true, photoUpdatedAt: fields.photoUpdatedAt || '' };
 }
 
-export async function removeRequesterPhoto() {
-  const requester = await getRequester();
+export async function removeRequesterPhoto(scope) {
+  const requester = await signedInAccount(scope);
   if (!requester) return { ok: false, formError: 'Sign in again to update this account.' };
   try {
     await deleteProfilePhoto(requester.uid);
@@ -62,8 +66,8 @@ export async function removeRequesterPhoto() {
   return { ok: true };
 }
 
-export async function saveNotificationPreference(field, enabled) {
-  const requester = await getRequester();
+export async function saveNotificationPreference(field, enabled, scope) {
+  const requester = await signedInAccount(scope);
   if (!requester || !NOTIFICATION_FIELDS.has(field)) return { ok: false };
   try {
     await updateUserProfile(requester.uid, requester.email, { [field]: enabled === true });

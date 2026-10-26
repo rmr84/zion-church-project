@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { signOutOfRequester } from '@/app/actions/requester';
 
-export function SignOutButton() {
+export function SignOutButton({ action = signOutOfRequester }) {
   const dialogRef = useRef(null);
   const [open, setOpen] = useState(false);
 
@@ -43,7 +43,7 @@ export function SignOutButton() {
         <p>Are you sure you want to sign out?</p>
         <div className="modal-actions">
           <button className="button secondary" type="button" onClick={() => setOpen(false)}>Cancel</button>
-          <form action={signOutOfRequester}>
+          <form action={action}>
             <button className="button" type="submit">Sign out</button>
           </form>
         </div>

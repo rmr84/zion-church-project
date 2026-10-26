@@ -25,9 +25,6 @@ export default async function RequesterSignInPage() {
       <p className="sign-in-alt">
         <Link href="/request">Request Care Without Account</Link>
       </p>
-      <p className="sign-in-alt">
-        <Link href="/staff/login">Care Team Sign In</Link>
-      </p>
       </div>
     </section>
   );

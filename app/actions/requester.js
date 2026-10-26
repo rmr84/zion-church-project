@@ -2,12 +2,12 @@
 
 import { redirect } from 'next/navigation';
 import { lookupFirebaseUser } from '@/lib/firebase-identity';
-import { signInRequester, signOutRequester } from '@/lib/session';
-import { saveUser } from '@/lib/users';
+import { signInRequester, signInStaff, signOutRequester } from '@/lib/session';
+import { REQUESTER_ROLE, getUserRole, isDeskRole, saveUser } from '@/lib/users';
 
 async function storeRequester(identity) {
   try {
-    await saveUser(identity);
+    await saveUser(identity, { role: REQUESTER_ROLE });
     return { ok: true };
   } catch (error) {
     console.error('Could not save the care requester.', error?.code || '');
@@ -27,6 +27,11 @@ export async function establishRequesterSession(idToken) {
   if (!identity.emailVerified) return { ok: false, reason: 'unverified' };
   const stored = await storeRequester(identity);
   if (!stored.ok) return stored;
+  if (isDeskRole(await getUserRole(identity.uid))) {
+    await signOutRequester();
+    await signInStaff(identity);
+    redirect('/staff');
+  }
   await signInRequester(identity);
   redirect('/account');
 }

@@ -3,7 +3,9 @@ import { test } from 'node:test';
 import {
   issueRequesterToken,
   issueSessionToken,
+  issueStaffToken,
   readRequesterToken,
+  readStaffToken,
   secretsMatch,
   verifySessionToken,
 } from '../lib/session-token.js';
@@ -11,8 +13,8 @@ import {
 const secret = 'demo-only-change-this-secret';
 
 test('password comparison ignores length differences', () => {
-  assert.equal(secretsMatch('zion-care-team', 'zion-care-team'), true);
-  assert.equal(secretsMatch('a', 'zion-care-team'), false);
+  assert.equal(secretsMatch('correct-secret', 'correct-secret'), true);
+  assert.equal(secretsMatch('a', 'correct-secret'), false);
 });
 
 test('session tokens reject tampering and expiry', () => {
@@ -38,4 +40,16 @@ test('requester sessions stay separate from the care team session', () => {
   assert.equal(readRequesterToken(token, secret, now + 1000), null);
   assert.equal(verifySessionToken(token, secret, now), false);
   assert.equal(readRequesterToken(token, 'another-secret-value', now), null);
+});
+
+test('a care team session carries the member and stays separate from a requester session', () => {
+  const now = Date.parse('2026-10-23T12:00:00.000Z');
+  const token = issueStaffToken(secret, 'firebaseUid1234', 'Desk@Zion.Example', now, 1000);
+  assert.equal(verifySessionToken(token, secret, now + 500), true);
+  assert.deepEqual(readStaffToken(token, secret, now + 500), {
+    uid: 'firebaseUid1234',
+    email: 'desk@zion.example',
+  });
+  assert.equal(readStaffToken(token, secret, now + 1000), null);
+  assert.equal(readRequesterToken(token, secret, now), null);
 });

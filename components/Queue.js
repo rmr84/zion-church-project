@@ -1,36 +1,114 @@
-import Link from 'next/link';
-import { RequestList } from './RequestList';
+'use client';
 
-const SORTS = [
-  { id: 'urgency', label: 'Urgency' },
-  { id: 'newest', label: 'Newest' },
-  { id: 'oldest', label: 'Oldest' },
-];
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { QueueFilters } from '@/components/QueueFilters';
+import { RequestTable } from '@/components/RequestTable';
+import { CARE_TYPES, DESK_STATUSES, labelFor } from '@/lib/constants';
+import { UNASSIGNED, findMember, memberValue } from '@/lib/members';
 
-function sortHint(sort) {
-  if (sort === 'newest') return 'Newest requests first.';
-  if (sort === 'oldest') return 'Oldest requests first.';
-  return 'Urgent requests come first, then soon, then routine. Within a level, older requests come first.';
+const URGENCY_RANK = { urgent: 0, soon: 1, routine: 2 };
+
+function compareCreated(left, right) {
+  return String(left.createdAt).localeCompare(String(right.createdAt));
 }
 
-export function Queue({ title, intro, requests, sort, basePath, empty }) {
+function sortByUrgency(rows) {
+  return [...rows].sort((left, right) => {
+    const rank = (URGENCY_RANK[left.urgency] ?? 3) - (URGENCY_RANK[right.urgency] ?? 3);
+    return rank || compareCreated(left, right);
+  });
+}
+
+function matchesQuery(request, query) {
+  const term = query.trim().toLowerCase();
+  if (!term) return true;
+  const haystack = [
+    request.referenceCode,
+    request.name,
+    request.description,
+    request.requesterEmail,
+    request.assignee,
+    request.contactDetail,
+    labelFor(CARE_TYPES, request.careType),
+    labelFor(DESK_STATUSES, request.status),
+    request.careType,
+    request.status,
+    request.urgency,
+  ].join(' ').toLowerCase();
+  return haystack.includes(term);
+}
+
+function matchesAssignee(request, assignees, members) {
+  if (!assignees.length) return true;
+  if (!request.assignee) return assignees.includes(UNASSIGNED);
+  const member = findMember(members, request.assignee);
+  const value = member ? memberValue(member) : request.assignee;
+  return assignees.includes(value);
+}
+
+export function Queue({ openRequests, archivedRequests, members = [], initialArchive = false }) {
+  const router = useRouter();
+  const [archive, setArchive] = useState(initialArchive);
+  const [query, setQuery] = useState('');
+  const [urgencies, setUrgencies] = useState([]);
+  const [careTypes, setCareTypes] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [assignees, setAssignees] = useState([]);
+
+  const source = archive ? archivedRequests : openRequests;
+  const empty = archive ? 'No completed requests yet.' : 'No open requests.';
+
+  const requests = useMemo(() => {
+    const filtered = source.filter((request) => {
+      if (!matchesQuery(request, query)) return false;
+      if (urgencies.length && !urgencies.includes(request.urgency)) return false;
+      if (careTypes.length && !careTypes.includes(request.careType)) return false;
+      if (statuses.length && !statuses.includes(request.status)) return false;
+      if (!matchesAssignee(request, assignees, members)) return false;
+      return true;
+    });
+    return sortByUrgency(filtered);
+  }, [source, query, urgencies, careTypes, statuses, assignees, members]);
+
+  function changeArchive(next) {
+    setArchive(next);
+    setStatuses([]);
+    router.replace(next ? '/staff/archive' : '/staff', { scroll: false });
+  }
+
   return (
-    <section className="wrap wide">
-      <h1>{title}</h1>
-      <p>{intro}</p>
-      <nav className="sort-nav" aria-label="Sort requests">
-        {SORTS.map((item) => (
-          <Link
-            key={item.id}
-            href={`${basePath}?sort=${item.id}`}
-            aria-current={sort === item.id ? 'page' : undefined}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      <p className="hint">{sortHint(sort)}</p>
-      {requests.length ? <RequestList requests={requests} /> : <p className="empty">{empty}</p>}
+    <section className="page-frame">
+      <div className="page-heading">
+        <h1>Care Requests</h1>
+      </div>
+      <div className="wrap wide">
+        <QueueFilters
+          query={query}
+          onQueryChange={setQuery}
+          archive={archive}
+          onArchiveChange={changeArchive}
+          urgencies={urgencies}
+          onUrgenciesChange={setUrgencies}
+          careTypes={careTypes}
+          onCareTypesChange={setCareTypes}
+          statuses={statuses}
+          onStatusesChange={setStatuses}
+          assignees={assignees}
+          onAssigneesChange={setAssignees}
+          members={members}
+        />
+      </div>
+      {requests.length ? (
+        <RequestTable
+          key={`${archive}-${query}-${urgencies.join(',')}-${careTypes.join(',')}-${statuses.join(',')}-${assignees.join(',')}`}
+          requests={requests}
+          desk
+          members={members}
+        />
+      ) : (
+        <p className="empty wrap wide">{empty}</p>
+      )}
     </section>
   );
 }
