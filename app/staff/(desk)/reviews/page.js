@@ -1,29 +1,24 @@
-import { REVIEWS } from '@/lib/reviews';
+import { ReviewModeration } from '@/components/ReviewModeration';
+import { listDeskReviews } from '@/lib/reviews';
+import { getStaff } from '@/lib/session';
+import { ADMIN_ROLE, getUserRole } from '@/lib/users';
 
 export const metadata = { title: 'Reviews' };
 
-export default function ReviewsPage() {
+export default async function ReviewsPage() {
+  const [reviews, staff] = await Promise.all([
+    listDeskReviews(),
+    getStaff(),
+  ]);
+  const role = staff ? await getUserRole(staff.uid) : '';
+
   return (
     <section className="page-frame">
       <div className="page-heading">
-        <p className="eyebrow">Care Team</p>
         <h1>Reviews</h1>
-        <p className="lede">What members say about the care desk.</p>
       </div>
-      <div className="wrap wide reviews-desk">
-        <ul className="reviews-desk-list">
-          {REVIEWS.map((review) => (
-            <li key={`${review.name}-${review.detail}`}>
-              <blockquote>
-                <p>{review.quote}</p>
-                <footer>
-                  <cite>{review.name}</cite>
-                  <span>{review.detail}</span>
-                </footer>
-              </blockquote>
-            </li>
-          ))}
-        </ul>
+      <div className="wrap wide">
+        <ReviewModeration reviews={reviews} canModerate={role === ADMIN_ROLE} />
       </div>
     </section>
   );

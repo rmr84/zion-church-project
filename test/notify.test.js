@@ -9,13 +9,13 @@ test('status mail omits staff-only fields even if they are passed in', () => {
   const text = buildStatusNotice({
     referenceCode: 'ZC-TEST-0001',
     careType: 'meal_delivery',
-    status: 'assigned',
+    status: 'in_review',
     memberNote: 'We will call today.',
     internalNote: 'PORCH-CODE-441',
     description: 'Room 312 diagnosis',
   });
 
-  assert.match(text, /Assigned/);
+  assert.match(text, /In Review/);
   assert.match(text, /We will call today/);
   assert.equal(text.includes('PORCH-CODE-441'), false);
   assert.equal(text.includes('Room 312'), false);

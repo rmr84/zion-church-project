@@ -47,12 +47,7 @@ export async function updateRequestAssignee(referenceCode, assignee, options = {
   const current = await getStaffRequest(referenceCode);
   if (!current) return { ok: false, formError: 'That request is not on file.' };
 
-  let nextStatus = current.status;
-  if (name) {
-    if (current.status === 'received') nextStatus = 'assigned';
-  } else if (current.status === 'assigned') {
-    nextStatus = 'received';
-  }
+  const nextStatus = current.status === 'assigned' ? 'in_review' : current.status;
 
   const internalNote = Object.prototype.hasOwnProperty.call(options, 'internalNote')
     ? String(options.internalNote || '').trim().slice(0, 2000)

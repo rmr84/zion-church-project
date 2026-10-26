@@ -25,7 +25,7 @@ Creating an account sends Firebase's confirmation email. The person is saved in 
 
 Care team sign-in is at [http://localhost:3000/staff/login](http://localhost:3000/staff/login). It uses the same email and password accounts. Each user document has a `role` of `requester`, `careTeam`, or `Admin`. A new requester account is stored as `requester`. `Admin` and `careTeam` open the desk. `STAFF_SESSION_SECRET` must be at least 16 characters and is in `.env.example`.
 
-`npm run seed` replaces the care requests in MongoDB with the demo requests.
+`npm run seed` replaces the care requests and reviews in MongoDB with the demo data.
 
 ## Demo reference codes
 
@@ -33,10 +33,10 @@ These codes are seeded when the care-requests collection is empty, including a f
 
 | Code | Who | Type | Urgency | Status | What to notice |
 | --- | --- | --- | --- | --- | --- |
-| ZC-OTHR-1005 | Samir Haddad | Other | Urgent | Assigned | Older urgent request, so it sorts first. Member note names a driver time. Staff note names the driver |
+| ZC-OTHR-1005 | Samir Haddad | Other | Urgent | In Review | Older urgent request, so it sorts first. Member note names a driver time. Staff note names the driver |
 | ZC-HOSP-1001 | Margaret Hale | Hospital Visit | Urgent | Received | Staff note mentions Pastor Ellis and a diagnosis. Neither appears on the status page |
 | ZC-MEAL-1002 | Daniel Cho | Meal Delivery | Soon | In Review | Member note mentions the meal team. Staff note mentions Ruth Alvarez and must stay off the status page |
-| ZC-ANON-1003 | Name not given | Prayer Support | Routine | Assigned | Anonymous. The status page shows the prayer-team note, not the staff caution |
+| ZC-ANON-1003 | Name not given | Prayer Support | Routine | In Review | Anonymous. The status page shows the prayer-team note, not the staff caution |
 | ZC-COUN-1004 | Alicia Grant | Counseling Referral | Soon | Completed | Archive only. It is not on the open queue |
 
 Member status for the hospital request: [http://localhost:3000/status?code=ZC-HOSP-1001](http://localhost:3000/status?code=ZC-HOSP-1001)

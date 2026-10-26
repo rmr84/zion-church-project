@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { DeskMenu } from '@/components/DeskMenu';
 import { SiteMenu } from '@/components/SiteMenu';
+import { countUnseenReviewNotifications } from '@/lib/reviews';
 import { getRequester, getStaff, isStaffSignedIn } from '@/lib/session';
 import { ADMIN_ROLE, getUser, getUserRole } from '@/lib/users';
 
@@ -12,6 +13,7 @@ export async function Header() {
   const staffProfile = staffIdentity ? await getUser(staffIdentity.uid).catch(() => null) : null;
   const role = staffIdentity ? await getUserRole(staffIdentity.uid).catch(() => '') : '';
   const isAdmin = role === ADMIN_ROLE;
+  const notificationCount = staff ? await countUnseenReviewNotifications().catch(() => 0) : 0;
   const staffName = [staffProfile?.firstName, staffProfile?.lastName].filter(Boolean).join(' ');
   const member = {
     label: staffName || staffIdentity?.email || 'Care Team',
@@ -33,7 +35,7 @@ export async function Header() {
           </Link>
         )}
         {staff ? <p className="desk-header-title">Care Team</p> : null}
-        {staff ? <DeskMenu member={member} isAdmin={isAdmin} /> : (
+        {staff ? <DeskMenu member={member} isAdmin={isAdmin} notificationCount={notificationCount} /> : (
           <SiteMenu>
             <nav className="primary-nav" aria-label="Primary">
               <Link href="/request">Request Care</Link>
