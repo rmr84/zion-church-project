@@ -2287,8 +2287,8 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   top: calc(100% + 0.4rem);
   right: 0;
   z-index: 20;
-  width: min(17rem, calc(100vw - 2.5rem));
-  max-height: 22rem;
+  width: min(18.5rem, calc(100vw - 2.5rem));
+  max-height: 24rem;
   overflow: auto;
   padding: 0.45rem;
   background: white;
@@ -2303,6 +2303,35 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+.queue-filter-dates {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.15rem 0.35rem 0.55rem;
+}
+.queue-filter-dates label {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0;
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.queue-filter-dates input[type="date"] {
+  width: 100%;
+  min-height: 2.35rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid #e6ebef;
+  border-radius: 0.5rem;
+  background: white;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+.queue-filter-dates input[type="date"]:focus {
+  border-color: var(--teal);
+  outline: none;
 }
 .queue-filter-menu button {
   display: flex;

@@ -2,7 +2,17 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CARE_TYPES, DESK_STATUSES, URGENCY_LEVELS } from '@/lib/constants';
+import { formatDateInput } from '@/lib/format';
 import { UNASSIGNED, activeMembers, memberLabel, memberValue } from '@/lib/members';
+
+function dateRangeLabel(dateFrom, dateTo) {
+  if (dateFrom && dateTo) {
+    return `${formatDateInput(dateFrom)} – ${formatDateInput(dateTo)}`;
+  }
+  if (dateFrom) return `From ${formatDateInput(dateFrom)}`;
+  if (dateTo) return `Through ${formatDateInput(dateTo)}`;
+  return '';
+}
 
 export function QueueFilters({
   query,
@@ -17,6 +27,10 @@ export function QueueFilters({
   onStatusesChange,
   assignees,
   onAssigneesChange,
+  dateFrom = '',
+  onDateFromChange,
+  dateTo = '',
+  onDateToChange,
   members = [],
 }) {
   const [open, setOpen] = useState(false);
@@ -65,6 +79,7 @@ export function QueueFilters({
     );
   }
 
+  const rangeLabel = dateRangeLabel(dateFrom, dateTo);
   const pills = [
     ...urgencies.map((value) => ({
       key: `urgency-${value}`,
@@ -88,6 +103,14 @@ export function QueueFilters({
         : memberLabel(members.find((member) => memberValue(member) === value) || { label: value }),
       clear: () => onAssigneesChange(assignees.filter((item) => item !== value)),
     })),
+    ...(rangeLabel ? [{
+      key: 'date-range',
+      label: rangeLabel,
+      clear: () => {
+        onDateFromChange('');
+        onDateToChange('');
+      },
+    }] : []),
   ];
 
   return (
@@ -132,6 +155,27 @@ export function QueueFilters({
           </button>
           {open ? (
             <div className="queue-filter-menu" role="menu">
+              <p className="queue-filter-label">Date submitted</p>
+              <div className="queue-filter-dates">
+                <label>
+                  <span>From</span>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    max={dateTo || undefined}
+                    onChange={(event) => onDateFromChange(event.target.value)}
+                  />
+                </label>
+                <label>
+                  <span>To</span>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    min={dateFrom || undefined}
+                    onChange={(event) => onDateToChange(event.target.value)}
+                  />
+                </label>
+              </div>
               <p className="queue-filter-label">Urgency</p>
               {URGENCY_LEVELS.map((item) => (
                 <FilterOption
@@ -185,6 +229,8 @@ export function QueueFilters({
                     onCareTypesChange([]);
                     onStatusesChange([]);
                     onAssigneesChange([]);
+                    onDateFromChange('');
+                    onDateToChange('');
                   }}
                 >
                   Clear filters
