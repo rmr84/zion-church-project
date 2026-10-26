@@ -1626,6 +1626,9 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 .badge-received { color: #3d2f6b; background: #ebe6fb; }
 .badge-in_review { color: #5c4810; background: #ffe89a; }
 .badge-completed { color: #1a5c3a; background: #d9f2e5; }
+.badge-admin { color: #3d2f6b; background: #ebe6fb; }
+.badge-care_team { color: #1a5c3a; background: #d9f2e5; }
+.badge-requester { color: #5c4810; background: #ffe89a; }
 .status-picker { position: relative; display: inline-flex; max-width: 100%; }
 .status-picker-trigger {
   display: inline-flex;
@@ -2094,6 +2097,25 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 }
 .request-table td.request-assignee {
   text-align: center;
+}
+.user-name-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-width: 0;
+  font-weight: 700;
+}
+.user-name-mark .member-avatar {
+  width: 2.15rem;
+  height: 2.15rem;
+  font-size: 0.7rem;
+}
+.request-table .user-email {
+  color: var(--ink-soft);
+  word-break: break-word;
+}
+.request-table .user-role {
+  white-space: nowrap;
 }
 .member-picker-menu {
   position: absolute;
