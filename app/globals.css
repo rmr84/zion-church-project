@@ -2870,6 +2870,14 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 
 .title-row h1 { margin: 0; }
 
+.requester-detail-notes h2 {
+  margin: 0 0 0.45rem;
+  font-size: 1.05rem;
+}
+.requester-detail-notes .hint { margin: 0 0 0.75rem; }
+.requester-detail-notes .prose { margin: 0; }
+.requester-detail-notes .status-feedback,
+.requester-detail-notes .feedback-sent { margin-top: 1.25rem; }
 .detail-panel {
   background: white;
   border: 1px solid #e6ebef;

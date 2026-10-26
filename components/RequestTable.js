@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateRequestStatus } from '@/app/actions/staff';
 import { StatusBadge, UrgencyBadge } from '@/components/Badges';
@@ -8,8 +8,8 @@ import { MemberAvatar } from '@/components/MemberAvatar';
 import { RequestActions } from '@/components/RequestActions';
 import { StatusPicker } from '@/components/StatusPicker';
 import { useToast } from '@/components/Toast';
-import { CARE_TYPES, CONTACT_METHODS, STATUSES, URGENCY_LEVELS, labelFor } from '@/lib/constants';
-import { formatDay, formatWhen } from '@/lib/format';
+import { CARE_TYPES, labelFor } from '@/lib/constants';
+import { formatDay } from '@/lib/format';
 import { findMember, memberLabel } from '@/lib/members';
 
 const WEB_PAGE_SIZE = 5;
@@ -22,10 +22,8 @@ export function RequestTable({
   allowAssign = true,
   allowReopen = true,
 }) {
-  const dialogRef = useRef(null);
   const router = useRouter();
   const showToast = useToast();
-  const [selected, setSelected] = useState(null);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(WEB_PAGE_SIZE);
   const [statuses, setStatuses] = useState(() => (
@@ -80,18 +78,6 @@ export function RequestTable({
     }
     router.refresh();
   }
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (selected && !dialog.open) dialog.showModal();
-    if (!selected && dialog.open) dialog.close();
-  }, [selected]);
-
-  const showContact = selected
-    && selected.contactMethod !== 'in_person'
-    && selected.contactMethod !== 'none'
-    && selected.contactDetail;
 
   return (
     <>
@@ -166,7 +152,7 @@ export function RequestTable({
                       className="request-view"
                       type="button"
                       aria-label={`View ${labelFor(CARE_TYPES, request.careType)} request`}
-                      onClick={() => setSelected(request)}
+                      onClick={() => router.push(`/account/requests/${request.referenceCode}`)}
                     >
                       <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M2.2 12s3.6-6.2 9.8-6.2S21.8 12 21.8 12 18.2 18.2 12 18.2 2.2 12 2.2 12z" fill="none" stroke="currentColor" strokeWidth="1.8" />
@@ -201,68 +187,6 @@ export function RequestTable({
           </nav>
         ) : null}
       </div>
-      {desk ? null : (
-        <dialog
-          ref={dialogRef}
-          className="sign-out-dialog request-dialog"
-          aria-labelledby="request-code"
-          onClose={() => setSelected(null)}
-          onClick={(event) => {
-            if (event.target === event.currentTarget) setSelected(null);
-          }}
-        >
-          {selected ? (
-            <>
-              <div className="sign-out-head">
-                <button className="sign-out-close" type="button" aria-label="Close" onClick={() => setSelected(null)}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                </button>
-              </div>
-              <p className="eyebrow">Reference code</p>
-              <h2 id="request-code">{selected.referenceCode}</h2>
-              <p>Updated {formatWhen(selected.updatedAt)}</p>
-              <dl className="request-summary status-summary">
-                <div>
-                  <dt>Name</dt>
-                  <dd>{selected.name || 'Name not given'}</dd>
-                </div>
-                <div>
-                  <dt>Type Of Care</dt>
-                  <dd>{labelFor(CARE_TYPES, selected.careType)}</dd>
-                </div>
-                <div>
-                  <dt>What Is Your Request?</dt>
-                  <dd>{selected.description}</dd>
-                </div>
-                <div>
-                  <dt>Preferred Contact Method</dt>
-                  <dd>{labelFor(CONTACT_METHODS, selected.contactMethod)}</dd>
-                </div>
-                {showContact ? (
-                  <div>
-                    <dt>How Should We Reach You?</dt>
-                    <dd>{selected.contactDetail}</dd>
-                  </div>
-                ) : null}
-                <div>
-                  <dt>Urgency</dt>
-                  <dd>{labelFor(URGENCY_LEVELS, selected.urgency)}</dd>
-                </div>
-                <div>
-                  <dt>Status</dt>
-                  <dd>{labelFor(STATUSES, selected.status)}</dd>
-                </div>
-                <div>
-                  <dt>Note For You</dt>
-                  <dd>{selected.memberNote.trim() || 'The care team has not added a note yet.'}</dd>
-                </div>
-              </dl>
-            </>
-          ) : null}
-        </dialog>
-      )}
     </>
   );
 }
