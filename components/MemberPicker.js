@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { MemberAvatar } from '@/components/MemberAvatar';
-import { findMember, memberLabel, memberValue } from '@/lib/members';
+import { activeMembers, findMember, memberLabel, memberValue } from '@/lib/members';
 
 export function MemberPicker({
   id,
@@ -18,6 +18,7 @@ export function MemberPicker({
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const listId = useId();
+  const options = activeMembers(members);
   const selected = findMember(members, value) || members.find((member) => memberValue(member) === value);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ export function MemberPicker({
       </button>
       {open ? (
         <ul className="member-picker-menu" id={listId} role="listbox" aria-label="Care Team Member">
-          {members.map((member) => {
+          {options.map((member) => {
             const option = memberValue(member);
             const checked = Boolean(selected && memberValue(selected) === option);
             return (

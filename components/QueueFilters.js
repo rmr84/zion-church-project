@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { CARE_TYPES, DESK_STATUSES, URGENCY_LEVELS } from '@/lib/constants';
-import { UNASSIGNED, memberLabel, memberValue } from '@/lib/members';
+import { UNASSIGNED, activeMembers, memberLabel, memberValue } from '@/lib/members';
 
 export function QueueFilters({
   query,
@@ -165,7 +165,7 @@ export function QueueFilters({
                 label="Unassigned"
                 onClick={() => toggle(assignees, UNASSIGNED, onAssigneesChange)}
               />
-              {members.map((member) => {
+              {activeMembers(members).map((member) => {
                 const value = memberValue(member);
                 return (
                   <FilterOption

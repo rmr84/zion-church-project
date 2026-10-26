@@ -26,6 +26,7 @@ export async function saveRequesterProfile(formData) {
   if (phoneProblem) errors.phone = phoneProblem;
 
   const picture = formData.get('photo');
+  const removePhoto = String(formData.get('removePhoto') || '') === '1';
   const hasPicture = picture && typeof picture === 'object' && picture.size > 0;
   if (hasPicture) {
     const problem = photoProblem(picture.type, picture.size);
@@ -47,6 +48,15 @@ export async function saveRequesterProfile(formData) {
       console.error('Could not store the profile picture.', error?.code || error?.message || '');
       return { ok: false, errors: { photo: 'That picture could not be saved. Try again.' } };
     }
+  } else if (removePhoto) {
+    try {
+      await deleteProfilePhoto(requester.uid);
+      fields.photoType = '';
+      fields.photoUpdatedAt = '';
+    } catch (error) {
+      console.error('Could not remove the profile picture.', error?.code || error?.message || '');
+      return { ok: false, errors: { photo: 'That picture could not be removed. Try again.' } };
+    }
   }
 
   try {
@@ -56,20 +66,7 @@ export async function saveRequesterProfile(formData) {
     return { ok: false, formError: 'That profile could not be saved. Try again.' };
   }
 
-  return { ok: true, photoUpdatedAt };
-}
-
-export async function removeRequesterPhoto(scope) {
-  const requester = await signedInAccount(scope);
-  if (!requester) return { ok: false, formError: 'Sign in again to update this account.' };
-  try {
-    await deleteProfilePhoto(requester.uid);
-    await updateUserProfile(requester.uid, requester.email, { photoType: '', photoUpdatedAt: '' });
-  } catch (error) {
-    console.error('Could not remove the profile picture.', error?.code || '');
-    return { ok: false, formError: 'That picture could not be removed. Try again.' };
-  }
-  return { ok: true };
+  return { ok: true, photoUpdatedAt, photoRemoved: removePhoto && !hasPicture };
 }
 
 export async function saveNotificationPreference(field, enabled, scope) {
