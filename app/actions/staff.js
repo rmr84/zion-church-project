@@ -7,7 +7,8 @@ import { STATUSES } from '@/lib/constants';
 import { createAssignmentNotification } from '@/lib/desk-notifications';
 import { getStaffRequest, searchRequests, updateCareRequest } from '@/lib/requests';
 import { getStaff, isStaffSignedIn, signInStaff, signOutRequester, signOutStaff } from '@/lib/session';
-import { ADMIN_ROLE, acceptDeskInvite, getUser, getUserRole, isDeskRole, saveUser } from '@/lib/users';
+import { findMember, memberValue } from '@/lib/members';
+import { ADMIN_ROLE, acceptDeskInvite, getUser, getUserRole, isDeskRole, listDeskMembers, saveUser } from '@/lib/users';
 import { validateStaffUpdate } from '@/lib/validate';
 
 async function canReopenCompleted() {
@@ -20,6 +21,17 @@ async function reopenDenied(currentStatus, nextStatus) {
   if (currentStatus !== 'completed' || nextStatus === 'completed') return null;
   if (await canReopenCompleted()) return null;
   return 'Only an admin can move a completed request out of the archive.';
+}
+
+async function resolveAssignableAssignee(assignee) {
+  const name = String(assignee || '').trim().slice(0, 120);
+  if (!name) return { ok: true, value: '' };
+  const members = await listDeskMembers();
+  const member = findMember(members, name);
+  if (!member || member.status === 'pending') {
+    return { ok: false, formError: 'Choose an active care team member.' };
+  }
+  return { ok: true, value: memberValue(member) };
 }
 
 async function notifyNewAssignee(current, nextAssignee) {
@@ -88,7 +100,8 @@ export async function logout() {
 
 export async function updateRequestAssignee(referenceCode, assignee, options = {}) {
   if (!(await isStaffSignedIn())) return { ok: false, formError: 'Sign in again to update this request.' };
-  const name = String(assignee || '').trim().slice(0, 120);
+  const assigned = await resolveAssignableAssignee(assignee);
+  if (!assigned.ok) return assigned;
 
   const current = await getStaffRequest(referenceCode);
   if (!current) return { ok: false, formError: 'That request is not on file.' };
@@ -102,7 +115,7 @@ export async function updateRequestAssignee(referenceCode, assignee, options = {
   try {
     const updated = await updateCareRequest(current.referenceCode, {
       status: nextStatus,
-      assignee: name,
+      assignee: assigned.value,
       memberNote: current.memberNote || '',
       internalNote,
     });
@@ -112,7 +125,7 @@ export async function updateRequestAssignee(referenceCode, assignee, options = {
     return { ok: false, formError: 'That assignment could not be saved. Try again.' };
   }
 
-  await notifyNewAssignee(current, name);
+  await notifyNewAssignee(current, assigned.value);
 
   revalidatePath('/staff');
   revalidatePath('/staff/archive');
@@ -185,17 +198,27 @@ export async function updateRequest(_previous, formData) {
     };
   }
 
-  const updated = await updateCareRequest(result.values.referenceCode, result.values);
-  if (!updated) {
+  const assigned = await resolveAssignableAssignee(result.values.assignee);
+  if (!assigned.ok) {
     return {
-      errors: { form: 'That request is not on file.' },
+      errors: { assignee: assigned.formError },
       values: result.values,
       saved: false,
     };
   }
+  const nextValues = { ...result.values, assignee: assigned.value };
 
-  if (String(result.values.assignee || '').trim() !== String(current.assignee || '').trim()) {
-    await notifyNewAssignee(current, result.values.assignee);
+  const updated = await updateCareRequest(result.values.referenceCode, nextValues);
+  if (!updated) {
+    return {
+      errors: { form: 'That request is not on file.' },
+      values: nextValues,
+      saved: false,
+    };
+  }
+
+  if (String(nextValues.assignee || '').trim() !== String(current.assignee || '').trim()) {
+    await notifyNewAssignee(current, nextValues.assignee);
   }
 
   revalidatePath('/staff');
@@ -204,5 +227,5 @@ export async function updateRequest(_previous, formData) {
   revalidatePath('/staff/email-logs');
   revalidatePath('/staff/notifications');
 
-  return { errors: {}, values: result.values, saved: true };
+  return { errors: {}, values: nextValues, saved: true };
 }
