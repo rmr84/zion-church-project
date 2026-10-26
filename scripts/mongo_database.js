@@ -1,4 +1,9 @@
 import { REQUESTS, closeDb, getDb, seedDatabase } from '../lib/db.js';
+import {
+  SEED_NOTIFICATIONS,
+  notificationsCollection,
+  seedNotifications,
+} from '../lib/notify.js';
 import { SEED_REQUESTS } from '../lib/seed-data.js';
 import { SEED_REVIEWS, reviewsCollection, seedReviews } from '../lib/reviews.js';
 
@@ -14,6 +19,24 @@ if (existingReviews === 0) {
 }
 for (const row of SEED_REVIEWS) {
   console.log(`${row.name}  ${row.detail}`);
+}
+
+try {
+  const notifications = await notificationsCollection();
+  const existingNotifications = await notifications.countDocuments();
+  let notificationCount = 0;
+  if (existingNotifications === 0) {
+    notificationCount = await seedNotifications();
+    console.log(`Seeded ${notificationCount} email log notifications`);
+  } else {
+    notificationCount = existingNotifications;
+    console.log(`Email log notifications already present (${existingNotifications}); left unchanged`);
+  }
+  for (const row of SEED_NOTIFICATIONS) {
+    console.log(`${row.createdAt}  ${row.kind}`);
+  }
+} catch (error) {
+  console.error(`Email log seed skipped: ${error?.message || error}`);
 }
 
 try {

@@ -3,8 +3,8 @@ import { listEmailLogEntries } from '@/lib/notify';
 
 export const metadata = { title: 'Email Logs' };
 
-export default function EmailLogsPage() {
-  const entries = listEmailLogEntries();
+export default async function EmailLogsPage() {
+  const entries = await listEmailLogEntries();
 
   return (
     <section className="page-frame">
