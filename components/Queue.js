@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { QueueFilters } from '@/components/QueueFilters';
 import { RequestTable } from '@/components/RequestTable';
 import { CARE_TYPES, DESK_STATUSES, labelFor } from '@/lib/constants';
+import { dayKey } from '@/lib/format';
 import { UNASSIGNED, findMember, memberValue } from '@/lib/members';
 
 const URGENCY_RANK = { urgent: 0, soon: 1, routine: 2 };
@@ -47,6 +48,15 @@ function matchesAssignee(request, assignees, members) {
   return assignees.includes(value);
 }
 
+function matchesDate(request, dateFrom, dateTo) {
+  if (!dateFrom && !dateTo) return true;
+  const day = dayKey(request.createdAt);
+  if (!day) return false;
+  if (dateFrom && day < dateFrom) return false;
+  if (dateTo && day > dateTo) return false;
+  return true;
+}
+
 export function Queue({
   openRequests,
   archivedRequests,
@@ -61,6 +71,8 @@ export function Queue({
   const [careTypes, setCareTypes] = useState([]);
   const [statuses, setStatuses] = useState([]);
   const [assignees, setAssignees] = useState([]);
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   const source = archive ? archivedRequests : openRequests;
   const empty = archive ? 'No completed requests yet.' : 'No open requests.';
@@ -72,10 +84,11 @@ export function Queue({
       if (careTypes.length && !careTypes.includes(request.careType)) return false;
       if (statuses.length && !statuses.includes(request.status)) return false;
       if (!matchesAssignee(request, assignees, members)) return false;
+      if (!matchesDate(request, dateFrom, dateTo)) return false;
       return true;
     });
     return sortByUrgency(filtered);
-  }, [source, query, urgencies, careTypes, statuses, assignees, members]);
+  }, [source, query, urgencies, careTypes, statuses, assignees, dateFrom, dateTo, members]);
 
   function changeArchive(next) {
     setArchive(next);
@@ -102,12 +115,16 @@ export function Queue({
           onStatusesChange={setStatuses}
           assignees={assignees}
           onAssigneesChange={setAssignees}
+          dateFrom={dateFrom}
+          onDateFromChange={setDateFrom}
+          dateTo={dateTo}
+          onDateToChange={setDateTo}
           members={members}
         />
       </div>
       {requests.length ? (
         <RequestTable
-          key={`${archive}-${query}-${urgencies.join(',')}-${careTypes.join(',')}-${statuses.join(',')}-${assignees.join(',')}`}
+          key={`${archive}-${query}-${urgencies.join(',')}-${careTypes.join(',')}-${statuses.join(',')}-${assignees.join(',')}-${dateFrom}-${dateTo}`}
           requests={requests}
           desk
           members={members}
