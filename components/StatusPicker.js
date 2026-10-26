@@ -4,7 +4,14 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { StatusBadge } from '@/components/Badges';
 import { DESK_STATUSES, statusLabel } from '@/lib/constants';
 
-export function StatusPicker({ status, disabled = false, onChange }) {
+export function StatusPicker({
+  status,
+  disabled = false,
+  onChange,
+  'aria-labelledby': ariaLabelledBy,
+  'aria-describedby': ariaDescribedBy,
+  'aria-invalid': ariaInvalid,
+}) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const listId = useId();
@@ -38,6 +45,9 @@ export function StatusPicker({ status, disabled = false, onChange }) {
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
+        aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
+        aria-invalid={ariaInvalid}
         disabled={disabled}
         onClick={() => setOpen((current) => !current)}
       >

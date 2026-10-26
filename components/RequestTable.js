@@ -59,7 +59,19 @@ export function RequestTable({ requests, desk = false, members = [] }) {
       showToast?.(result?.formError || 'That status could not be saved.');
       return;
     }
-    showToast?.('Status updated.');
+    if (nextStatus === 'completed') {
+      showToast?.('Status updated.', {
+        href: '/staff/archive',
+        label: 'View this request in Archive tab',
+      });
+    } else if (previous === 'completed') {
+      showToast?.('Status updated.', {
+        href: '/staff',
+        label: 'View this request in Active tab',
+      });
+    } else {
+      showToast?.('Status updated.');
+    }
     router.refresh();
   }
 

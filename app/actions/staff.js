@@ -40,7 +40,7 @@ export async function logout() {
   redirect('/');
 }
 
-export async function updateRequestAssignee(referenceCode, assignee) {
+export async function updateRequestAssignee(referenceCode, assignee, options = {}) {
   if (!(await isStaffSignedIn())) return { ok: false, formError: 'Sign in again to update this request.' };
   const name = String(assignee || '').trim().slice(0, 120);
 
@@ -54,12 +54,16 @@ export async function updateRequestAssignee(referenceCode, assignee) {
     nextStatus = 'received';
   }
 
+  const internalNote = Object.prototype.hasOwnProperty.call(options, 'internalNote')
+    ? String(options.internalNote || '').trim().slice(0, 2000)
+    : (current.internalNote || '');
+
   try {
     const updated = await updateCareRequest(current.referenceCode, {
       status: nextStatus,
       assignee: name,
       memberNote: current.memberNote || '',
-      internalNote: current.internalNote || '',
+      internalNote,
     });
     if (!updated) return { ok: false, formError: 'That request is not on file.' };
   } catch (error) {

@@ -12,11 +12,14 @@ export function RequestActions({ request, members = [] }) {
   const menuId = useId();
   const titleId = useId();
   const fieldId = useId();
+  const noteId = useId();
   const rootRef = useRef(null);
   const dialogRef = useRef(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
+  const [step, setStep] = useState(1);
   const [assignee, setAssignee] = useState(request.assignee || '');
+  const [careNote, setCareNote] = useState('');
   const [pending, setPending] = useState(false);
 
   useEffect(() => {
@@ -42,9 +45,17 @@ export function RequestActions({ request, members = [] }) {
     if (!assignOpen && dialog.open) dialog.close();
   }, [assignOpen]);
 
+  function closeAssign() {
+    setAssignOpen(false);
+    setStep(1);
+    setCareNote('');
+  }
+
   function openAssign() {
     setMenuOpen(false);
     setAssignee(request.assignee || '');
+    setCareNote('');
+    setStep(1);
     setAssignOpen(true);
   }
 
@@ -56,19 +67,38 @@ export function RequestActions({ request, members = [] }) {
   const initialAssignee = request.assignee || '';
   const canSave = assignee !== initialAssignee;
 
-  async function saveAssign(event) {
-    event.preventDefault();
+  async function finishAssign(options = {}) {
     if (!canSave) return;
     setPending(true);
-    const result = await updateRequestAssignee(request.referenceCode, assignee);
+    const result = await updateRequestAssignee(request.referenceCode, assignee, options);
     setPending(false);
     if (!result?.ok) {
       showToast?.(result?.formError || 'That assignment could not be saved.');
       return;
     }
-    setAssignOpen(false);
+    closeAssign();
     showToast?.('Request saved.');
     router.refresh();
+  }
+
+  function continueAssign(event) {
+    event.preventDefault();
+    if (!canSave) return;
+    if (!assignee) {
+      finishAssign();
+      return;
+    }
+    setStep(2);
+  }
+
+  function skipNote() {
+    finishAssign();
+  }
+
+  function submitNote(event) {
+    event.preventDefault();
+    const note = careNote.trim();
+    finishAssign(note ? { internalNote: note } : {});
   }
 
   return (
@@ -112,45 +142,86 @@ export function RequestActions({ request, members = [] }) {
         ref={dialogRef}
         className="sign-out-dialog assign-dialog"
         aria-labelledby={titleId}
-        onClose={() => setAssignOpen(false)}
+        onClose={closeAssign}
         onClick={(event) => {
-          if (event.target === event.currentTarget) setAssignOpen(false);
+          if (event.target === event.currentTarget) closeAssign();
         }}
       >
         <div className="sign-out-head">
           <span className="sign-out-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M4.8 17.2c.8-2.2 2.3-3.3 4.2-3.3s3.4 1.1 4.2 3.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-              <path d="M15.5 11.5h5M18 9v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
+            {step === 1 ? (
+              <svg viewBox="0 0 24 24">
+                <circle cx="9" cy="9" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M4.8 17.2c.8-2.2 2.3-3.3 4.2-3.3s3.4 1.1 4.2 3.3" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <path d="M15.5 11.5h5M18 9v5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24">
+                <path d="M7 7.5h10M7 12h10M7 16.5h6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <rect x="4.5" y="4" width="15" height="16" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+              </svg>
+            )}
           </span>
-          <button className="sign-out-close" type="button" aria-label="Close" onClick={() => setAssignOpen(false)}>
+          <button className="sign-out-close" type="button" aria-label="Close" onClick={closeAssign}>
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
           </button>
         </div>
-        <h2 id={titleId}>Assign Request</h2>
-        <p>Choose a care team member for {request.referenceCode}.</p>
-        <form className="assign-form" onSubmit={saveAssign}>
-          <div className="field">
-            <label htmlFor={fieldId}>Care Team Member</label>
-            <MemberPicker
-              id={fieldId}
-              members={members}
-              value={assignee}
-              onChange={setAssignee}
-              disabled={pending}
-            />
-          </div>
-          <div className="modal-actions">
-            <button className="button secondary" type="button" onClick={() => setAssignOpen(false)}>Cancel</button>
-            <button className="button" type="submit" disabled={pending || !canSave}>
-              {pending ? 'Saving…' : 'Save'}
-            </button>
-          </div>
-        </form>
+        {step === 1 ? (
+          <>
+            <h2 id={titleId}>Assign Request</h2>
+            <p>Choose a care team member for {request.referenceCode}.</p>
+            <form className="assign-form" onSubmit={continueAssign}>
+              <div className="field">
+                <label htmlFor={fieldId}>Care Team Member</label>
+                <MemberPicker
+                  id={fieldId}
+                  members={members}
+                  value={assignee}
+                  onChange={setAssignee}
+                  disabled={pending}
+                />
+              </div>
+              <div className="modal-actions">
+                <button className="button secondary" type="button" onClick={closeAssign}>Cancel</button>
+                <button className="button" type="submit" disabled={pending || !canSave}>
+                  {pending ? 'Saving…' : assignee ? 'Continue' : 'Save'}
+                </button>
+              </div>
+            </form>
+          </>
+        ) : (
+          <>
+            <h2 id={titleId}>Care Team Note</h2>
+            <p>Add a private note for the care team, or skip this step.</p>
+            <form className="assign-form" onSubmit={submitNote}>
+              <div className="field">
+                <label htmlFor={noteId}>Note</label>
+                <p className="hint" id={`${noteId}-hint`}>
+                  Never shown on the status page, and left out of the notification log.
+                </p>
+                <textarea
+                  id={noteId}
+                  rows={4}
+                  maxLength={2000}
+                  aria-describedby={`${noteId}-hint`}
+                  value={careNote}
+                  disabled={pending}
+                  onChange={(event) => setCareNote(event.target.value)}
+                />
+              </div>
+              <div className="modal-actions">
+                <button className="button secondary" type="button" disabled={pending} onClick={skipNote}>
+                  {pending ? 'Saving…' : 'Skip'}
+                </button>
+                <button className="button" type="submit" disabled={pending}>
+                  {pending ? 'Saving…' : 'Submit'}
+                </button>
+              </div>
+            </form>
+          </>
+        )}
       </dialog>
     </div>
   );

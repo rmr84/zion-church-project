@@ -2122,16 +2122,26 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   font-weight: 700;
   line-height: 1.35;
 }
+.toast-action,
 .toast-dismiss {
-  margin-top: 0.15rem;
+  display: inline-block;
+  margin-top: 0.35rem;
   padding: 0;
   border: 0;
   background: none;
-  color: #6b7280;
+  color: var(--teal);
   font: inherit;
   font-size: 0.88rem;
+  font-weight: 700;
   cursor: pointer;
+  text-decoration: none;
 }
+.toast-action + .toast-dismiss {
+  margin-left: 0.85rem;
+  color: #6b7280;
+  font-weight: 600;
+}
+.toast-action:hover,
 .toast-dismiss:hover { color: var(--ink); }
 .toast-close {
   width: 1.7rem;
@@ -2241,8 +2251,30 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   width: 100%;
   margin-top: 0.25rem;
 }
-.staff-editor .member-picker { z-index: 2; }
-.staff-editor .member-picker.is-open { z-index: 30; }
+.staff-editor .member-picker,
+.staff-editor .status-picker { z-index: 2; width: 100%; display: block; }
+.staff-editor .member-picker.is-open,
+.staff-editor .status-picker.is-open { z-index: 30; }
+.staff-editor .status-picker-trigger {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.45rem 0.7rem;
+  border: 2px solid var(--mist);
+  border-radius: 0.5rem;
+  background: white;
+  justify-content: space-between;
+}
+.staff-editor .status-picker.is-open .status-picker-trigger,
+.staff-editor .status-picker-trigger:focus-visible {
+  border-color: var(--orange);
+  outline: none;
+}
+.staff-editor .status-picker-menu {
+  left: 0;
+  right: 0;
+  min-width: 0;
+  width: 100%;
+}
 
 .meta {
   display: grid;

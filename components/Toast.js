@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 const ToastContext = createContext(null);
@@ -11,6 +12,7 @@ export function ToastProvider({ children }) {
   const openRef = useRef(false);
   const mountedRef = useRef(false);
   const [message, setMessage] = useState('');
+  const [action, setAction] = useState(null);
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -38,12 +40,16 @@ export function ToastProvider({ children }) {
     }, 380);
   };
 
-  const showToast = useCallback((text) => {
+  const showToast = useCallback((text, options = {}) => {
     const next = String(text || '').trim();
     if (!next) return;
+    const nextAction = options?.href && options?.label
+      ? { href: options.href, label: options.label }
+      : null;
     window.clearTimeout(hideTimer.current);
     window.clearTimeout(leaveTimer.current);
     setMessage(next);
+    setAction(nextAction);
     if (mountedRef.current && openRef.current) {
       hideTimer.current = window.setTimeout(() => dismissRef.current(), VISIBLE_MS);
       return;
@@ -95,6 +101,15 @@ export function ToastProvider({ children }) {
           </span>
           <div className="toast-body">
             <p>{message}</p>
+            {action ? (
+              <Link
+                href={action.href}
+                className="toast-action"
+                onClick={() => dismissRef.current()}
+              >
+                {action.label}
+              </Link>
+            ) : null}
             <button type="button" className="toast-dismiss" onClick={() => dismissRef.current()}>Dismiss</button>
           </div>
           <button type="button" className="toast-close" aria-label="Dismiss" onClick={() => dismissRef.current()}>

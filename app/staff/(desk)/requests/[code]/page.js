@@ -12,6 +12,14 @@ export async function generateMetadata({ params }) {
   return { title: code };
 }
 
+function titleCase(value) {
+  return String(value || '')
+    .split(' ')
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 export default async function RequestDetailPage({ params }) {
   const { code } = await params;
   const [request, members] = await Promise.all([
@@ -21,11 +29,15 @@ export default async function RequestDetailPage({ params }) {
   if (!request) notFound();
 
   const backHref = request.status === 'completed' ? '/staff/archive' : '/staff';
+  const contact = [
+    titleCase(labelFor(CONTACT_METHODS, request.contactMethod)),
+    request.contactDetail || '',
+  ].filter(Boolean).join(' · ');
 
   return (
     <section className="page-frame request-detail">
       <div className="page-heading">
-        <Link href={backHref} className="desk-back" aria-label="Back to care requests">
+        <Link href={backHref} className="desk-back" aria-label="Back To Care Requests">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -43,16 +55,17 @@ export default async function RequestDetailPage({ params }) {
           <div>
             <dl className="meta">
               <dt>From</dt>
-              <dd>{request.name || 'Name not given'}</dd>
+              <dd>{request.name ? titleCase(request.name) : 'Name Not Given'}</dd>
               <dt>Account</dt>
-              <dd>{request.requesterEmail || 'No account'}</dd>
+              <dd>{request.requesterEmail || 'No Account'}</dd>
               <dt>Contact</dt>
+              <dd>{contact}</dd>
+              <dt>Assignee</dt>
               <dd>
-                {labelFor(CONTACT_METHODS, request.contactMethod)}
-                {request.contactDetail ? ` · ${request.contactDetail}` : ''}
+                {request.assignee
+                  ? (request.assignee.includes('@') ? request.assignee : titleCase(request.assignee))
+                  : 'Unassigned'}
               </dd>
-              <dt>Assigned to</dt>
-              <dd>{request.assignee || 'Unassigned'}</dd>
               <dt>Submitted</dt>
               <dd>{formatWhen(request.createdAt)}</dd>
               <dt>Updated</dt>
@@ -64,7 +77,7 @@ export default async function RequestDetailPage({ params }) {
                 </>
               ) : null}
             </dl>
-            <h2>What they asked</h2>
+            <h2>What They Asked</h2>
             <p className="prose">{request.description}</p>
           </div>
           <StaffEditor
