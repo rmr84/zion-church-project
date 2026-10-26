@@ -1691,6 +1691,7 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
 }
 @media (max-width: 759px) {
   .request-table .user-actions { text-align: left; width: auto; }
+  .request-table td.user-actions.is-empty { display: none; }
 }
 .users-search {
   min-width: min(100%, 16rem);
