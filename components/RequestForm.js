@@ -333,6 +333,9 @@ export function RequestForm({ defaults = null }) {
       {message ? (
         <p className="field-error" id={`${step.key}-error`} tabIndex={-1} ref={errorRef}>{message}</p>
       ) : null}
+      {reviewing && errors.form ? (
+        <p className="banner error" role="alert">{errors.form}</p>
+      ) : null}
 
       <div className="builder-actions">
         {reviewing ? (
