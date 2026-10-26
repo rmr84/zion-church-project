@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { StatusFeedback } from '@/components/StatusFeedback';
 import { CARE_TYPES, CONTACT_METHODS, STATUSES, URGENCY_LEVELS, labelFor } from '@/lib/constants';
 import { formatWhen } from '@/lib/format';
 import { normalizeReferenceCode } from '@/lib/reference';
@@ -84,6 +85,12 @@ export default async function StatusPage({ searchParams }) {
                 <dd>{String(request.memberNote || '').trim() || 'The care team has not added a note yet.'}</dd>
               </div>
             </dl>
+            {request.status === 'completed' ? (
+              <StatusFeedback
+                referenceCode={request.referenceCode}
+                defaultName={request.name || ''}
+              />
+            ) : null}
           </article>
         ) : null}
       </div>

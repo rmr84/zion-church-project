@@ -9,7 +9,7 @@ export const metadata = { title: 'Care Desk' };
 export default async function HomePage() {
   const [staff, reviews] = await Promise.all([
     isStaffSignedIn(),
-    listReviews(),
+    listReviews({ status: 'approved' }),
   ]);
 
   return (

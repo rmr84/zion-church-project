@@ -779,6 +779,11 @@ body {
   font-size: 0.75rem;
 }
 
+.reviews-desk-section + .reviews-desk-section { margin-top: 2rem; }
+.reviews-desk-section h2 {
+  margin: 0 0 0.85rem;
+  font-size: 1.15rem;
+}
 .reviews-desk-list {
   display: grid;
   gap: 0.85rem;
@@ -787,6 +792,8 @@ body {
   list-style: none;
 }
 .reviews-desk-list li {
+  display: grid;
+  gap: 0.85rem;
   margin: 0;
   padding: 1.05rem 1.15rem;
   background: white;
@@ -811,6 +818,24 @@ body {
   font-style: normal;
   font-weight: 700;
   color: var(--teal);
+}
+.reviews-desk-list .button {
+  width: fit-content;
+  padding: 0.55rem 1rem;
+  font-size: 0.92rem;
+}
+.status-feedback {
+  margin-top: 1.15rem;
+}
+.status-feedback .button { width: 100%; }
+.feedback-sent {
+  margin: 1.15rem 0 0;
+  color: var(--teal);
+  font-weight: 700;
+}
+.hint-inline {
+  font-weight: 600;
+  color: var(--ink-soft);
 }
 
 .sign-out-dialog {
