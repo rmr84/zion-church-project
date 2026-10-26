@@ -805,6 +805,7 @@ body {
   margin: 0 0 0.85rem;
   font-size: 1.15rem;
 }
+.review-status-filter { margin: 0 0 1.1rem; }
 .reviews-desk-list {
   display: grid;
   gap: 0.85rem;
@@ -820,6 +821,49 @@ body {
   background: white;
   border: 1px solid #e6ebef;
   border-radius: 0.85rem;
+}
+.reviews-desk-list li.review-card {
+  position: relative;
+  padding-top: 2.65rem;
+}
+.review-card-actions {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.review-card-action {
+  width: 2rem;
+  height: 2rem;
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid #e6ebef;
+  border-radius: 0.45rem;
+  background: white;
+  padding: 0;
+  cursor: pointer;
+}
+.review-card-action svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.review-card-action.is-approve { color: var(--orange); }
+.review-card-action.is-reject { color: #6b7280; }
+.review-card-action:hover:not(:disabled) { background: #f7f8fa; }
+.review-card-action.is-approve:hover:not(:disabled) {
+  border-color: #f3c7a8;
+  background: #fff6ee;
+}
+.review-card-action.is-reject:hover:not(:disabled) {
+  border-color: #f0b4b0;
+  color: #d92d20;
+  background: #fff5f4;
+}
+.review-card-action:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 .reviews-desk-list blockquote { margin: 0; }
 .reviews-desk-list p {

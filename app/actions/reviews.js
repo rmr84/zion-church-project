@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import {
   REVIEW_STATUS_APPROVED,
+  REVIEW_STATUS_REJECTED,
   markAllReviewNotificationsSeen,
   markReviewNotificationSeen,
   setReviewStatus,
@@ -20,6 +21,16 @@ export async function approveReview(id) {
     return { ok: false, formError: 'Sign in again to update this review.' };
   }
   const result = await setReviewStatus(id, REVIEW_STATUS_APPROVED);
+  if (!result.ok) return result;
+  revalidateReviewPaths();
+  return { ok: true };
+}
+
+export async function rejectReview(id) {
+  if (!(await isStaffSignedIn())) {
+    return { ok: false, formError: 'Sign in again to update this review.' };
+  }
+  const result = await setReviewStatus(id, REVIEW_STATUS_REJECTED);
   if (!result.ok) return result;
   revalidateReviewPaths();
   return { ok: true };
