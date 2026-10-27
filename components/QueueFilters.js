@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
+import { QueueDateField } from '@/components/QueueDateField';
 import { CARE_TYPES, DESK_STATUSES, URGENCY_LEVELS } from '@/lib/constants';
 import { formatDateInput } from '@/lib/format';
 import { UNASSIGNED, activeMembers, memberLabel, memberValue } from '@/lib/members';
@@ -146,24 +147,18 @@ export function QueueFilters({
     <>
       <p className="queue-filter-label">Date submitted</p>
       <div className="queue-filter-dates">
-        <label>
-          <span>From</span>
-          <input
-            type="date"
-            value={dateFrom}
-            max={dateTo || undefined}
-            onChange={(event) => onDateFromChange(event.target.value)}
-          />
-        </label>
-        <label>
-          <span>To</span>
-          <input
-            type="date"
-            value={dateTo}
-            min={dateFrom || undefined}
-            onChange={(event) => onDateToChange(event.target.value)}
-          />
-        </label>
+        <QueueDateField
+          label="From"
+          value={dateFrom}
+          max={dateTo || undefined}
+          onChange={onDateFromChange}
+        />
+        <QueueDateField
+          label="To"
+          value={dateTo}
+          min={dateFrom || undefined}
+          onChange={onDateToChange}
+        />
       </div>
       <p className="queue-filter-label">Urgency</p>
       {URGENCY_LEVELS.map((item) => (

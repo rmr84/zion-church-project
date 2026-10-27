@@ -2393,7 +2393,7 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   gap: 0.45rem;
   margin: 0.15rem 0.35rem 0.55rem;
 }
-.queue-filter-dates label {
+.queue-date-field {
   display: flex;
   align-items: center;
   gap: 0.55rem;
@@ -2403,10 +2403,10 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   font-size: 0.82rem;
   font-weight: 700;
 }
-.queue-filter-dates label > span {
+.queue-date-field > span:first-child {
   flex: 0 0 2.5rem;
 }
-.queue-filter-dates input[type="date"] {
+.queue-date-field input[type="date"] {
   width: 10.5rem;
   max-width: 100%;
   min-width: 0;
@@ -2420,9 +2420,66 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   font-size: 0.92rem;
   font-weight: 600;
 }
-.queue-filter-dates input[type="date"]:focus {
+.queue-date-field input[type="date"]:focus {
   border-color: var(--teal);
   outline: none;
+}
+.queue-date-shell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 10.5rem;
+  max-width: 100%;
+  min-height: 2.35rem;
+  padding: 0.4rem 2.2rem 0.4rem 0.65rem;
+  border: 1px solid #e6ebef;
+  border-radius: 0.5rem;
+  background: white;
+}
+.queue-date-display {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.queue-date-display.is-empty {
+  color: #9aa3ad;
+  font-weight: 600;
+}
+.queue-date-icon {
+  position: absolute;
+  top: 50%;
+  right: 0.55rem;
+  display: grid;
+  place-items: center;
+  color: #6b7280;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.queue-date-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+.queue-date-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.queue-date-field.is-mobile input[type="date"]:focus {
+  outline: none;
+}
+.queue-date-field.is-mobile:focus-within .queue-date-shell {
+  border-color: var(--teal);
 }
 .queue-filter-menu button {
   display: flex;
@@ -2462,9 +2519,6 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 .queue-filter-dialog-body .queue-filter-dates {
   margin-left: 0;
   margin-right: 0;
-}
-.queue-filter-dialog-body .queue-filter-dates input[type="date"] {
-  width: 10.5rem;
 }
 .queue-filter-dialog-body .queue-filter-label:first-child {
   margin-top: 0;
