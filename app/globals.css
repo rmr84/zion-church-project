@@ -2315,6 +2315,57 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 }
 .queue-filter-button svg { width: 1.05rem; height: 1.05rem; color: #6b7280; }
 .queue-filter-button:hover { border-color: #d5dbe0; }
+.queue-clear-filters {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  border-radius: 0.65rem;
+  background: transparent;
+  color: var(--teal);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.queue-clear-filters:hover { color: var(--orange); }
+@media (min-width: 760px) {
+  .queue-clear-filters { margin-left: auto; }
+}
+@media (max-width: 759px) {
+  .queue-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.65rem;
+  }
+  .queue-search {
+    grid-column: 1 / -1;
+    flex: none;
+    width: 100%;
+  }
+  .queue-toolbar:has(.queue-clear-filters) .queue-search {
+    grid-column: 1;
+  }
+  .queue-clear-filters {
+    grid-column: 2;
+    grid-row: 1;
+    margin-left: 0;
+    justify-self: end;
+    white-space: nowrap;
+  }
+  .queue-switch {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+  .queue-filter {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
+  }
+}
 .queue-filter-menu {
   position: absolute;
   top: calc(100% + 0.4rem);
@@ -2383,18 +2434,6 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   cursor: pointer;
 }
 .queue-filter-menu button:hover { background: #f7f8fa; }
-.queue-filter-menu .queue-filter-clear {
-  margin-top: 0.35rem;
-  border-top: 1px solid #e6ebef;
-  border-radius: 0 0 0.45rem 0.45rem;
-  color: var(--teal);
-  font-weight: 800;
-  justify-content: center;
-}
-.queue-filter-menu .queue-filter-clear:hover {
-  background: #f3f5f7;
-  color: var(--orange);
-}
 .queue-filter-dialog {
   width: min(24rem, calc(100vw - 2rem));
   max-height: min(40rem, calc(100vh - 2rem));
@@ -2433,18 +2472,6 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   cursor: pointer;
 }
 .queue-filter-dialog-body button:hover { background: #f7f8fa; }
-.queue-filter-dialog-body .queue-filter-clear {
-  margin-top: 0.35rem;
-  border-top: 1px solid #e6ebef;
-  border-radius: 0 0 0.45rem 0.45rem;
-  color: var(--teal);
-  font-weight: 800;
-  justify-content: center;
-}
-.queue-filter-dialog-body .queue-filter-clear:hover {
-  background: #f3f5f7;
-  color: var(--orange);
-}
 .queue-filter-check {
   width: 1.15rem;
   height: 1.15rem;
@@ -2517,6 +2544,23 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
   gap: 0.4rem;
   margin-top: 1rem;
 }
+.request-pager-pages {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+.request-pager-ellipsis {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5rem;
+  color: #8b95a1;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+  user-select: none;
+}
 .request-pager button {
   min-width: 2.25rem;
   height: 2.25rem;
@@ -2539,6 +2583,38 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
 .request-pager button:focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;
+}
+@media (max-width: 759px) {
+  .request-pager {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-content: stretch;
+    align-items: center;
+    gap: 0.45rem;
+    width: min(100% - 2.5rem, var(--desk));
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .request-pager-step {
+    min-width: 0;
+    padding: 0 0.7rem;
+    font-size: 0.85rem;
+  }
+  .request-pager-pages {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    min-width: 0;
+  }
+  .request-pager-pages button {
+    min-width: 2.1rem;
+    height: 2.1rem;
+    padding: 0;
+    font-size: 0.85rem;
+  }
+  .request-pager-ellipsis {
+    min-width: 1.1rem;
+  }
 }
 .request-table {
   width: 100%;
@@ -3010,7 +3086,6 @@ main .forgot-password a { font-style: italic; font-weight: 800; }
     border-color: #d5dbe0;
     background: white;
   }
-  .request-pager { justify-content: center; }
 }
 .request-dialog {
   max-height: min(40rem, calc(100vh - 2rem));

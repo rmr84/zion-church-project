@@ -209,11 +209,6 @@ export function QueueFilters({
           />
         );
       })}
-      {pills.length > 0 ? (
-        <button className="queue-filter-clear" type="button" onClick={clearFilters}>
-          Clear filters
-        </button>
-      ) : null}
     </>
   );
 
@@ -263,6 +258,12 @@ export function QueueFilters({
             </div>
           ) : null}
         </div>
+
+        {pills.length > 0 ? (
+          <button className="queue-clear-filters" type="button" onClick={clearFilters}>
+            Clear filters
+          </button>
+        ) : null}
       </div>
 
       <dialog
@@ -292,15 +293,9 @@ export function QueueFilters({
           {filterBody}
         </div>
         <div className="modal-actions">
-          {pills.length > 0 ? (
-            <button className="button secondary" type="button" onClick={clearFilters}>
-              Clear
-            </button>
-          ) : (
-            <button className="button secondary" type="button" onClick={() => setOpen(false)}>
-              Cancel
-            </button>
-          )}
+          <button className="button secondary" type="button" onClick={() => setOpen(false)}>
+            Cancel
+          </button>
           <button className="button" type="button" onClick={() => setOpen(false)}>
             Done
           </button>

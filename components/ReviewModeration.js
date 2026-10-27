@@ -3,6 +3,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { approveReview, rejectReview } from '@/app/actions/reviews';
+import { RequestPager } from '@/components/RequestPager';
 import { useToast } from '@/components/Toast';
 
 const FILTERS = [
@@ -185,26 +186,12 @@ export function ReviewModeration({ reviews = [], canModerate = false }) {
               </li>
             ))}
           </ul>
-          {pageCount > 1 ? (
-            <nav className="request-pager" aria-label={`${filter} review pages`}>
-              <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 0}>
-                Previous
-              </button>
-              {Array.from({ length: pageCount }, (_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  aria-current={index === currentPage ? 'page' : undefined}
-                  onClick={() => setPage(index)}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount - 1}>
-                Next
-              </button>
-            </nav>
-          ) : null}
+          <RequestPager
+            page={currentPage}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            label={`${filter} review pages`}
+          />
         </>
       )}
 
