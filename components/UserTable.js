@@ -6,6 +6,7 @@ import { deletePendingUser } from '@/app/actions/users';
 import { RoleBadge } from '@/components/Badges';
 import { InviteUser } from '@/components/InviteUser';
 import { MemberAvatar } from '@/components/MemberAvatar';
+import { RequestPager } from '@/components/RequestPager';
 import { useToast } from '@/components/Toast';
 
 const PAGE_SIZE = 5;
@@ -231,26 +232,12 @@ export function UserTable({ members = [], canInvite = false }) {
               })}
             </tbody>
           </table>
-          {pageCount > 1 ? (
-            <nav className="request-pager" aria-label="User pages">
-              <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 0}>
-                Previous
-              </button>
-              {Array.from({ length: pageCount }, (_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  aria-current={index === currentPage ? 'page' : undefined}
-                  onClick={() => setPage(index)}
-                >
-                  {index + 1}
-                </button>
-              ))}
-              <button type="button" onClick={() => setPage(currentPage + 1)} disabled={currentPage === pageCount - 1}>
-                Next
-              </button>
-            </nav>
-          ) : null}
+          <RequestPager
+            page={currentPage}
+            pageCount={pageCount}
+            onPageChange={setPage}
+            label="User pages"
+          />
         </>
       )}
 

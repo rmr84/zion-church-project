@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { RequestPager } from '@/components/RequestPager';
 
 const PAGE_SIZE = 5;
 
@@ -21,30 +22,12 @@ export function EmailLogList({ entries = [] }) {
       {visible.map((entry, index) => (
         <pre key={`${currentPage}-${index}-${entry.slice(0, 40)}`} className="log">{entry}</pre>
       ))}
-      {pageCount > 1 ? (
-        <nav className="request-pager" aria-label="Email log pages">
-          <button type="button" onClick={() => setPage(currentPage - 1)} disabled={currentPage === 0}>
-            Previous
-          </button>
-          {Array.from({ length: pageCount }, (_, index) => (
-            <button
-              key={index}
-              type="button"
-              aria-current={index === currentPage ? 'page' : undefined}
-              onClick={() => setPage(index)}
-            >
-              {index + 1}
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => setPage(currentPage + 1)}
-            disabled={currentPage === pageCount - 1}
-          >
-            Next
-          </button>
-        </nav>
-      ) : null}
+      <RequestPager
+        page={currentPage}
+        pageCount={pageCount}
+        onPageChange={setPage}
+        label="Email log pages"
+      />
     </>
   );
 }
