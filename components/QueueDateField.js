@@ -37,11 +37,14 @@ export function QueueDateField({
     return () => media.removeEventListener('change', apply);
   }, []);
 
+  const boundsKey = `${min || ''}:${max || ''}`;
+
   if (!phone) {
     return (
       <label className="queue-date-field" htmlFor={inputId}>
         <span>{label}</span>
         <input
+          key={boundsKey}
           id={inputId}
           type="date"
           value={value}
@@ -66,6 +69,7 @@ export function QueueDateField({
           <CalendarIcon />
         </span>
         <input
+          key={boundsKey}
           id={inputId}
           className="queue-date-native"
           type="date"
