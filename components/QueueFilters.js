@@ -143,6 +143,21 @@ export function QueueFilters({
     }] : []),
   ];
 
+  function handleDateFromChange(value) {
+    onDateFromChange(value);
+    if (value && dateTo && dateTo < value) {
+      onDateToChange(value);
+    }
+  }
+
+  function handleDateToChange(value) {
+    if (value && dateFrom && value < dateFrom) {
+      onDateToChange(dateFrom);
+      return;
+    }
+    onDateToChange(value);
+  }
+
   const filterBody = (
     <>
       <p className="queue-filter-label">Date submitted</p>
@@ -151,13 +166,13 @@ export function QueueFilters({
           label="From"
           value={dateFrom}
           max={dateTo || undefined}
-          onChange={onDateFromChange}
+          onChange={handleDateFromChange}
         />
         <QueueDateField
           label="To"
           value={dateTo}
           min={dateFrom || undefined}
-          onChange={onDateToChange}
+          onChange={handleDateToChange}
         />
       </div>
       <p className="queue-filter-label">Urgency</p>
