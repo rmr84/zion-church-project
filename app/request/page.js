@@ -17,22 +17,22 @@ export default async function RequestPage() {
   } : null;
 
   return (
-    <section className="wrap narrow">
-      <p className="eyebrow">New request</p>
-      <h1>Request Care</h1>
-     
-      <p className="hint">If you or someone else is in danger, please call 911. This desk is not an emergency line.</p>
-      <RequestForm defaults={defaults} />
-      {!requester ? (
-         <p className="hint account-note">
-         <Link href="/sign-in">Sign In</Link>
-         {' '}
-         to your care request account if you want this request kept on your account.
-       </p>
-       
-      ) : (
-       null
-      )}
+    <section className="page-frame">
+      <div className="page-heading centered">
+        <p className="eyebrow">New request</p>
+        <h1>Request Care</h1>
+      </div>
+      <div className="wrap narrow">
+        <p className="hint">If you or someone else is in danger, please call 911. This desk is not an emergency line.</p>
+        <RequestForm defaults={defaults} />
+        {!requester ? (
+          <p className="hint account-note">
+            <Link href="/sign-in">Sign In</Link>
+            {' '}
+            to your care request account if you want this request kept on your account.
+          </p>
+        ) : null}
+      </div>
     </section>
   );
 }

@@ -13,7 +13,7 @@ export default async function ForgotPasswordPage({ searchParams }) {
 
   return (
     <section className="page-frame">
-      <div className="page-heading centered-web">
+      <div className="page-heading centered">
         <p className="eyebrow">Care requester</p>
         <h1>Forgot Password</h1>
       </div>

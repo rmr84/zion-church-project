@@ -14,7 +14,7 @@ export default async function SentPage({ searchParams }) {
 
   return (
     <section className="page-frame">
-      <div className="page-heading centered-web">
+      <div className="page-heading centered">
         <p className="eyebrow">Received</p>
         <h1>Request Received!</h1>
       </div>
