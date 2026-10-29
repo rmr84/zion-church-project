@@ -11,7 +11,7 @@ export default async function CreateAccountPage() {
 
   return (
     <section className="page-frame">
-      <div className="page-heading">
+      <div className="page-heading centered">
         <p className="eyebrow">Care requester</p>
         <h1>Create an account</h1>
       </div>

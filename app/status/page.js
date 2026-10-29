@@ -29,7 +29,7 @@ export default async function StatusPage({ searchParams }) {
 
   return (
     <section className="page-frame status-page">
-      <div className="page-heading centered-web">
+      <div className="page-heading centered">
         <p className="eyebrow">Status</p>
         <h1>Check a Request</h1>
         <p className="lede">

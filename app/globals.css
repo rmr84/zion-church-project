@@ -1533,10 +1533,15 @@ textarea[aria-invalid="true"] { border-color: #a90707; }
   margin: 0 auto 1.4rem;
   text-align: left;
 }
-.page-heading.centered { text-align: center; }
+.page-heading.centered,
+.page-heading.centered-web {
+  text-align: center;
+}
+.page-heading.centered .lede,
+.page-heading.centered-web .lede {
+  margin-inline: auto;
+}
 @media (min-width: 760px) {
-  .page-heading.centered-web { text-align: center; }
-  .page-heading.centered-web .lede { margin-inline: auto; }
   main h1 { font-size: 2.15rem; }
   .page-frame:has(.wrap.settings) .page-heading {
     width: min(100% - 2.5rem, 58rem);
